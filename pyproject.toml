@@ -1,7 +1,7 @@
 [project]
 name = "irsattend"
 version = "0.1.0"
-description = "Add your description here"
+description = "The Issaquah Robotics Society's Python program for managing attendance"
 readme = "README.md"
 authors = [
     { name = "irwinsnet", email = "stacy.k.irwin@gmail.com" }
@@ -13,6 +13,8 @@ dependencies = [
     "textual-dev>=1.7.0",
     "textual[syntax]>=5.3.0",
     "treepoem>=3.27.1",
+    "python-barcode[images]>=0.15.1",
+    "zxing-cpp>=2.3.0",
 ]
 
 [build-system]
