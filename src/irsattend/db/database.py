@@ -8,7 +8,8 @@ from .. import config
 
 # Main database connection
 def get_db_connection():
-    """Establishes a connection to the SQLite database."""
+    """Establishes a connection to the SQLite database
+    Creates one if it doesn't exist."""
     conn = sqlite3.connect(config.DB_FILE)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON;")
