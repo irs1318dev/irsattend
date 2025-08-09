@@ -3,7 +3,7 @@ from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.binding import Binding
 from textual.widgets import Header, Footer, DataTable, Static, Button, Label
-from textual.containers import Vertical, Horizontal
+from textual.containers import Vertical, Horizontal, ScrollableContainer
 
 from ..emailer import send_email
 from ..scanner.barcode_generator import generate_barcode_image
@@ -24,17 +24,18 @@ class ManagementView(Screen):
                 yield DataTable(id="student-table")
             with Vertical(id="actions-container"):
                 yield Label("Actions")
-                yield Static("No student selected", id="selection-indicator", classes="selection-info")
-                yield Static()
-                yield Button("Add Student", variant="success", id="add-student")
-                yield Button("Import from CSV", variant="success", id="import-csv")
-                yield Button("Edit Selected", id="edit-student", disabled=True)
-                yield Button("Delete Selected", variant="error", id="delete-student", disabled=True)
-                yield Static()
-                yield Label("Communication")
-                yield Button("Email Barcode to Selected", id="email-qr", disabled=True) # TODO implement email functionality
-                yield Button("Email All Barcodes", id="email-all-qr")
-                yield Static(id="status-message", classes="status") # To be used for error and success messages
+                with ScrollableContainer():
+                    yield Static("No student selected", id="selection-indicator", classes="selection-info")
+                    yield Static()
+                    yield Button("Add Student", variant="success", id="add-student")
+                    yield Button("Import from CSV", variant="success", id="import-csv")
+                    yield Button("Edit Selected", id="edit-student", disabled=True)
+                    yield Button("Delete Selected", variant="error", id="delete-student", disabled=True)
+                    yield Static()
+                    yield Label("Communication")
+                    yield Button("Email Barcode to Selected", id="email-qr", disabled=True) # TODO implement email functionality
+                    yield Button("Email All Barcodes", id="email-all-qr")
+                    yield Static(id="status-message", classes="status") # To be used for error and success messages
 
         yield Footer()
     
@@ -44,7 +45,6 @@ class ManagementView(Screen):
         self.table.add_columns("ID", "Last Name", "First Name", "Email", "Grad Year", "Attendance Count")
         self.load_student_data()
         self.selected_student_id = None
-        self.table.zebra_stripes = True
 
     # Load students from db
     def load_student_data(self) -> None:

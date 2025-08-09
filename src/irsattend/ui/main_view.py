@@ -66,8 +66,12 @@ class MainView(Screen):
                     await asyncio.sleep(0.1)
                     continue
 
+                # Resize preview based on container size
+                container_size = self.camera_view.size
+                preview_width, preview_height = self.camera.calculate_preview_size(container_size)
+                
                 # Convert frame to braille for display
-                preview = self.camera.frame_to_braille(frame, width=100, height=30)
+                preview = self.camera.frame_to_braille(frame, width=preview_width, height=preview_height)
                 
                 self.camera_view.update(preview)
 
