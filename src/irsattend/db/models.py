@@ -5,8 +5,8 @@ CREATE TABLE IF NOT EXISTS students (
     id TEXT PRIMARY KEY,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
-    email TEXT UNIQUE,
-    grad_year INTEGER
+    email TEXT UNIQUE NOT NULL,
+    grad_year INTEGER NOT NULL
 );
 """
 
