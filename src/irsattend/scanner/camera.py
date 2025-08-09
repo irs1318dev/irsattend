@@ -17,6 +17,9 @@ class Camera:
     def get_frame(self) -> tuple[bool, np.ndarray | None]:
         """Get a frame from the camera."""
         ret, frame = self.cap.read()
+        if ret and frame is not None:
+            # Mirror the camera so it looks natural
+            frame = cv2.flip(frame, 1)
         return ret, frame
     
     def release(self):

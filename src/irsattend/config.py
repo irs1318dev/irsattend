@@ -4,7 +4,7 @@ import os
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # Path to the SQLite database file
-DB_FILE = os.path.join(APP_ROOT, "db", "irsattend.db")
+DB_FILE = os.path.join(APP_ROOT, "irsattend.db")
 
 # Directory to store barcode images temporarily
 BAR_CODE_DIR = os.path.join(APP_ROOT, "barcodes")
