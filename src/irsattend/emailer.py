@@ -50,6 +50,7 @@ def send_email(email: str, student_name: str, barcode_path: str) -> Tuple[bool, 
             <div class="content">
                 <h2>Hello {student_name}! 👋</h2>
                 <p>Your attendance pass is ready! This pass is unique to you and will be used to track your attendance at every meeting.</p>
+                <p>Please star this email or take a screenshot of your QR code for personal safekeeping.</p>
 
                 <div class="pass-container">
                     <h3>Your Attendance Pass:</h3>

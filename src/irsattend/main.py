@@ -7,7 +7,7 @@ from .ui.main_view import MainView
 from .ui.management_view import ManagementView
 
 class IRSAttend(App):
-
+    CSS_PATH = "../styles/modal.tcss"
     TITLE = "IRS 1318 Attendance System"
     SCREENS = {
         "main": MainView,
