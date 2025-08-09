@@ -21,5 +21,5 @@ def generate_barcode_image(data: str, filename: str, format: str) -> str:
     elif format == 'QRCode':
         qrcode = segno.make_qr(data, error='H')
         filepath = os.path.join(config.BAR_CODE_DIR, filename)
-        qrcode.save(filepath, border=3)
+        qrcode.save(filepath, border=3, scale=10)
         return filepath
