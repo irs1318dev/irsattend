@@ -70,6 +70,12 @@ def get_all_students() -> List[sqlite3.Row]:
     with get_db_connection() as conn:
         cursor = conn.execute("SELECT * FROM students ORDER BY last_name, first_name")
         return cursor.fetchall()
+    
+def get_student_by_id(student_id: str) -> Optional[sqlite3.Row]:
+    """Retrieve a student by their ID."""
+    with get_db_connection() as conn:
+        cursor = conn.execute("SELECT * FROM students WHERE id = ?", (student_id,))
+        return cursor.fetchone()
         
 def get_attendance_counts() -> Dict[str, int]:
     """Get a dictionary of student IDs and their attendance counts."""
@@ -80,6 +86,43 @@ def get_attendance_counts() -> Dict[str, int]:
                GROUP BY student_id"""
         )
         return {row['student_id']: row['count'] for row in cursor.fetchall()}
+    
+def get_attendance_count_by_id(student_id: str) -> int:
+    """Retrieve a student's attendance count by their ID."""
+    with get_db_connection() as conn:
+        cursor = conn.execute(
+            """SELECT COUNT(id) as count
+               FROM attendance WHERE student_id = ?""", (student_id,))
+        result = cursor.fetchone()
+        return result['count'] if result else 0
+    
+def remove_last_attendance_record(student_id: str) -> Optional[datetime]:
+    """Remove the most recent attendance record for a student.
+    Returns the timestamp of the removed record if successful."""
+    with get_db_connection() as conn:
+        cursor = conn.execute(
+            """SELECT id, timestamp FROM attendance 
+               WHERE student_id = ? 
+               ORDER BY timestamp DESC 
+               LIMIT 1""",
+            (student_id,)
+        )
+        record = cursor.fetchone()
+        
+        if record:
+            conn.execute("DELETE FROM attendance WHERE id = ?", (record['id'],))
+            conn.commit()
+            return record['timestamp']
+        
+        return None
+
+def remove_all_attendance_records(student_id: str) -> int:
+    """Remove all attendance records for a student.
+    Returns the number of records removed."""
+    with get_db_connection() as conn:
+        cursor = conn.execute("DELETE FROM attendance WHERE student_id = ?", (student_id,))
+        conn.commit()
+        return cursor.rowcount
         
 # Attendance Functions
         

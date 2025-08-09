@@ -2,6 +2,7 @@
 PasswordPrompt {
     align: center middle;
 }
+
 #password-dialog {
     grid-size: 2;
     grid-gutter: 1 2;
@@ -12,14 +13,17 @@ PasswordPrompt {
     border: thick $primary 80%;
     background: $surface;
 }
+
 #password-actions {
     align: center middle;
 }
+
 #password-dialog Label {
     column-span: 2;
     width: 100%;
     content-align: center middle;
 }
+
 #password-error {
     column-span: 2;
     content-align: center middle;
@@ -29,27 +33,54 @@ PasswordPrompt {
 StudentDialog {
     align: center middle;
 }
+
 #student-dialog {
     width: 80;
-    height: 25;
+    height: 35;
     max-height: 30;
     border: thick $primary 80%;
     background: $surface;
     padding: 1;
     overflow-y: auto;
 }
+
+StudentDialog.add-mode #student-dialog {
+    height: 30;
+}
+
 #student-dialog Input {
     margin-bottom: 0;
 }
+
 #student-dialog Horizontal {
     margin-top: 1;
     align: center middle;
+}
+
+#attendance-label {
+    content-align: center middle;
+    margin-right: 2;
+    height: 3;
+}
+
+#add-attendance, #remove-attendance {
+    width: 4;
+    height: 3;
+    min-width: 4;
+    max-width: 4;
+    margin-left: 1;
+}
+
+#attendance-actions {
+    width: 100%;
+    content-align: center middle;
 }
 
 /* Delete Confirmation Dialog */
 DeleteConfirmDialog {
     align: center middle;
 }
+
 #delete-dialog {
     width: 50;
     height: 18;
@@ -57,7 +88,26 @@ DeleteConfirmDialog {
     background: $surface;
     padding: 1;
 }
+
 #delete-dialog Horizontal {
+    margin-top: 1;
+    align: center middle;
+}
+
+/* CSV Import Dialog */
+CSVImportDialog {
+    align: center middle;
+}
+
+#csv-import-dialog {
+    width: 70;
+    height: 22;
+    border: thick $primary 80%;
+    background: $surface;
+    padding: 1;
+}
+
+#csv-import-dialog Horizontal {
     margin-top: 1;
     align: center middle;
 }

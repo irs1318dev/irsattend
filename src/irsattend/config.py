@@ -1,3 +1,4 @@
+import hashlib
 import os
 
 # Main path where the app is running
@@ -18,4 +19,12 @@ SMTP_SERVER = "server"
 SMTP_PORT = 465
 SMTP_USERNAME = "noreply@team1318.org"
 SMTP_PASSWORD = "password123"
-EMAIL_SENDER_NAME = "IRS 1318 Attendance Code"
+EMAIL_SENDER_NAME = "IRS 1318 Attendance"
+
+
+# --- Admin Password ---
+# We should probably move at least secrets to an environment file
+MANAGEMENT_PASSWORD_HASH = hashlib.sha256('irs1318'.encode()).hexdigest()
+
+# --- Attendance Settings ---
+ALLOW_PHYSICAL_ID = False
