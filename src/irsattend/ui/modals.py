@@ -1,3 +1,5 @@
+import hashlib
+from .. import config
 from textual.app import ComposeResult
 from textual.widgets import ModalScreen, Vertical, Horizontal, Label, Input, Static, Button
 from textual.validation import ValidationResult, Validator
