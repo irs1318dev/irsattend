@@ -6,7 +6,7 @@ from textual.widgets import Header, Footer, Static, RichLog
 from textual.containers import Vertical, Horizontal
 
 from ..scanner.camera import Camera
-from ..scanner.barcode_reader import read_barcodes
+from ..scanner.qr_code_reader import read_qr_codes
 from ..db import database as db
 from .. import config
 
@@ -18,7 +18,7 @@ class MainView(Screen):
         ("m", "show_management", "Management"), # TODO password modal to switch
     ]
     
-    class BarcodeFound(Message):
+    class QrCodeFound(Message):
         def __init__(self, code: str) -> None:
             self.code = code
             super().__init__()
@@ -42,7 +42,7 @@ class MainView(Screen):
         try:
             self.camera = Camera()
 
-            self.scan_task = self.run_worker(self.scan_barcodes(), exclusive=False)
+            self.scan_task = self.run_worker(self.scan_qr_codes(), exclusive=False)
             self.log_widget.write(f"[green]Camera ready for scanning![/]")
         except IOError as e:
             self.camera_view.update(f"[bold red]Camera Error: {e}[/bold red]")
@@ -57,7 +57,7 @@ class MainView(Screen):
             self.camera.release()
             
     # This has to be async to not block the UI
-    async def scan_barcodes(self) -> None:
+    async def scan_qr_codes(self) -> None:
         while True:
             try:
                 ret, frame = self.camera.get_frame()
@@ -74,22 +74,22 @@ class MainView(Screen):
                 
                 self.camera_view.update(preview)
 
-                # Check for barcodes using reader
-                results = read_barcodes(frame)
+                # Check for QR codes using reader
+                results = read_qr_codes(frame)
                 if results:
                     for result in results:
                         code_text = result.text
                         if code_text and code_text not in self.scanned:
                             self.scanned.add(code_text)
-                            self.post_message(self.BarcodeFound(code_text))
+                            self.post_message(self.QrCodeFound(code_text))
 
                 await asyncio.sleep(0.1)  # delay between scans
             except Exception as e:
                 self.camera_view.update(f"[red]Camera error: {str(e)}[/]")
                 await asyncio.sleep(1)
                 break
-            
-    async def on_main_view_barcode_found(self, message: BarcodeFound) -> None:
+
+    async def on_main_view_qr_code_found(self, message: QrCodeFound) -> None:
         student_id = message.code
         
         def remove_from_scanned():

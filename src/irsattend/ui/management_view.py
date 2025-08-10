@@ -6,7 +6,7 @@ from textual.widgets import Header, Footer, DataTable, Static, Button, Label
 from textual.containers import Vertical, Horizontal, ScrollableContainer
 
 from ..emailer import send_email
-from ..scanner.barcode_generator import generate_barcode_image
+from ..scanner.qr_code_generator import generate_qr_code_image
 from .modals import CSVImportDialog, DeleteConfirmDialog, StudentDialog
 from ..db import database as db
 
@@ -114,19 +114,24 @@ class ManagementView(Screen):
                     db.update_student(**data)
                     # Might change the way this is done in the future, the current way is a pain
                     if attendance_count is not None:
+                        current_attendance = attendance
                         if attendance_count == 0:
                             db.remove_all_attendance_records(self.selected_student_id)
-                        if attendance_count > 0:
-                            difference = attendance_count - attendance
+                        elif attendance_count > 0:
+                            difference = attendance_count - current_attendance
                             if difference > 0:
+                                # This means we need to add more records
                                 for _ in range(difference):
                                     db.add_attendance_record(self.selected_student_id)
                             elif difference < 0:
+                                # This means we need to remove records
                                 for _ in range(abs(difference)):
-                                    # Not ideal, once we have proper meeting management, we need to specify which to remove
                                     db.remove_last_attendance_record(self.selected_student_id)
+
+                            self.query_one("#status-message", Static).update("[green]Student updated successfully.[/]")
+                    else:
+                        self.query_one("#status-message", Static).update("[green]Student updated successfully.[/]")
                     self.load_student_data()
-                    self.query_one("#status-message", Static).update("[green]Student updated successfully.[/]")
             await self.app.push_screen(StudentDialog(student_data=student), callback=on_dialog_closed)
             
     async def action_delete_student(self) -> None:
@@ -169,10 +174,10 @@ class ManagementView(Screen):
                 continue
 
             try:
-                barcode_path = generate_barcode_image(student['id'], f"{student['id']}.png", "QRCode")
+                qr_code_path = generate_qr_code_image(student['id'], f"{student['id']}.png", "QRCode")
                 full_name = f"{student['first_name']} {student['last_name']}"
 
-                sent, msg = send_email(student['email'], full_name, barcode_path)
+                sent, msg = send_email(student['email'], full_name, qr_code_path)
                 if sent:
                     success_count += 1
                 else:
@@ -180,9 +185,9 @@ class ManagementView(Screen):
                     status_widget.update(f"[red]Error sending to {student['email']}: {msg}[/]")
 
                 # Remove temp file
-                if os.path.exists(barcode_path):
-                    os.remove(barcode_path)
-                    
+                if os.path.exists(qr_code_path):
+                    os.remove(qr_code_path)
+
             except Exception as e:
                 fail_count += 1
                 status_widget.update(f"[red]Error processing {student['first_name']} {student['last_name']}: {str(e)}[/]")
