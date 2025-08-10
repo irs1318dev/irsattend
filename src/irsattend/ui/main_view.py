@@ -19,9 +19,8 @@ class MainView(Screen):
     ]
     
     class BarcodeFound(Message):
-        def __init__(self, code: str, format: str) -> None:
+        def __init__(self, code: str) -> None:
             self.code = code
-            self.format = format
             super().__init__()
     
     def compose(self) -> ComposeResult:
@@ -80,10 +79,9 @@ class MainView(Screen):
                 if results:
                     for result in results:
                         code_text = result.text
-                        code_format = result.format.name
                         if code_text and code_text not in self.scanned:
                             self.scanned.add(code_text)
-                            self.post_message(self.BarcodeFound(code_text, code_format))
+                            self.post_message(self.BarcodeFound(code_text))
 
                 await asyncio.sleep(0.1)  # delay between scans
             except Exception as e:
@@ -93,16 +91,9 @@ class MainView(Screen):
             
     async def on_main_view_barcode_found(self, message: BarcodeFound) -> None:
         student_id = message.code
-        format = message.format
         
         def remove_from_scanned():
             self.scanned.discard(student_id)
-        
-        # Check if we are allowing physical IDs
-        if format == "Code39" and not config.ALLOW_PHYSICAL_ID:
-            self.log_widget.write(f"[red]You cannot use your physical ID.[/]")
-            self.set_timer(2.0, remove_from_scanned)
-            return
         
         student = db.get_student_by_id(student_id)
 

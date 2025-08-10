@@ -167,7 +167,6 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "opencv-python" },
-    { name = "python-barcode", extra = ["images"] },
     { name = "segno" },
     { name = "textual", extra = ["syntax"] },
     { name = "textual-dev" },
@@ -185,7 +184,6 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "opencv-python", specifier = ">=4.12.0.88" },
-    { name = "python-barcode", extras = ["images"], specifier = ">=0.15.1" },
     { name = "segno", specifier = ">=1.6.6" },
     { name = "textual", extras = ["syntax"], specifier = ">=5.3.0" },
     { name = "textual-dev", specifier = ">=1.7.0" },
@@ -591,20 +589,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/08/ba/45911d754e8eba3d5a841a5ce61a65a685ff1798421ac054f85aa8747dfb/pytest-8.4.1.tar.gz", hash = "sha256:7c67fd69174877359ed9371ec3af8a3d2b04741818c51e5e99cc1742251fa93c", size = 1517714, upload-time = "2025-06-18T05:48:06.109Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/29/16/c8a903f4c4dffe7a12843191437d7cd8e32751d5de349d45d3fe69544e87/pytest-8.4.1-py3-none-any.whl", hash = "sha256:539c70ba6fcead8e78eebbf1115e8b589e7565830d7d006a8723f19ac8a0afb7", size = 365474, upload-time = "2025-06-18T05:48:03.955Z" },
-]
-
-[[package]]
-name = "python-barcode"
-version = "0.15.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/22/63/bc2fb47c9ba904b376780917f053b1c85b87085fd44948590e71c11187b0/python-barcode-0.15.1.tar.gz", hash = "sha256:3b1825fbdb11e597466dff4286b4ea9b1e86a57717b59e563ae679726fc854de", size = 228161, upload-time = "2023-07-05T22:56:59.962Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/10/27/9b5c5bb1938d4e6b12f4c95f40ea905c11df3cd58e128e9305397b9a2697/python_barcode-0.15.1-py3-none-any.whl", hash = "sha256:057636fba37369c22852410c8535b36adfbeb965ddfd4e5b6924455d692e0886", size = 212956, upload-time = "2023-07-05T22:56:58.596Z" },
-]
-
-[package.optional-dependencies]
-images = [
-    { name = "pillow" },
 ]
 
 [[package]]

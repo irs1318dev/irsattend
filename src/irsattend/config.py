@@ -7,8 +7,8 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 # Path to the SQLite database file
 DB_FILE = os.path.join(APP_ROOT, "irsattend.db")
 
-# Directory to store barcode images temporarily
-BAR_CODE_DIR = os.path.join(APP_ROOT, "barcodes")
+# Directory to store QR code images temporarily
+QR_CODE_DIR = os.path.join(APP_ROOT, "qr_codes")
 
 # --- Camera Display Settings ---
 # Number of the camera to use (0 is default for laptops)
@@ -25,6 +25,3 @@ EMAIL_SENDER_NAME = "IRS 1318 Attendance"
 # --- Admin Password ---
 # We should probably move at least secrets to an environment file
 MANAGEMENT_PASSWORD_HASH = hashlib.sha256('irs1318'.encode()).hexdigest()
-
-# --- Attendance Settings ---
-ALLOW_PHYSICAL_ID = False

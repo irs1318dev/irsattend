@@ -33,8 +33,8 @@ class ManagementView(Screen):
                     yield Button("Delete Selected", variant="error", id="delete-student", disabled=True)
                     yield Static()
                     yield Label("Communication")
-                    yield Button("Email Barcode to Selected", id="email-qr", disabled=True) # TODO implement email functionality
-                    yield Button("Email All Barcodes", id="email-all-qr")
+                    yield Button("Email QR Code to Selected", id="email-qr", disabled=True) # TODO implement email functionality
+                    yield Button("Email All QR Codes", id="email-all-qr")
                     yield Static(id="status-message", classes="status") # To be used for error and success messages
 
         yield Footer()
@@ -93,12 +93,12 @@ class ManagementView(Screen):
         def on_dialog_closed(data: dict | None):
             if data:
                 data.pop("attendance", None)
-                success = db.add_student(**data)
-                if success:
+                try:
+                    student_id = db.add_student(**data)
                     self.load_student_data()
-                    self.query_one("#status-message", Static).update("[green]Student added successfully.[/]")
-                else:
-                    self.query_one("#status-message", Static).update("[red]Error: Student ID or Email already exists.[/]")
+                    self.query_one("#status-message", Static).update(f"[green]Student added successfully. ID: {student_id}[/]")
+                except Exception:
+                    self.query_one("#status-message", Static).update(f"[red]Error adding student (duplicate email?)[/]")
         await self.app.push_screen(StudentDialog(), callback=on_dialog_closed)
         
     async def action_edit_student(self) -> None:

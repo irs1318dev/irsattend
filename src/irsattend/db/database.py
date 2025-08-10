@@ -1,6 +1,7 @@
 # Main database connector
 
 import sqlite3
+import random
 from datetime import datetime
 from typing import List, Optional, Tuple, Dict
 
@@ -25,6 +26,21 @@ def create_tables():
     cursor.execute(ATTENDANCE_TABLE_SCHEMA)
     conn.commit()
     conn.close()
+
+def generate_unique_student_id() -> str:
+    """Generate a unique 8-digit student ID.
+    Checks against existing IDs to ensure uniqueness."""
+    max_attempts = 100
+    
+    for _ in range(max_attempts):
+        # Generate ID
+        student_id = str(random.randint(10000000, 99999999))
+        
+        # Check if ID already exists
+        if get_student_by_id(student_id) is None:
+            return student_id
+
+    raise RuntimeError("Error generating ID")
     
 # We can add more functions here to interact with the database
 
@@ -33,21 +49,21 @@ def create_tables():
 
 # Management Panel Functions
 
-def add_student(id: str, first_name: str, last_name: str, email: str, grad_year: int) -> bool:
+def add_student(first_name: str, last_name: str, email: str, grad_year: int) -> str:
     """Add a new student to the database.
-    Returns True/False on success/fail."""
+    Returns ID on success."""
     try:
+        student_id = generate_unique_student_id()
         with get_db_connection() as conn:
             conn.execute(
                 "INSERT INTO students (id, first_name, last_name, email, grad_year) VALUES (?, ?, ?, ?, ?)",
-                (id, first_name, last_name, email, grad_year)
+                (student_id, first_name, last_name, email, grad_year)
             )
             conn.commit()
-        return True
-    except sqlite3.IntegrityError: # Catch duplicates
-        return False
+        return student_id
+    except sqlite3.IntegrityError as e:
+        raise RuntimeError(f"Failed to add student: {e}")
 
-# For now, its a good idea to not allow editing of student IDs
 def update_student(id: str, first_name: str, last_name: str, email: str, grad_year: int) -> None:
     """Edit student."""
     with get_db_connection() as conn:

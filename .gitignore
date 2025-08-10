@@ -205,5 +205,5 @@ __marimo__/
 # DB file
 **/*.db
 
-# Barcode directory
-src/irsattend/barcodes
+# QR Codes directory
+src/irsattend/qr_codes

@@ -13,7 +13,6 @@ dependencies = [
     "textual-dev>=1.7.0",
     "textual[syntax]>=5.3.0",
     "treepoem>=3.27.1",
-    "python-barcode[images]>=0.15.1",
     "zxing-cpp>=2.3.0",
 ]
 

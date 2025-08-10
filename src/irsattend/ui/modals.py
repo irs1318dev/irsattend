@@ -69,12 +69,9 @@ class StudentDialog(ModalScreen):
         self.count = self.student_data['attendance'] if self.student_data and 'attendance' in self.student_data else 0
         with Vertical(id="student-dialog"):
             yield Label(title)
-            yield Input(
-                value=self.student_data['id'] if self.student_data else "",
-                placeholder="Student ID (Barcode)",
-                id="s-id",
-                validators=[NotEmpty()]
-            )
+            # Display read-only ID for existing students, but don't show input for new students
+            if self.student_data:
+                yield Label(f"Student ID: {self.student_data['id']}")
             yield Input(
                 value=self.student_data['first_name'] if self.student_data else "",
                 placeholder="First Name",
@@ -110,9 +107,7 @@ class StudentDialog(ModalScreen):
                 yield Button("Cancel", id="cancel-student")
 
     def on_mount(self) -> None:
-        # Disable ID editing for existing students
-        if self.student_data:
-            self.query_one("#s-id", Input).disabled = True
+        self.query_one("#s-fname", Input).focus()
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "add-attendance":
@@ -130,13 +125,14 @@ class StudentDialog(ModalScreen):
                     pass
         elif event.button.id == "save-student":
             data = {
-                "id": self.query_one("#s-id", Input).value,
                 "first_name": self.query_one("#s-fname", Input).value,
                 "last_name": self.query_one("#s-lname", Input).value,
                 "email": self.query_one("#s-email", Input).value or None,
                 "grad_year": int(self.query_one("#s-gyear", Input).value) if self.query_one("#s-gyear", Input).value else None,
                 "attendance": self.count
             }
+            if self.student_data:
+                data["id"] = self.student_data['id']
             self.dismiss(data)
         elif event.button.id == "cancel-student":
             self.dismiss(None)

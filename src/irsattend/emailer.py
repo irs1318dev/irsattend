@@ -7,9 +7,9 @@ from typing import Tuple
 
 from . import config
 
-def send_email(email: str, student_name: str, barcode_path: str) -> Tuple[bool, str]:
+def send_email(email: str, student_name: str, qr_code_path: str) -> Tuple[bool, str]:
     """
-    Sends an email with a barcode to a student.
+    Sends an email with a QR Code to a student.
     """
 
     if not all([config.SMTP_SERVER, config.SMTP_USERNAME, config.SMTP_PASSWORD]):
@@ -54,7 +54,7 @@ def send_email(email: str, student_name: str, barcode_path: str) -> Tuple[bool, 
 
                 <div class="pass-container">
                     <h3>Your Attendance Pass:</h3>
-                    <img src="cid:barcode" alt="Your personal pass">
+                    <img src="cid:qr_code" alt="Your personal pass">
                 </div>
 
                 <p><strong>Important:</strong> This pass is personal to you. You are not to share it with others.</p>
@@ -71,18 +71,18 @@ def send_email(email: str, student_name: str, barcode_path: str) -> Tuple[bool, 
 
     # Add the image
     try:
-        if not os.path.exists(barcode_path):
-            return False, f"Barcode image not found at {barcode_path}"
-        
-        with open(barcode_path, 'rb') as fp:
+        if not os.path.exists(qr_code_path):
+            return False, f"QR Code image not found at {qr_code_path}"
+
+        with open(qr_code_path, 'rb') as fp:
             img = MIMEImage(fp.read())
-            img.add_header('Content-ID', '<barcode>')
-            img.add_header('Content-Disposition', 'inline', filename=os.path.basename(barcode_path))
+            img.add_header('Content-ID', '<qr_code>')
+            img.add_header('Content-Disposition', 'inline', filename=os.path.basename(qr_code_path))
             msg.attach(img)
     except FileNotFoundError:
-        return False, f"Barcode image not found at {barcode_path}."
+        return False, f"QR Code image not found at {qr_code_path}."
     except Exception as e:
-        return False, f"Error attaching barcode image: {str(e)}"
+        return False, f"Error attaching QR Code image: {str(e)}"
 
     # Send the email
     try:
