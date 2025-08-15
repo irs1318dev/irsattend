@@ -1,10 +1,15 @@
-from textual.app import App, ComposeResult
-from textual.widgets import Label
+import argparse
+import pathlib
 import signal
 import sys
+
+from textual.app import App, ComposeResult
+from textual.widgets import Label
+
 from irsattend.db import database
 from irsattend.ui.main_view import MainView
 from irsattend.ui.management_view import ManagementView
+from irsattend import config
 
 
 class IRSAttend(App):
@@ -27,12 +32,23 @@ class IRSAttend(App):
     # def action_quit(self) -> None:
     #     self.exit()
 
+def build_parser():
+    """Read command line arguments."""
+    parser = argparse.ArgumentParser(prog="IRS Attendance Program")
+    parser.add_argument("db_path", help="Path to attendance database", type=pathlib.Path)
+    parser.add_argument("config_path", help="Path to config file", type=pathlib.Path)
+    return parser
+
+def set_args():
+    parser = build_parser()
+    args = parser.parse_args()
+    config.config.update_from_args(args)
 
 def run_app():
     """Function to run the app, used for the setup.py entry_point."""
-    app = IRSAttend()
-    app.run()
-
+    
+    #app = IRSAttend()
+    #app.run()
 
 if __name__ == "__main__":
     run_app()
