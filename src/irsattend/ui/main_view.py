@@ -10,19 +10,20 @@ from ..scanner.qr_code_reader import read_qr_codes
 from ..db import database as db
 from .. import config
 
+
 class MainView(Screen):
 
     CSS_PATH = "../styles/main.tcss"
     BINDINGS = [
         ("q", "quit", "Quit"),
-        ("m", "show_management", "Management"), # TODO password modal to switch
+        ("m", "show_management", "Management"),  # TODO password modal to switch
     ]
-    
+
     class QrCodeFound(Message):
         def __init__(self, code: str) -> None:
             self.code = code
             super().__init__()
-    
+
     def compose(self) -> ComposeResult:
         yield Header()
         with Horizontal(id="main-container"):
@@ -55,7 +56,7 @@ class MainView(Screen):
             self.scan_task.cancel()
         if hasattr(self, "camera"):
             self.camera.release()
-            
+
     # This has to be async to not block the UI
     async def scan_qr_codes(self) -> None:
         while True:
@@ -67,11 +68,15 @@ class MainView(Screen):
 
                 # Resize preview based on container size
                 container_size = self.camera_view.size
-                preview_width, preview_height = self.camera.calculate_preview_size(container_size)
-                
+                preview_width, preview_height = self.camera.calculate_preview_size(
+                    container_size
+                )
+
                 # Convert frame to braille for display
-                preview = self.camera.frame_to_braille(frame, width=preview_width, height=preview_height)
-                
+                preview = self.camera.frame_to_braille(
+                    frame, width=preview_width, height=preview_height
+                )
+
                 self.camera_view.update(preview)
 
                 # Check for QR codes using reader
@@ -91,14 +96,16 @@ class MainView(Screen):
 
     async def on_main_view_qr_code_found(self, message: QrCodeFound) -> None:
         student_id = message.code
-        
+
         def remove_from_scanned():
             self.scanned.discard(student_id)
-        
+
         student = db.get_student_by_id(student_id)
 
         if not student:
-            self.log_widget.write(f"[yellow]Unknown ID scanned,\nplease talk to a mentor.[/]")
+            self.log_widget.write(
+                f"[yellow]Unknown ID scanned,\nplease talk to a mentor.[/]"
+            )
             return
 
         student_name = f"{student['first_name']} {student['last_name']}"
@@ -107,22 +114,24 @@ class MainView(Screen):
             self.log_widget.write(f"[orange3]Already attended: {student_name}[/]")
         else:
             timestamp = db.add_attendance_record(student_id)
-            self.log_widget.write(f"[green]Success: {student_name} checked in at {timestamp.strftime('%H:%M:%S')}[/]")
+            self.log_widget.write(
+                f"[green]Success: {student_name} checked in at {timestamp.strftime('%H:%M:%S')}[/]"
+            )
 
         # Wait two seconds before removing from list
         # We want to remove from the list so that the same code can be scanned again
         # In case the student is unsure if they attended the meeting
         self.set_timer(2.0, remove_from_scanned)
-            
+
     def action_show_management(self) -> None:
         from .management_view import ManagementView
         from .modals import PasswordPrompt
-        
+
         def on_password_result(success: bool | None) -> None:
             if success:
                 self.app.push_screen(ManagementView())
-        
+
         self.app.push_screen(PasswordPrompt(), callback=on_password_result)
-        
+
     def action_quit(self) -> None:
         self.app.action_quit()

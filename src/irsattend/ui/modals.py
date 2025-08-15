@@ -8,11 +8,13 @@ from textual.validation import ValidationResult, Validator
 from textual.screen import ModalScreen
 from textual.containers import Vertical, Horizontal
 
+
 class NotEmpty(Validator):
     def validate(self, value: str) -> ValidationResult:
         if not value:
             return self.failure("Field cannot be empty.")
         return self.success()
+
 
 class IsInteger(Validator):
     def validate(self, value: str) -> ValidationResult:
@@ -55,6 +57,7 @@ class PasswordPrompt(ModalScreen):
             error_msg.update("[bold red]Incorrect Password[/]")
             self.query_one("#password-input", Input).value = ""
 
+
 class StudentDialog(ModalScreen):
     """A dialog for adding or editing student details."""
 
@@ -66,40 +69,50 @@ class StudentDialog(ModalScreen):
 
     def compose(self) -> ComposeResult:
         title = "Edit Student" if self.student_data else "Add New Student"
-        self.count = self.student_data['attendance'] if self.student_data and 'attendance' in self.student_data else 0
+        self.count = (
+            self.student_data["attendance"]
+            if self.student_data and "attendance" in self.student_data
+            else 0
+        )
         with Vertical(id="student-dialog"):
             yield Label(title)
             # Display read-only ID for existing students, but don't show input for new students
             if self.student_data:
                 yield Label(f"Student ID: {self.student_data['id']}")
             yield Input(
-                value=self.student_data['first_name'] if self.student_data else "",
+                value=self.student_data["first_name"] if self.student_data else "",
                 placeholder="First Name",
                 id="s-fname",
-                validators=[NotEmpty()]
+                validators=[NotEmpty()],
             )
             yield Input(
-                value=self.student_data['last_name'] if self.student_data else "",
+                value=self.student_data["last_name"] if self.student_data else "",
                 placeholder="Last Name",
                 id="s-lname",
-                validators=[NotEmpty()]
+                validators=[NotEmpty()],
             )
             yield Input(
-                value=self.student_data['email'] if self.student_data else "",
+                value=self.student_data["email"] if self.student_data else "",
                 placeholder="Email",
                 id="s-email",
-                validators=[NotEmpty()]
+                validators=[NotEmpty()],
             )
             yield Input(
-                value=str(self.student_data['grad_year']) if self.student_data and self.student_data['grad_year'] else "",
+                value=(
+                    str(self.student_data["grad_year"])
+                    if self.student_data and self.student_data["grad_year"]
+                    else ""
+                ),
                 placeholder="Graduation Year",
                 id="s-gyear",
-                validators=[NotEmpty(), IsInteger()]
+                validators=[NotEmpty(), IsInteger()],
             )
             yield Static()
             if self.student_data:
                 with Horizontal():
-                    yield Label("Attendance Count: " + str(self.count), id="attendance-label")
+                    yield Label(
+                        "Attendance Count: " + str(self.count), id="attendance-label"
+                    )
                     yield Button("+", variant="success", id="add-attendance")
                     yield Button("-", variant="error", id="remove-attendance")
             with Horizontal(id="attendance-actions"):
@@ -113,14 +126,18 @@ class StudentDialog(ModalScreen):
         if event.button.id == "add-attendance":
             self.count += 1
             try:
-                self.query_one("#attendance-label", Label).update(f"Attendance Count: {self.count}")
+                self.query_one("#attendance-label", Label).update(
+                    f"Attendance Count: {self.count}"
+                )
             except:
                 pass
         elif event.button.id == "remove-attendance":
             if self.count > 0:
                 self.count -= 1
                 try:
-                    self.query_one("#attendance-label", Label).update(f"Attendance Count: {self.count}")
+                    self.query_one("#attendance-label", Label).update(
+                        f"Attendance Count: {self.count}"
+                    )
                 except:
                     pass
         elif event.button.id == "save-student":
@@ -128,14 +145,19 @@ class StudentDialog(ModalScreen):
                 "first_name": self.query_one("#s-fname", Input).value,
                 "last_name": self.query_one("#s-lname", Input).value,
                 "email": self.query_one("#s-email", Input).value or None,
-                "grad_year": int(self.query_one("#s-gyear", Input).value) if self.query_one("#s-gyear", Input).value else None,
-                "attendance": self.count
+                "grad_year": (
+                    int(self.query_one("#s-gyear", Input).value)
+                    if self.query_one("#s-gyear", Input).value
+                    else None
+                ),
+                "attendance": self.count,
             }
             if self.student_data:
-                data["id"] = self.student_data['id']
+                data["id"] = self.student_data["id"]
             self.dismiss(data)
         elif event.button.id == "cancel-student":
             self.dismiss(None)
+
 
 class DeleteConfirmDialog(ModalScreen):
     """A confirmation dialog for deleting students."""
@@ -164,7 +186,8 @@ class DeleteConfirmDialog(ModalScreen):
             self.dismiss(True)
         elif event.button.id == "cancel-delete":
             self.dismiss(False)
-            
+
+
 class CSVImportDialog(ModalScreen):
     """A dialog for importing students from CSV."""
 
@@ -174,8 +197,12 @@ class CSVImportDialog(ModalScreen):
             yield Static()
             yield Label("CSV Format Requirements:")
             yield Static("The CSV file must have these column headers (first row):")
-            yield Static('[yellow]"ID", "Last Name", "First Name", "Email", "Grad Year"[/yellow]')
-            yield Static("[bold red]All fields are required - no empty values allowed.[/bold red]")
+            yield Static(
+                '[yellow]"ID", "Last Name", "First Name", "Email", "Grad Year"[/yellow]'
+            )
+            yield Static(
+                "[bold red]All fields are required - no empty values allowed.[/bold red]"
+            )
             yield Static()
             yield Label("Select CSV File:")
             yield Input(placeholder="Enter full path to CSV file", id="csv-path")
@@ -199,62 +226,75 @@ class CSVImportDialog(ModalScreen):
     def start_import(self) -> None:
         csv_path = self.query_one("#csv-path", Input).value.strip()
         status_widget = self.query_one("#csv-import-status", Static)
-        
+
         if not csv_path:
             status_widget.update("[red]Please enter a file path.[/]")
             return
-            
+
         if not os.path.exists(csv_path):
             status_widget.update("[red]File not found.[/]")
             return
-            
+
         try:
             imported_students = []
-            
-            with open(csv_path, 'r', newline='', encoding='utf-8') as csvfile:
+
+            with open(csv_path, "r", newline="", encoding="utf-8") as csvfile:
                 reader = csv.DictReader(csvfile)
-                
+
                 # Check if required columns exist
-                required_columns = ["ID", "Last Name", "First Name", "Email", "Grad Year"]
-                missing_columns = [col for col in required_columns if col not in reader.fieldnames]
-                
+                required_columns = [
+                    "ID",
+                    "Last Name",
+                    "First Name",
+                    "Email",
+                    "Grad Year",
+                ]
+                missing_columns = [
+                    col for col in required_columns if col not in reader.fieldnames
+                ]
+
                 if missing_columns:
-                    status_widget.update(f"[red]Missing columns: {', '.join(missing_columns)}[/]")
+                    status_widget.update(
+                        f"[red]Missing columns: {', '.join(missing_columns)}[/]"
+                    )
                     return
-                
-                for row_num, row in enumerate(reader, start=2):  # Start at 2 since row 1 is headers
+
+                for row_num, row in enumerate(
+                    reader, start=2
+                ):  # Start at 2 since row 1 is headers
                     # Check if all rows exist
                     field_validators = {
                         "ID": NotEmpty(),
                         "First Name": NotEmpty(),
                         "Last Name": NotEmpty(),
                         "Email": NotEmpty(),
-                        "Grad Year": IsInteger()
+                        "Grad Year": IsInteger(),
                     }
-                    
+
                     for field_name, validator in field_validators.items():
                         field_value = row[field_name].strip()
                         validation_result = validator.validate(field_value)
                         if not validation_result.is_valid:
-                            status_widget.update(f"[red]Row {row_num}: {field_name} - {validation_result.failure_description}[/]")
+                            status_widget.update(
+                                f"[red]Row {row_num}: {field_name} - {validation_result.failure_description}[/]"
+                            )
                             return
-                    
+
                     student_data = {
                         "id": row["ID"].strip(),
                         "first_name": row["First Name"].strip(),
                         "last_name": row["Last Name"].strip(),
                         "email": row["Email"].strip(),
-                        "grad_year": int(row["Grad Year"].strip())
+                        "grad_year": int(row["Grad Year"].strip()),
                     }
-                    
+
                     imported_students.append(student_data)
-            
+
             if not imported_students:
                 status_widget.update("[red]No valid data found in CSV.[/]")
                 return
-                
+
             self.dismiss(imported_students)
-            
+
         except Exception as e:
             status_widget.update(f"[red]Error reading CSV: {str(e)}[/]")
-            

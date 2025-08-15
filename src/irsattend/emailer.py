@@ -7,6 +7,7 @@ from typing import Tuple
 
 from . import config
 
+
 def send_email(email: str, student_name: str, qr_code_path: str) -> Tuple[bool, str]:
     """
     Sends an email with a QR Code to a student.
@@ -14,16 +15,19 @@ def send_email(email: str, student_name: str, qr_code_path: str) -> Tuple[bool, 
 
     if not all([config.SMTP_SERVER, config.SMTP_USERNAME, config.SMTP_PASSWORD]):
         missing = []
-        if not config.SMTP_SERVER: missing.append("SMTP_SERVER")
-        if not config.SMTP_USERNAME: missing.append("SMTP_USERNAME") 
-        if not config.SMTP_PASSWORD: missing.append("SMTP_PASSWORD")
+        if not config.SMTP_SERVER:
+            missing.append("SMTP_SERVER")
+        if not config.SMTP_USERNAME:
+            missing.append("SMTP_USERNAME")
+        if not config.SMTP_PASSWORD:
+            missing.append("SMTP_PASSWORD")
         return False, f"SMTP settings missing: {', '.join(missing)}"
 
     # Create email
-    msg = MIMEMultipart('related')
-    msg['Subject'] = "Your Attendance Pass"
-    msg['From'] = f"{config.EMAIL_SENDER_NAME} <{config.SMTP_USERNAME}>"
-    msg['To'] = email
+    msg = MIMEMultipart("related")
+    msg["Subject"] = "Your Attendance Pass"
+    msg["From"] = f"{config.EMAIL_SENDER_NAME} <{config.SMTP_USERNAME}>"
+    msg["To"] = email
 
     # Email using HTML, makes it look nicer
     html_body = f"""
@@ -67,17 +71,19 @@ def send_email(email: str, student_name: str, qr_code_path: str) -> Tuple[bool, 
     </body>
     </html>
     """
-    msg.attach(MIMEText(html_body, 'html'))
+    msg.attach(MIMEText(html_body, "html"))
 
     # Add the image
     try:
         if not os.path.exists(qr_code_path):
             return False, f"QR Code image not found at {qr_code_path}"
 
-        with open(qr_code_path, 'rb') as fp:
+        with open(qr_code_path, "rb") as fp:
             img = MIMEImage(fp.read())
-            img.add_header('Content-ID', '<qr_code>')
-            img.add_header('Content-Disposition', 'inline', filename=os.path.basename(qr_code_path))
+            img.add_header("Content-ID", "<qr_code>")
+            img.add_header(
+                "Content-Disposition", "inline", filename=os.path.basename(qr_code_path)
+            )
             msg.attach(img)
     except FileNotFoundError:
         return False, f"QR Code image not found at {qr_code_path}."
@@ -86,12 +92,12 @@ def send_email(email: str, student_name: str, qr_code_path: str) -> Tuple[bool, 
 
     # Send the email
     try:
-        smtp_port = getattr(config, 'SMTP_PORT', 465)
-        
+        smtp_port = getattr(config, "SMTP_PORT", 465)
+
         with smtplib.SMTP_SSL(config.SMTP_SERVER, smtp_port) as server:
             server.login(config.SMTP_USERNAME, config.SMTP_PASSWORD)
             server.send_message(msg)
-            
+
         return True, "Email sent successfully."
     except smtplib.SMTPAuthenticationError as e:
         return False, f"SMTP Authentication failed: {str(e)}"

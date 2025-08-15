@@ -24,4 +24,4 @@ EMAIL_SENDER_NAME = "IRS 1318 Attendance"
 
 # --- Admin Password ---
 # We should probably move at least secrets to an environment file
-MANAGEMENT_PASSWORD_HASH = hashlib.sha256('irs1318'.encode()).hexdigest()
+MANAGEMENT_PASSWORD_HASH = hashlib.sha256("irs1318".encode()).hexdigest()
