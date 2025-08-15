@@ -5,10 +5,10 @@ from textual.binding import Binding
 from textual.widgets import Header, Footer, DataTable, Static, Button, Label
 from textual.containers import Vertical, Horizontal, ScrollableContainer
 
-from ..emailer import send_email
-from ..scanner.qr_code_generator import generate_qr_code_image
-from .modals import CSVImportDialog, DeleteConfirmDialog, StudentDialog
-from ..db import database as db
+from irsattend.emailer import send_email
+from irsattend.scanner.qr_code_generator import generate_qr_code_image
+from irsattend.ui.modals import CSVImportDialog, DeleteConfirmDialog, StudentDialog
+from irsattend.db import database as db
 
 
 class ManagementView(Screen):

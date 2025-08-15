@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from .. import config
+from irsattend import config
 
 
 class Camera:

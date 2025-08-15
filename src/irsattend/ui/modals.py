@@ -1,7 +1,7 @@
 import csv
 import hashlib
 import os
-from .. import config
+from irsattend import config
 from textual.app import ComposeResult
 from textual.widgets import Label, Input, Static, Button
 from textual.validation import ValidationResult, Validator

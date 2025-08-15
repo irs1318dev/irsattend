@@ -5,7 +5,7 @@ from email.mime.image import MIMEImage
 import os
 from typing import Tuple
 
-from . import config
+from irsattend import config
 
 
 def send_email(email: str, student_name: str, qr_code_path: str) -> Tuple[bool, str]:

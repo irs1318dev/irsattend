@@ -1,7 +1,7 @@
 import os
 import segno
 
-from .. import config
+from irsattend import config
 
 
 def generate_qr_code_image(data: str, filename: str) -> str:

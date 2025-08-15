@@ -2,9 +2,9 @@ from textual.app import App, ComposeResult
 from textual.widgets import Label
 import signal
 import sys
-from .db import database
-from .ui.main_view import MainView
-from .ui.management_view import ManagementView
+from irsattend.db import database
+from irsattend.ui.main_view import MainView
+from irsattend.ui.management_view import ManagementView
 
 
 class IRSAttend(App):

@@ -5,10 +5,10 @@ from textual.screen import Screen
 from textual.widgets import Header, Footer, Static, RichLog
 from textual.containers import Vertical, Horizontal
 
-from ..scanner.camera import Camera
-from ..scanner.qr_code_reader import read_qr_codes
-from ..db import database as db
-from .. import config
+from irsattend.scanner.camera import Camera
+from irsattend.scanner.qr_code_reader import read_qr_codes
+from irsattend.db import database as db
+from irsattend import config
 
 
 class MainView(Screen):

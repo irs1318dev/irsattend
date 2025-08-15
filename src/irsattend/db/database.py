@@ -5,7 +5,7 @@ import random
 from datetime import datetime
 from typing import List, Optional, Tuple, Dict
 
-from .. import config
+from irsattend import config
 
 
 # Main database connection
