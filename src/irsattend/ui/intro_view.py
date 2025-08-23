@@ -12,6 +12,14 @@ class IntroView(screen.Screen):
     """IRSAttend App Introduction Screen."""
 
     CSS_PATH = "../styles/intro.tcss"
+    BINDINGS = [
+        ("a", "take_attendance", "Take Attendance"),
+        ("r", "register_students", "Register Students"),
+        ("v", "view_records", "View Attendance Records"),
+        ("d", "configure_database", "Configure Database"),
+        ("e", "edit_settings", "Edit App Settings"),
+        ("CTRL+q", "action_quit", "Quit")
+    ]
 
     message = reactive.reactive("Initial Message!")
 
@@ -41,27 +49,27 @@ class IntroView(screen.Screen):
         status_label.update(self.message)
     
     @textual.on(widgets.Button.Pressed, "#take-attendance")
-    def take_attendance(self):
+    def action_take_attendance(self):
         """Put application in attenance mode, so students can scan QR codes."""
         self.message = "Taking attendance is not yet implemented."
 
     @textual.on(widgets.Button.Pressed, "#register-students")
-    def register_students(self):
+    def action_register_students(self):
         """Go to register students screen."""
         self.message = "Registering students is not yet implemented."
 
     @textual.on(widgets.Button.Pressed, "#view-records")
-    def view_records(self):
+    def action_view_records(self):
         """View attendance records."""
         self.message = "Viewing attendance records is not yet implemented."
 
     @textual.on(widgets.Button.Pressed, "#config-database")
-    def configure_database(self):
+    def action_configure_database(self):
         """Select a different database file or create a new one."""
         self.message = "Configuring the database is not yet implemented."
 
     @textual.on(widgets.Button.Pressed, "#edit-settings")
-    def edit_settings(self):
+    def action_edit_settings(self):
         """Go to the settings management screen."""
         self.message = "Editing settings is not yet implemented."
         
