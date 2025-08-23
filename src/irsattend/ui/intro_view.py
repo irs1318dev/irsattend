@@ -1,11 +1,8 @@
 """First screen that is displayed on app startup."""
-import pathlib
-
 import textual
-from textual import app, binding, containers, reactive, screen, widgets
+from textual import app, containers, reactive, screen, widgets
 
 from irsattend import config
-from irsattend.db import database
 
 
 class IntroView(screen.Screen):
