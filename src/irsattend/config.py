@@ -97,6 +97,15 @@ class Settings:
 # Settings class.
 settings = Settings()
 
+
+
+
+
+
+
+
+
+
 # DELETE THIS LATER
 # # Main path where the app is running
 # APP_ROOT = os.path.dirname(os.path.abspath(__file__))

@@ -1,0 +1,26 @@
+HorizontalGroup {
+    border: yellow;
+}
+Button {
+    background: purple;
+    color: yellow;
+    min-width: 25;
+    dock: none;
+    border: white;
+}
+Label.irs-label {
+    text-style: bold;
+    color: yellow;
+    height: 3;
+}
+
+Button.right {
+    dock: right;
+}
+
+Label.irs-alert {
+    text-align: center;
+    background: indigo;
+    color: thistle;
+    border: thistle;
+}
