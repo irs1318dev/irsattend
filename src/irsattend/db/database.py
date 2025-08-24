@@ -10,6 +10,10 @@ from irsattend import config
 from irsattend.db import models
 
 
+class DBaseError(Exception):
+    """Error occurred when working with database."""
+
+
 class DBase:
     """Read and write to database."""
     db_path: pathlib.Path
@@ -21,10 +25,8 @@ class DBase:
         if not self.db_path.exists() and create_new:
             self.create_tables()
         else:
-            raise config.ConfigError(
-                f"Databae file at {db_path} does not exist and create_new is False.",
-                config.ConfigError.ErrorType.PATH_DOES_NOT_EXIST
-            )
+            raise DBaseError(
+                f"Databae file at {db_path} does not exist and create_new is False.")
 
     def get_db_connection(self) -> sqlite3.Connection:
         """Get connection to the SQLite database. Create DB if it doesn't exist."""

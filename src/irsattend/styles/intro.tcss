@@ -1,12 +1,3 @@
-HorizontalGroup.outer {
-    width: 100%;
-    border: yellow;
-}
-
-HorizontalGroup.config {
-    align-horizontal: right;
-}
-
 Button {
     background: purple;
     color: yellow;
@@ -14,23 +5,54 @@ Button {
     border: white;
 }
 
-Label.config-label {
-    text-style: bold;
-    color: yellow;
-    height: 3;
+FileSelector {
+    border: yellow;
 }
 
-#top-menu {
-    align-horizontal: center
+Input {
+    background: darkslategrey;
 }
 
-Label.app-alert {
+VerticalGroup {
+    width: 30
+}
+
+.app-alert {
     text-align: center;
     background: indigo;
     color: thistle;
     border: thistle;
 }
 
-VerticalGroup {
-    width: 30
+.cancel {
+    background: gold;
+    color: indigo;
+}
+
+.config {
+    align-horizontal: right;
+}
+
+.config-row {
+    text-style: bold;
+    color: yellow;
+    height: 3;
+}
+
+.field-label {
+    color: yellow;
+    align-vertical: bottom
+}
+
+.ok {
+    background: indigo;
+}
+
+.outer {
+    width: 100%;
+    border: yellow;
+}
+
+#intro-top-menu {
+    align-horizontal: center
 }

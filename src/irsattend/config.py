@@ -3,6 +3,7 @@ import argparse
 import dataclasses
 import enum
 import pathlib
+import shutil
 import tomllib
 from typing import Optional
 
@@ -88,7 +89,17 @@ class Settings:
             file_settngs = tomllib.load(toml_file)
         for setting_name, value in file_settngs.items():
             if setting_name in app_settings:
+                if isinstance(value, str) and value.lower() in ["", "none", "null"]:
+                    value = None
                 setattr(self, setting_name, value)
+
+    def create_new_config_file(self, config_path: pathlib.Path) -> None:
+        """Create a new configuration file with default settings."""
+        if not config_path.exists():
+            shutil.copy(
+                pathlib.Path(__file__).parent / "example-config.toml",
+                config_path
+            )
 
 
 # Store settings in a module-level variable, which will be available from any
