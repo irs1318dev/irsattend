@@ -1,26 +1,36 @@
-HorizontalGroup {
+HorizontalGroup.outer {
+    width: 100%;
     border: yellow;
 }
+
+HorizontalGroup.config {
+    align-horizontal: right;
+}
+
 Button {
     background: purple;
     color: yellow;
-    min-width: 25;
-    dock: none;
+    min-width: 30;
     border: white;
 }
-Label.irs-label {
+
+Label.config-label {
     text-style: bold;
     color: yellow;
     height: 3;
 }
 
-Button.right {
-    dock: right;
+#top-menu {
+    align-horizontal: center
 }
 
-Label.irs-alert {
+Label.app-alert {
     text-align: center;
     background: indigo;
     color: thistle;
     border: thistle;
+}
+
+VerticalGroup {
+    width: 30
 }
