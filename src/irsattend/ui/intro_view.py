@@ -77,7 +77,7 @@ class DatabaseCreator(containers.Horizontal):
         """Add widgets to screen."""
         with containers.VerticalGroup():
             yield widgets.Button("Cancel", id="cancel-db-create")
-            yield widgets.Input(self.default_filename id="db-filename")
+            yield widgets.Input(self.default_filename, id="db-filename")
         yield DatabaseSelectorTree(os.getcwd(), self.default_filename)
 
     @textual.on(widgets.Input.Changed, "#db-filename")
