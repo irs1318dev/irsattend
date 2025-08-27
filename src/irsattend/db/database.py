@@ -2,11 +2,10 @@
 
 import datetime
 import pathlib
-import random
+import re
 import sqlite3
-from typing import List, Optional, Tuple, Dict
+from typing import List, Optional, Dict
 
-from irsattend import config
 from irsattend.db import models
 
 
@@ -19,14 +18,22 @@ class DBase:
     db_path: pathlib.Path
     """Path to Sqlite database."""
 
-    def __init__(self, db_path: pathlib.Path, create_new: bool = False) -> None:
+    def __init__(
+        self,
+        db_path: Optional[pathlib.Path],
+        create_new: bool = False
+    ) -> None:
         """Set database path."""
-        self.db_path = db_path
-        if not self.db_path.exists() and create_new:
-            self.create_tables()
+        if db_path is None:
+            raise DBaseError("db_path is None. Can't locate database file.")
         else:
-            raise DBaseError(
-                f"Databae file at {db_path} does not exist and create_new is False.")
+            self.db_path = db_path
+        if create_new:
+            if self.db_path.exists():
+                raise DBaseError(
+                    f"Databae file at {db_path} does not exist and create_new is False.")
+            else:
+                self.create_tables()
 
     def get_db_connection(self) -> sqlite3.Connection:
         """Get connection to the SQLite database. Create DB if it doesn't exist."""
@@ -44,22 +51,16 @@ class DBase:
         conn.commit()
         conn.close()
 
-    def generate_unique_student_id(self) -> str:
-        """Generate a unique 8-digit student ID.
-
-        Checks against existing IDs to ensure uniqueness.
-        """
-        max_attempts = 100
-
-        for _ in range(max_attempts):
-            # Generate ID
-            student_id = str(random.randint(10_000_000, 99_999_999))
-
-            # Check if ID already exists
-            if self.get_student_by_id(student_id) is None:
-                return student_id
-
-        raise RuntimeError("Error generating ID")
+    def generate_unique_student_id(
+            self,
+            first_name: str,
+            last_name: str,
+            grad_year: int
+        ) -> str:
+        """Generate a unique 8-digit student ID."""
+        id_ = f"{last_name.strip().lower()}-{first_name.strip().lower()}-{grad_year}"
+        no_punctuaion_id = re.sub(r"[.!?;,:]+", "", id_)  # Remove punctuation
+        return re.sub(r"\s+", "_", no_punctuaion_id)  # Remove internal whitespace
 
 
 # We can add more functions here to interact with the database
@@ -79,21 +80,18 @@ class DBase:
     ) -> str:
         """Add a new student to the database.
         Returns ID on success."""
-        try:
-            student_id = self.generate_unique_student_id()
-            with self.get_db_connection() as conn:
-                conn.execute(
-                    """
-                        INSERT INTO students
-                                    (id, first_name, last_name, email, grad_year)
-                             VALUES (?, ?, ?, ?, ?)
-                    """,
-                    (student_id, first_name, last_name, email, grad_year),
-                )
-                conn.commit()
-            return student_id
-        except sqlite3.IntegrityError as e:
-            raise RuntimeError(f"Failed to add student: {e}")
+        student_id = self.generate_unique_student_id(first_name, last_name, grad_year)
+        with self.get_db_connection() as conn:
+            conn.execute(
+                """
+                    INSERT INTO students
+                                (student_id, first_name, last_name, email, grad_year)
+                            VALUES (?, ?, ?, ?, ?)
+                """,
+                (student_id, first_name, last_name, email, grad_year),
+            )
+            conn.commit()
+        return student_id
 
 
     def update_student(
@@ -124,11 +122,13 @@ class DBase:
             return cursor.fetchall()
 
 
-    def get_student_by_id(self, student_id: str) -> Optional[sqlite3.Row]:
+    def get_student_by_id(self, student_id: str) -> Optional[dict[str, str | int]]:
         """Retrieve a student by their ID."""
         with self.get_db_connection() as conn:
             cursor = conn.execute("SELECT * FROM students WHERE id = ?", (student_id,))
-            return cursor.fetchone()
+            if cursor is None:
+                return None
+            return dict(cursor.fetchone())
 
 
     def get_attendance_counts(self) -> Dict[str, int]:
@@ -142,16 +142,16 @@ class DBase:
             return {row["student_id"]: row["count"] for row in cursor.fetchall()}
 
 
-        def get_attendance_count_by_id(self, student_id: str) -> int:
-            """Retrieve a student's attendance count by their ID."""
-            with self.get_db_connection() as conn:
-                cursor = conn.execute(
-                    """SELECT COUNT(id) as count
-                    FROM attendance WHERE student_id = ?""",
-                    (student_id,),
-                )
-                result = cursor.fetchone()
-                return result["count"] if result else 0
+    def get_attendance_count_by_id(self, student_id: str) -> int:
+        """Retrieve a student's attendance count by their ID."""
+        with self.get_db_connection() as conn:
+            cursor = conn.execute(
+                """SELECT COUNT(id) as count
+                FROM attendance WHERE student_id = ?""",
+                (student_id,),
+            )
+            result = cursor.fetchone()
+            return result["count"] if result else 0
 
 
     def remove_last_attendance_record(self, student_id: str) -> Optional[datetime]:

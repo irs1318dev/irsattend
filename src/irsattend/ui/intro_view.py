@@ -6,6 +6,7 @@ from textual import app, containers, reactive, screen, widgets
 
 from irsattend import config
 from irsattend.db import database
+from irsattend.ui import management_view
 from irsattend.utils import files
 
 
@@ -81,7 +82,7 @@ class IntroView(screen.Screen):
     @textual.on(widgets.Button.Pressed, "#intro-register-students")
     def action_register_students(self):
         """Go to register students screen."""
-        self.message = "Registering students is not yet implemented."
+        self.app.push_screen(management_view.ManagementView())
 
     @textual.on(widgets.Button.Pressed, "#intro-view-records")
     def action_view_records(self):
