@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS attendance (
     attendance_id INTEGER PRIMARY KEY AUTOINCREMENT,
     student_id TEXT NOT NULL,
     timestamp DATETIME NOT NULL,
-    FOREIGN KEY (student_id) REFERENCES students (id)
+    FOREIGN KEY (student_id) REFERENCES students (student_id)
 );
 """
 # "ON DELETE CASCADE " ensures that if a student is deleted,

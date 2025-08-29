@@ -1,32 +1,46 @@
+import pathlib
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 import os
-from typing import Tuple
+from typing import cast
 
 from irsattend import config
 
 
-def send_email(email: str, student_name: str, qr_code_path: str) -> Tuple[bool, str]:
+def send_email(
+    email: str,
+    student_name: str,
+    qr_code_path: pathlib.Path
+) -> tuple[bool, str]:
     """
     Sends an email with a QR Code to a student.
     """
 
-    if not all([config.SMTP_SERVER, config.SMTP_USERNAME, config.SMTP_PASSWORD]):
+    if any([
+        config.settings.smtp_server is None,
+        config.settings.smtp_username is None,
+        config.settings.smtp_password is None]
+    ):
         missing = []
-        if not config.SMTP_SERVER:
+        if config.settings.smtp_server is None:
             missing.append("SMTP_SERVER")
-        if not config.SMTP_USERNAME:
+        if config.settings.smtp_username is None:
             missing.append("SMTP_USERNAME")
-        if not config.SMTP_PASSWORD:
+        if config.settings.smtp_password is None:
             missing.append("SMTP_PASSWORD")
         return False, f"SMTP settings missing: {', '.join(missing)}"
+    else:
+        smtp_server = cast(str, config.settings.smtp_server)
+        smtp_username = cast(str, config.settings.smtp_username)
+        smtp_password = cast(str, config.settings.smtp_password)
+        email_sender_name = cast(str, config.settings.email_sender_name)
 
     # Create email
     msg = MIMEMultipart("related")
     msg["Subject"] = "Your Attendance Pass"
-    msg["From"] = f"{config.EMAIL_SENDER_NAME} <{config.SMTP_USERNAME}>"
+    msg["From"] = f"{email_sender_name} <{smtp_username}>"
     msg["To"] = email
 
     # Email using HTML, makes it look nicer
@@ -94,8 +108,8 @@ def send_email(email: str, student_name: str, qr_code_path: str) -> Tuple[bool, 
     try:
         smtp_port = getattr(config, "SMTP_PORT", 465)
 
-        with smtplib.SMTP_SSL(config.SMTP_SERVER, smtp_port) as server:
-            server.login(config.SMTP_USERNAME, config.SMTP_PASSWORD)
+        with smtplib.SMTP_SSL(smtp_server, smtp_port) as server:
+            server.login(smtp_username, smtp_password)
             server.send_message(msg)
 
         return True, "Email sent successfully."

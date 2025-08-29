@@ -4,7 +4,7 @@ import datetime
 import pathlib
 import re
 import sqlite3
-from typing import List, Optional, Dict
+from typing import Any, List, Optional, Dict
 
 from irsattend.db import models
 
@@ -95,15 +95,15 @@ class DBase:
 
 
     def update_student(
-        self, id: str, first_name: str, last_name: str, email: str, grad_year: int
+        self, student_id: str, first_name: str, last_name: str, email: str, grad_year: int
     ) -> None:
         """Edit student."""
         with self.get_db_connection() as conn:
             conn.execute(
                 """UPDATE students
                 SET first_name = ?, last_name = ?, email = ?, grad_year = ?
-                WHERE id = ?""",
-                (first_name, last_name, email, grad_year, id),
+                WHERE student_id = ?""",
+                (first_name, last_name, email, grad_year, student_id),
             )
             conn.commit()
 
@@ -111,7 +111,7 @@ class DBase:
     def delete_student(self, student_id: str):
         """Delete a student and their attendance records."""
         with self.get_db_connection() as conn:
-            conn.execute("DELETE FROM students WHERE id = ?", (student_id,))
+            conn.execute("DELETE FROM students WHERE student_id = ?", (student_id,))
             conn.commit()
 
 
@@ -122,10 +122,10 @@ class DBase:
             return cursor.fetchall()
 
 
-    def get_student_by_id(self, student_id: str) -> Optional[dict[str, str | int]]:
+    def get_student_by_id(self, student_id: str) -> Optional[dict[str, Any]]:
         """Retrieve a student by their ID."""
         with self.get_db_connection() as conn:
-            cursor = conn.execute("SELECT * FROM students WHERE id = ?", (student_id,))
+            cursor = conn.execute("SELECT * FROM students WHERE student_id = ?", (student_id,))
             if cursor is None:
                 return None
             return dict(cursor.fetchone())
@@ -135,7 +135,7 @@ class DBase:
         """Get a dictionary of student IDs and their attendance counts."""
         with self.get_db_connection() as conn:
             cursor = conn.execute(
-                """SELECT student_id, COUNT(id) as count
+                """SELECT student_id, COUNT(student_id) as count
                 FROM attendance
                 GROUP BY student_id"""
             )
@@ -146,7 +146,7 @@ class DBase:
         """Retrieve a student's attendance count by their ID."""
         with self.get_db_connection() as conn:
             cursor = conn.execute(
-                """SELECT COUNT(id) as count
+                """SELECT COUNT(student_id) as count
                 FROM attendance WHERE student_id = ?""",
                 (student_id,),
             )
@@ -154,7 +154,7 @@ class DBase:
             return result["count"] if result else 0
 
 
-    def remove_last_attendance_record(self, student_id: str) -> Optional[datetime]:
+    def remove_last_attendance_record(self, student_id: str) -> Optional[datetime.datetime]:
         """Remove the most recent attendance record for a student.
         Returns the timestamp of the removed record if successful."""
         with self.get_db_connection() as conn:
@@ -168,7 +168,9 @@ class DBase:
             record = cursor.fetchone()
 
             if record:
-                conn.execute("DELETE FROM attendance WHERE id = ?", (record["id"],))
+                conn.execute(
+                    "DELETE FROM attendance WHERE student_id = ?",
+                    (record["student_id"],))
                 conn.commit()
                 return record["timestamp"]
 
