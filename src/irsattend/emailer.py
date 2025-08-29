@@ -88,36 +88,37 @@ def send_email(
     msg.attach(MIMEText(html_body, "html"))
 
     # Add the image
-    try:
-        if not os.path.exists(qr_code_path):
-            return False, f"QR Code image not found at {qr_code_path}"
+    # try:
+    if not os.path.exists(qr_code_path):
+        return False, f"QR Code image not found at {qr_code_path}"
 
-        with open(qr_code_path, "rb") as fp:
-            img = MIMEImage(fp.read())
-            img.add_header("Content-ID", "<qr_code>")
-            img.add_header(
-                "Content-Disposition", "inline", filename=os.path.basename(qr_code_path)
-            )
-            msg.attach(img)
-    except FileNotFoundError:
-        return False, f"QR Code image not found at {qr_code_path}."
-    except Exception as e:
-        return False, f"Error attaching QR Code image: {str(e)}"
+    with open(qr_code_path, "rb") as fp:
+        img = MIMEImage(fp.read())
+        img.add_header("Content-ID", "<qr_code>")
+        img.add_header(
+            "Content-Disposition", "inline", filename=os.path.basename(qr_code_path)
+        )
+        msg.attach(img)
+    # except FileNotFoundError:
+    #     return False, f"QR Code image not found at {qr_code_path}."
+    # except Exception as e:
+    #     return False, f"Error attaching QR Code image: {str(e)}"
+    
 
     # Send the email
-    try:
-        smtp_port = getattr(config, "SMTP_PORT", 465)
+    # try:
+    smtp_port = getattr(config, "SMTP_PORT", 465)
 
-        with smtplib.SMTP_SSL(smtp_server, smtp_port) as server:
-            server.login(smtp_username, smtp_password)
-            server.send_message(msg)
+    with smtplib.SMTP_SSL(smtp_server, smtp_port) as server:
+        server.login(smtp_username, smtp_password)
+        server.send_message(msg)
 
-        return True, "Email sent successfully."
-    except smtplib.SMTPAuthenticationError as e:
-        return False, f"SMTP Authentication failed: {str(e)}"
-    except smtplib.SMTPServerDisconnected as e:
-        return False, f"SMTP Server disconnected: {str(e)}"
-    except smtplib.SMTPException as e:
-        return False, f"SMTP error: {str(e)}"
-    except Exception as e:
-        return False, f"Failed to send email: {str(e)}"
+    return True, "Email sent successfully."
+    # except smtplib.SMTPAuthenticationError as e:
+    #     return False, f"SMTP Authentication failed: {str(e)}"
+    # except smtplib.SMTPServerDisconnected as e:
+    #     return False, f"SMTP Server disconnected: {str(e)}"
+    # except smtplib.SMTPException as e:
+    #     return False, f"SMTP error: {str(e)}"
+    # except Exception as e:
+    #     return False, f"Failed to send email: {str(e)}"

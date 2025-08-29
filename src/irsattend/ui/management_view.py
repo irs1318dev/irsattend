@@ -236,7 +236,7 @@ class ManagementView(Screen):
 
             try:
                 qr_code_path = generate_qr_code_image(
-                    student["student_id"], f"{student['id']}.png" #, "QRCode"
+                    student["student_id"], f"{student['student_id']}.png" #, "QRCode"
                 )
                 full_name = f"{student['first_name']} {student['last_name']}"
 

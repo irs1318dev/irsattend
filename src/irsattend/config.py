@@ -89,9 +89,12 @@ class Settings:
             file_settngs = tomllib.load(toml_file)
         for setting_name, value in file_settngs.items():
             if setting_name in app_settings:
-                if isinstance(value, str) and value.lower() in ["", "none", "null"]:
+                if setting_name == "qr_code_dir" and setting_name is not None:
+                    self.qr_code_dir = pathlib.Path(setting_name)
+                elif isinstance(value, str) and value.lower() in ["", "none", "null"]:
                     value = None
-                setattr(self, setting_name, value)
+                else:
+                    setattr(self, setting_name, value)
 
     def create_new_config_file(self, config_path: pathlib.Path) -> None:
         """Create a new configuration file with default settings."""

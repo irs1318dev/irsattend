@@ -78,7 +78,7 @@ class StudentDialog(ModalScreen):
             yield Label(title)
             # Display read-only ID for existing students, but don't show input for new students
             if self.student_data:
-                yield Label(f"Student ID: {self.student_data['id']}")
+                yield Label(f"Student ID: {self.student_data['student_id']}")
             yield Input(
                 value=self.student_data["first_name"] if self.student_data else "",
                 placeholder="First Name",
@@ -125,21 +125,17 @@ class StudentDialog(ModalScreen):
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "add-attendance":
             self.count += 1
-            try:
-                self.query_one("#attendance-label", Label).update(
-                    f"Attendance Count: {self.count}"
-                )
-            except:
-                pass
+            self.query_one("#attendance-label", Label).update(
+                f"Attendance Count: {self.count}"
+            )
+
         elif event.button.id == "remove-attendance":
             if self.count > 0:
                 self.count -= 1
-                try:
-                    self.query_one("#attendance-label", Label).update(
-                        f"Attendance Count: {self.count}"
-                    )
-                except:
-                    pass
+                self.query_one("#attendance-label", Label).update(
+                    f"Attendance Count: {self.count}"
+                )
+
         elif event.button.id == "save-student":
             data = {
                 "first_name": self.query_one("#s-fname", Input).value,
@@ -153,7 +149,7 @@ class StudentDialog(ModalScreen):
                 "attendance": self.count,
             }
             if self.student_data:
-                data["id"] = self.student_data["id"]
+                data["student_id"] = self.student_data["student_id"]
             self.dismiss(data)
         elif event.button.id == "cancel-student":
             self.dismiss(None)
@@ -281,7 +277,7 @@ class CSVImportDialog(ModalScreen):
                             return
 
                     student_data = {
-                        "id": row["ID"].strip(),
+                        "student_id": row["ID"].strip(),
                         "first_name": row["First Name"].strip(),
                         "last_name": row["Last Name"].strip(),
                         "email": row["Email"].strip(),
