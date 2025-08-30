@@ -21,7 +21,8 @@ def send_email(
     if any([
         config.settings.smtp_server is None,
         config.settings.smtp_username is None,
-        config.settings.smtp_password is None]
+        config.settings.smtp_password is None,
+        config.settings.smtp_port is None]
     ):
         missing = []
         if config.settings.smtp_server is None:
@@ -36,6 +37,7 @@ def send_email(
         smtp_username = cast(str, config.settings.smtp_username)
         smtp_password = cast(str, config.settings.smtp_password)
         email_sender_name = cast(str, config.settings.email_sender_name)
+        smtp_port = cast(int, config.settings.smtp_port)
 
     # Create email
     msg = MIMEMultipart("related")
@@ -95,10 +97,17 @@ def send_email(
     with open(qr_code_path, "rb") as fp:
         img = MIMEImage(fp.read())
         img.add_header("Content-ID", "<qr_code>")
+        # Send QR code both inline and as file attachment (easy to save in gallary).
         img.add_header(
             "Content-Disposition", "inline", filename=os.path.basename(qr_code_path)
         )
+        img.add_header(
+            "Content-Disposition", "attachment", filename=os.path.basename(qr_code_path)
+        )
         msg.attach(img)
+
+
+
     # except FileNotFoundError:
     #     return False, f"QR Code image not found at {qr_code_path}."
     # except Exception as e:
@@ -107,11 +116,17 @@ def send_email(
 
     # Send the email
     # try:
-    smtp_port = getattr(config, "SMTP_PORT", 465)
 
-    with smtplib.SMTP_SSL(smtp_server, smtp_port) as server:
-        server.login(smtp_username, smtp_password)
-        server.send_message(msg)
+    # Note: IHS WIFI blocks gmail.
+    if smtp_port == 465:
+        with smtplib.SMTP_SSL(smtp_server, smtp_port) as server:
+            server.login(smtp_username, smtp_password)
+            server.send_message(msg)
+    else:
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_username, smtp_password)
+            server.send_message(msg)
 
     return True, "Email sent successfully."
     # except smtplib.SMTPAuthenticationError as e:
