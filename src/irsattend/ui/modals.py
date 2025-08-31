@@ -51,7 +51,7 @@ class PasswordPrompt(ModalScreen):
         password = self.query_one("#password-input", Input).value
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         error_msg = self.query_one("#password-error", Static)
-        if hashed_password == config.MANAGEMENT_PASSWORD_HASH:
+        if hashed_password == config.settings.password_hash:
             self.dismiss(True)  # Dismiss with success
         else:
             error_msg.update("[bold red]Incorrect Password[/]")

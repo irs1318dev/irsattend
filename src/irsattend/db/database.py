@@ -1,7 +1,7 @@
-"""Manage all database operations."""
-
+"""Connect to the Sqlite database and run queries."""
 import datetime
 import pathlib
+import random
 import re
 import sqlite3
 from typing import Any, List, Optional, Dict
@@ -58,18 +58,12 @@ class DBase:
             grad_year: int
         ) -> str:
         """Generate a unique 8-digit student ID."""
-        id_ = f"{last_name.strip().lower()}-{first_name.strip().lower()}-{grad_year}"
-        no_punctuaion_id = re.sub(r"[.!?;,:]+", "", id_)  # Remove punctuation
-        return re.sub(r"\s+", "_", no_punctuaion_id)  # Remove internal whitespace
-
-
-# We can add more functions here to interact with the database
-
-# We probably want Add Student, Remove Student, Edit Student, Get Student
-# Get all Students, Get Attendance Record by Student ID & Timestamp, and others
-
-# Management Panel Functions
-
+        id_ = (
+            f"{last_name.strip().lower()}-{first_name.strip().lower()}"
+            f"-{grad_year}-{random.randint(1, 999):03}")
+        no_punctuation_id = re.sub(r"[.!?;,:]+", "", id_)  # Remove punctuation
+        final_id = re.sub(r"\s+", "_", no_punctuation_id)  # Remove internal whitespace
+        return final_id
 
     def add_student(
         self,
@@ -79,23 +73,30 @@ class DBase:
         grad_year: int
     ) -> str:
         """Add a new student to the database.
-        Returns ID on success."""
+
+        Returns:
+            student_id
+        
+        Raises:
+            sqlite3.IntegrityError if insert query is not successful.
+        """
         student_id = self.generate_unique_student_id(first_name, last_name, grad_year)
         with self.get_db_connection() as conn:
-            conn.execute(
-                """
-                    INSERT INTO students
-                                (student_id, first_name, last_name, email, grad_year)
-                            VALUES (?, ?, ?, ?, ?)
-                """,
+            conn.execute("""
+                INSERT INTO students
+                            (student_id, first_name, last_name, email, grad_year)
+                        VALUES (?, ?, ?, ?, ?);""",
                 (student_id, first_name, last_name, email, grad_year),
             )
-            conn.commit()
         return student_id
-
-
+    
     def update_student(
-        self, student_id: str, first_name: str, last_name: str, email: str, grad_year: int
+        self,
+        student_id: str,
+        first_name: str,
+        last_name: str,
+        email: str,
+        grad_year: int
     ) -> None:
         """Edit student."""
         with self.get_db_connection() as conn:
@@ -107,20 +108,17 @@ class DBase:
             )
             conn.commit()
 
-
     def delete_student(self, student_id: str):
         """Delete a student and their attendance records."""
         with self.get_db_connection() as conn:
             conn.execute("DELETE FROM students WHERE student_id = ?", (student_id,))
             conn.commit()
 
-
     def get_all_students(self) -> List[sqlite3.Row]:
         """Retrieve all students from the database."""
         with self.get_db_connection() as conn:
             cursor = conn.execute("SELECT * FROM students ORDER BY last_name, first_name")
             return cursor.fetchall()
-
 
     def get_student_by_id(self, student_id: str) -> Optional[dict[str, Any]]:
         """Retrieve a student by their ID."""
@@ -129,7 +127,6 @@ class DBase:
             if cursor is None:
                 return None
             return dict(cursor.fetchone())
-
 
     def get_attendance_counts(self) -> Dict[str, int]:
         """Get a dictionary of student IDs and their attendance counts."""
@@ -141,7 +138,6 @@ class DBase:
             )
             return {row["student_id"]: row["count"] for row in cursor.fetchall()}
 
-
     def get_attendance_count_by_id(self, student_id: str) -> int:
         """Retrieve a student's attendance count by their ID."""
         with self.get_db_connection() as conn:
@@ -152,7 +148,6 @@ class DBase:
             )
             result = cursor.fetchone()
             return result["count"] if result else 0
-
 
     def remove_last_attendance_record(self, student_id: str) -> Optional[datetime.datetime]:
         """Remove the most recent attendance record for a student.
@@ -176,7 +171,6 @@ class DBase:
 
             return None
 
-
     def remove_all_attendance_records(self, student_id: str) -> int:
         """Remove all attendance records for a student.
         Returns the number of records removed."""
@@ -186,10 +180,6 @@ class DBase:
             )
             conn.commit()
             return cursor.rowcount
-
-
-# Attendance Functions
-
 
     def add_attendance_record(
         self,
@@ -205,7 +195,6 @@ class DBase:
             )
             conn.commit()
         return timestamp
-
 
     def has_attended_today(self, student_id: str) -> bool:
         """Check if a student has already been marked present today.

@@ -6,7 +6,7 @@ from textual import app, containers, reactive, screen, widgets
 
 from irsattend import config
 from irsattend.db import database
-from irsattend.ui import management_view
+from irsattend.ui import management_view, scan_view
 from irsattend.utils import files
 
 
@@ -77,7 +77,7 @@ class IntroView(screen.Screen):
     @textual.on(widgets.Button.Pressed, "#intro-take-attendance")
     def action_take_attendance(self):
         """Put application in attenance mode, so students can scan QR codes."""
-        self.message = "Taking attendance is not yet implemented."
+        self.app.push_screen(scan_view.ScanView())
 
     @textual.on(widgets.Button.Pressed, "#intro-register-students")
     def action_register_students(self):

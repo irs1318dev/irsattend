@@ -1,26 +1,22 @@
-import os
-from textual.app import ComposeResult
-from textual.screen import Screen
-from textual.binding import Binding
-from textual.widgets import Header, Footer, DataTable, Static, Button, Label
-from textual.containers import Vertical, Horizontal, ScrollableContainer
+"""View roster and add new students."""
+import sqlite3
 
-from irsattend.emailer import send_email
-from irsattend.scanner.qr_code_generator import generate_qr_code_image
-from irsattend.ui.modals import CSVImportDialog, DeleteConfirmDialog, StudentDialog
+from textual import app, binding, containers, screen, widgets
+
+from irsattend import config, emailer
 from irsattend.db import database
-from irsattend import config
+from irsattend.scanner import qr_code_generator
+from irsattend.ui import modals
 
 
-class ManagementView(Screen):
+class ManagementView(screen.Screen):
     """Add, delete, and edit students."""
     dbase: database.DBase
     """Connection to Sqlite Database."""
 
-
     CSS_PATH = "../styles/management.tcss"
     BINDINGS = [
-        Binding("escape", "app.pop_screen", "Back to Main Screen", show=True),
+        binding.Binding("escape", "app.pop_screen", "Back to Main Screen", show=True),
     ]
 
     def __init__(self) -> None:
@@ -28,44 +24,47 @@ class ManagementView(Screen):
         super().__init__()
         self.dbase = database.DBase(config.settings.db_path)
 
-    def compose(self) -> ComposeResult:
-        yield Header()
-        with Horizontal():
-            with Vertical(id="student-list-container"):
-                yield Label("Student List")
-                yield DataTable(id="student-table")
-            with Vertical(id="actions-container"):
-                yield Label("Actions")
-                with ScrollableContainer():
-                    yield Static(
+    def compose(self) -> app.ComposeResult:
+        yield widgets.Header()
+        with containers.Horizontal():
+            with containers.Vertical(id="student-list-container"):
+                yield widgets.Label("Student List")
+                yield widgets.DataTable(id="student-table")
+            with containers.Vertical(id="actions-container"):
+                yield widgets.Label("Actions")
+                with containers.ScrollableContainer():
+                    yield widgets.Static(
                         "No student selected",
                         id="selection-indicator",
                         classes="selection-info",
                     )
-                    yield Static()
-                    yield Button("Add Student", variant="success", id="add-student")
-                    yield Button("Import from CSV", variant="success", id="import-csv")
-                    yield Button("Edit Selected", id="edit-student", disabled=True)
-                    yield Button(
+                    yield widgets.Static()
+                    yield widgets.Button(
+                        "Add Student", variant="success", id="add-student")
+                    yield widgets.Button(
+                        "Import from CSV", variant="success", id="import-csv")
+                    yield widgets.Button(
+                        "Edit Selected", id="edit-student", disabled=True)
+                    yield widgets.Button(
                         "Delete Selected",
                         variant="error",
                         id="delete-student",
                         disabled=True,
                     )
-                    yield Static()
-                    yield Label("Communication")
-                    yield Button(
+                    yield widgets.Static()
+                    yield widgets.Label("Communication")
+                    yield widgets.Button(
                         "Email QR Code to Selected", id="email-qr", disabled=True
                     )  # TODO implement email functionality
-                    yield Button("Email All QR Codes", id="email-all-qr")
-                    yield Static(
+                    yield widgets.Button("Email All QR Codes", id="email-all-qr")
+                    yield widgets.Static(
                         id="status-message", classes="status"
                     )  # To be used for error and success messages
 
-        yield Footer()
+        yield widgets.Footer()
 
     def on_mount(self) -> None:
-        self.table = self.query_one(DataTable)
+        self.table = self.query_one(widgets.DataTable)
         self.table.cursor_type = "row"
         self.table.add_columns(
             "ID", "Last Name", "First Name", "Email", "Grad Year", "Attendance Count"
@@ -90,25 +89,24 @@ class ManagementView(Screen):
             )
 
     # Handle selecting row
-    def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
+    def on_data_table_row_selected(self, event: widgets.DataTable.RowSelected) -> None:
         self.selected_student_id = event.row_key.value
         if self.selected_student_id is None:
             return
-        self.query_one("#edit-student", Button).disabled = False
-        self.query_one("#delete-student", Button).disabled = False
+        self.query_one("#edit-student", widgets.Button).disabled = False
+        self.query_one("#delete-student", widgets.Button).disabled = False
         student = self.dbase.get_student_by_id(self.selected_student_id)
-        self.query_one("#email-qr", Button).disabled = not (
+        self.query_one("#email-qr", widgets.Button).disabled = not (
             student and student["email"]
         )
 
         if student:
-            selection_text = (
+            self.update_status(
                 f"[bold]Selected:[/bold]\n{student['first_name']} "
                 f"{student['last_name']}\nID: {student['student_id']}")
-            self.query_one("#selection-indicator", Static).update(selection_text)
 
     # Handle button press
-    async def on_button_pressed(self, event: Button.Pressed) -> None:
+    async def on_button_pressed(self, event: widgets.Button.Pressed) -> None:
         if event.button.id == "add-student":
             await self.action_add_student()
         elif event.button.id == "import-csv":
@@ -123,21 +121,25 @@ class ManagementView(Screen):
             self.action_email_qr(all_students=True)
 
     async def action_add_student(self) -> None:
+        """Show the student dialog and add a new student."""
         def on_dialog_closed(data: dict | None):
-            if data:
-                data.pop("attendance", None)
-                # try:
+            if data is None:
+                return
+            data.pop("attendance", None)
+            try:
                 student_id = self.dbase.add_student(**data)
-                self.load_student_data()
-                self.query_one("#status-message", Static).update(
-                    f"[green]Student added successfully. ID: {student_id}[/]"
+            except sqlite3.IntegrityError as err:
+                self.update_status(
+                    "[red]Error adding student "
+                    f"{data["first_name"]} {data["last_name"]}.[/]\n"
+                    f"Error Description:\n{err}"
                 )
-                # except Exception:
-                #     self.query_one("#status-message", Static).update(
-                #         f"[red]Error adding student (duplicate email?)[/]"
-                #     )
-
-        await self.app.push_screen(StudentDialog(), callback=on_dialog_closed)
+            else:
+                self.load_student_data()
+                self.query_one("#status-message", widgets.Static).update(
+                    f"[green]Student added successfully. ID: {student_id}[/]")
+                    
+        await self.app.push_screen(modals.StudentDialog(), callback=on_dialog_closed)
 
     async def action_edit_student(self) -> None:
         if self.selected_student_id is None:
@@ -171,18 +173,13 @@ class ManagementView(Screen):
                             self.dbase.remove_last_attendance_record(
                                 self.selected_student_id
                             )
-
-                    self.query_one("#status-message", Static).update(
-                        "[green]Student updated successfully.[/]"
-                    )
+                    self.update_status("[green]Student updated successfully.[/]")
             else:
-                self.query_one("#status-message", Static).update(
-                    "[green]Student updated successfully.[/]"
-                )
+                self.update_status("[green]Student updated successfully.[/]")
             self.load_student_data()
 
         await self.app.push_screen(
-            StudentDialog(student_data=student), callback=on_dialog_closed
+            modals.StudentDialog(student_data=student), callback=on_dialog_closed
         )
 
     async def action_delete_student(self) -> None:
@@ -198,18 +195,16 @@ class ManagementView(Screen):
                 if self.selected_student_id is not None:
                     self.dbase.delete_student(self.selected_student_id)
                 self.load_student_data()
-                self.query_one("#status-message", Static).update(
-                    "[green]Student deleted successfully.[/]"
-                )
+                self.update_status("[green]Student deleted successfully.[/]")
                 self.selected_student_id = None
-                self.query_one("#edit-student", Button).disabled = True
-                self.query_one("#delete-student", Button).disabled = True
-                self.query_one("#selection-indicator", Static).update(
+                self.query_one("#edit-student", widgets.Button).disabled = True
+                self.query_one("#delete-student", widgets.Button).disabled = True
+                self.query_one("#selection-indicator", widgets.Static).update(
                     "No student selected"
                 )
 
         await self.app.push_screen(
-            DeleteConfirmDialog(student_name, student["student_id"]),
+            modals.DeleteConfirmDialog(student_name, student["student_id"]),
             callback=on_confirm_closed,
         )
 
@@ -225,7 +220,7 @@ class ManagementView(Screen):
         self.run_worker(self.send_emails_worker(students_to_email), exclusive=False)
 
     async def send_emails_worker(self, students_to_email: list) -> None:
-        status_widget = self.query_one("#status-message", Static)
+        # status_widget = self.query_one("#status-message", Static)
         success_count = 0
         fail_count = 0
 
@@ -233,45 +228,49 @@ class ManagementView(Screen):
             if not student["email"]:
                 fail_count += 1
                 continue
-
             try:
-                qr_code_path = generate_qr_code_image(
+                qr_code_path = qr_code_generator.generate_qr_code_image(
                     student["student_id"], f"{student['student_id']}.png" #, "QRCode"
                 )
+                if qr_code_path is None:
+                    self.update_status(
+                        f"[red]Error generating QR code for"
+                        f"{student['first_name']} {student['last_name']}[/]"
+                    )
+                    return
                 full_name = f"{student['first_name']} {student['last_name']}"
-
-                sent, msg = send_email(student["email"], full_name, qr_code_path)
+                sent, msg = emailer.send_email(
+                    student["email"], full_name, qr_code_path)
                 if sent:
                     success_count += 1
                 else:
                     fail_count += 1
-                    status_widget.update(
-                        f"[red]Error sending to {student['email']}: {msg}[/]"
-                    )
-
+                    self.update_status(f"[red]Error sending to {student['email']}: {msg}[/]")
                 # Remove temp file
                 if qr_code_path is not None and qr_code_path.exists():
                     qr_code_path.unlink()
 
             except Exception as e:
                 fail_count += 1
-                status_widget.update(
-                    f"[red]Error processing {student['first_name']} {student['last_name']}: {str(e)}[/]"
-                )
+                self.update_status(
+                    f"[red]Error processing {student['first_name']} "
+                    f"{student['last_name']}: {str(e)}[/]")
                 raise(e)
 
         # Add final msg after all emails are sent
         final_msg = f"[green]Sent {success_count} emails.[/]"
         if fail_count > 0:
-            final_msg += f" [red]Failed to send {fail_count} (check SMTP config/student emails).[/]"
-        status_widget.update(final_msg)
+            final_msg += (
+                f" [red]Failed to send {fail_count} "
+                "(check SMTP config/student emails).[/]"
+            )
+        self.update_status(final_msg)
 
     async def action_import_csv(self) -> None:
         def on_import_closed(imported_students: list | None):
             if imported_students:
                 success_count = 0
                 error_count = 0
-
                 for student_data in imported_students:
                     success = self.dbase.add_student(**student_data)
                     if success:
@@ -282,11 +281,17 @@ class ManagementView(Screen):
                 self.load_student_data()
 
                 if error_count == 0:
-                    self.query_one("#status-message", Static).update(
+                    self.update_status(
                         f"[green]Successfully imported {success_count} students.[/]"
                     )
                 else:
-                    error_msg = f"[green]Imported {success_count} students.[/] [red]Failed to import {error_count} students. (If they are duplicates, you can ignore this message.)[/]"
-                    self.query_one("#status-message", Static).update(error_msg)
+                    self.update_status(
+                        f"[green]Imported {success_count} students.[/] "
+                        f" [red]Failed to import {error_count} students. "
+                        "(If they are duplicates, you can ignore this message.)[/]")
 
-        await self.app.push_screen(CSVImportDialog(), callback=on_import_closed)
+        await self.app.push_screen(modals.CSVImportDialog(), callback=on_import_closed)
+
+    def update_status(self, message: str) -> None:
+        """Update the text in the status widget."""
+        self.query_one("#status-message", widgets.Static).update(message)

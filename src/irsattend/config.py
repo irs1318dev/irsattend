@@ -38,7 +38,7 @@ class Settings:
     qr_code_dir: Optional[pathlib.Path] = None
     password_hash: Optional[str] = (
         "095eaa09cd36d1f1e7a963c9ad618edab13f466882c9027ab81ffc18b0eb727e") # 1318
-    camera_number = 0
+    camera_number: int = 0
     smtp_server: Optional[str] = None
     smtp_port: int = 465
     smtp_username: Optional[str] = None
@@ -110,38 +110,3 @@ class Settings:
 # to as a Singleton pattern, because there is only a single instance of the
 # Settings class.
 settings = Settings()
-
-
-
-
-
-
-
-
-
-
-# DELETE THIS LATER
-# # Main path where the app is running
-# APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-
-# # Path to the SQLite database file
-# DB_FILE = os.path.join(APP_ROOT, "irsattend.db")
-
-# # Directory to store QR code images temporarily
-# QR_CODE_DIR = os.path.join(APP_ROOT, "qr_codes")
-
-# # --- Camera Display Settings ---
-# # Number of the camera to use (0 is default for laptops)
-# CAMERA_NUMBER = 0
-
-# # --- Email Settings ---
-# SMTP_SERVER = "server"
-# SMTP_PORT = 465
-# SMTP_USERNAME = "noreply@team1318.org"
-# SMTP_PASSWORD = "password123"
-# EMAIL_SENDER_NAME = "IRS 1318 Attendance"
-
-
-# # --- Admin Password ---
-# # We should probably move at least secrets to an environment file
-# MANAGEMENT_PASSWORD_HASH = hashlib.sha256("irs1318".encode()).hexdigest()
