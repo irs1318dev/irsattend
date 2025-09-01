@@ -1,18 +1,62 @@
+"""Send QR Code Emails."""
+from collections.abc import Iterator
+from email.mime import  image, multipart, text
 import pathlib
+import sqlite3
 import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.image import MIMEImage
-import os
 from typing import cast
 
-from irsattend.model import config
+from irsattend.model import config, database, qr_code_generator
+
+
+class EmailError(Exception):
+    """Error while creating or sending emails."""
+
+
+def send_all_emails(
+    qr_folder: pathlib.Path,
+    students: list[sqlite3.Row]
+) -> Iterator[tuple[str, int]]:
+    """Send an email with a QR code to all students."""
+    for student in students:
+        qr_path = qr_folder / f"{student["student_id"]}.png"
+        if not qr_path.exists():
+            qr_code_generator.generate_qr_code_image(student["student_id"], qr_path)
+        qr_image = _get_qr_image(qr_path)
+        try:
+            send_email(
+                student["email"],
+                f"{student['first_name']} {student['last_name']}",
+                qr_image
+            )
+        except (
+            smtplib.SMTPAuthenticationError, smtplib.SMTPAuthenticationError,
+            smtplib.SMTPException
+        ):
+            yield student["student_id"], 1
+        else:
+            yield student["student_id"], 1
+        
+
+def _get_qr_image(qr_code_path: pathlib.Path) -> image.MIMEImage:
+    """Open QR Codde image file and create email image object."""
+    with open(qr_code_path, "rb") as fp:
+        img = image.MIMEImage(fp.read())
+    img.add_header("Content-ID", "<qr_code>")
+    # Send QR code both inline and as file attachment (easy to save in gallary).
+    img.add_header(
+        "Content-Disposition", "inline", filename=qr_code_path.name
+    )
+    img.add_header(
+        "Content-Disposition", "attachment", filename=qr_code_path.name
+        )
+    return img
 
 
 def send_email(
     email: str,
     student_name: str,
-    qr_code_path: pathlib.Path
+    qr_code_img: image.MIMEImage
 ) -> tuple[bool, str]:
     """
     Sends an email with a QR Code to a student.
@@ -40,7 +84,7 @@ def send_email(
         smtp_port = cast(int, config.settings.smtp_port)
 
     # Create email
-    msg = MIMEMultipart("related")
+    msg = multipart.MIMEMultipart("related")
     msg["Subject"] = "Your Attendance Pass"
     msg["From"] = f"{email_sender_name} <{smtp_username}>"
     msg["To"] = email
@@ -87,42 +131,15 @@ def send_email(
     </body>
     </html>
     """
-    msg.attach(MIMEText(html_body, "html"))
-
-    # Add the image
-    # try:
-    if not os.path.exists(qr_code_path):
-        return False, f"QR Code image not found at {qr_code_path}"
-
-    with open(qr_code_path, "rb") as fp:
-        img = MIMEImage(fp.read())
-        img.add_header("Content-ID", "<qr_code>")
-        # Send QR code both inline and as file attachment (easy to save in gallary).
-        img.add_header(
-            "Content-Disposition", "inline", filename=os.path.basename(qr_code_path)
-        )
-        img.add_header(
-            "Content-Disposition", "attachment", filename=os.path.basename(qr_code_path)
-        )
-        msg.attach(img)
-
-
-
-    # except FileNotFoundError:
-    #     return False, f"QR Code image not found at {qr_code_path}."
-    # except Exception as e:
-    #     return False, f"Error attaching QR Code image: {str(e)}"
-    
-
-    # Send the email
-    # try:
+    msg.attach(text.MIMEText(html_body, "html"))
+    msg.attach(qr_code_img)
 
     # Note: IHS WIFI blocks gmail.
     if smtp_port == 465:
         with smtplib.SMTP_SSL(smtp_server, smtp_port) as server:
             server.login(smtp_username, smtp_password)
             server.send_message(msg)
-    else:
+    else:  # Port 587 is for TLS encryption.
         with smtplib.SMTP(smtp_server, smtp_port) as server:
             server.starttls()
             server.login(smtp_username, smtp_password)

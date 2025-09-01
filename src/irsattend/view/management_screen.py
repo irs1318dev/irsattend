@@ -1,6 +1,8 @@
 """View roster and add new students."""
 import sqlite3
 
+import textual
+import textual.css.query
 from textual import app, binding, containers, screen, widgets
 
 from irsattend.model import config, database, emailer, qr_code_generator
@@ -18,11 +20,12 @@ class ManagementScreen(screen.Screen):
     ]
 
     def __init__(self) -> None:
-        """Initialize databae connection."""
+        """Initialize the databae connection."""
         super().__init__()
         self.dbase = database.DBase(config.settings.db_path)
 
     def compose(self) -> app.ComposeResult:
+        """Build the management screen's user interface."""
         yield widgets.Header()
         with containers.Horizontal():
             with containers.Vertical(id="student-list-container"):
@@ -51,9 +54,10 @@ class ManagementScreen(screen.Screen):
                     )
                     yield widgets.Static()
                     yield widgets.Label("Communication")
+                    yield widgets.Button("Generate QR Codes", id="generate-qr-codes")
                     yield widgets.Button(
                         "Email QR Code to Selected", id="email-qr", disabled=True
-                    )  # TODO implement email functionality
+                    )
                     yield widgets.Button("Email All QR Codes", id="email-all-qr")
                     yield widgets.Static(
                         id="status-message", classes="status"
@@ -62,6 +66,7 @@ class ManagementScreen(screen.Screen):
         yield widgets.Footer()
 
     def on_mount(self) -> None:
+        """Initialize the datatable widget."""
         self.table = self.query_one(widgets.DataTable)
         self.table.cursor_type = "row"
         self.table.add_columns(
@@ -70,8 +75,39 @@ class ManagementScreen(screen.Screen):
         self.load_student_data()
         self.selected_student_id = None
 
-    # Load students from db
+    def _add_progress_bar(self, total: int | None, name: str) -> widgets.ProgressBar:
+        """Add a progress bar for sending emails or generating QR Codes."""
+        pbar = widgets.ProgressBar(total, name=name, id="qr-progress-bar")
+        container = self.query_one("#actions-container", containers.Vertical)
+        container.mount(pbar)
+        return pbar
+    
+    def _update_progress_bar(self, total: int, progress: int) -> None:
+        """Update the progress bar."""
+        try:
+            pbar = self.query_one("#qr-progress-bar", widgets.ProgressBar)
+        except textual.css.query.NoMatches:
+            return
+        pbar.update(total=total, progress=progress)
+    
+    def _advance_progress_bar(self) -> None:
+        """Advanced the progress bar one step."""
+        try:
+            pbar = self.query_one("#qr-progress-bar", widgets.ProgressBar)
+        except textual.css.query.NoMatches:
+            return
+        pbar.advance()
+
+    def _remove_progress_bar(self) -> None:
+        """Remove the progress bar if mounted."""
+        try:
+            pbar = self.query_one("#qr-progress-bar", widgets.ProgressBar)
+        except textual.css.query.NoMatches:
+            return
+        pbar.remove()
+
     def load_student_data(self) -> None:
+        """Load student data into the datatable widget."""
         self.table.clear()
         students = self.dbase.get_all_students()
         counts = self.dbase.get_attendance_counts()
@@ -86,8 +122,8 @@ class ManagementScreen(screen.Screen):
                 key=student["student_id"],
             )
 
-    # Handle selecting row
     def on_data_table_row_selected(self, event: widgets.DataTable.RowSelected) -> None:
+        """Select a row in the datatable."""
         self.selected_student_id = event.row_key.value
         if self.selected_student_id is None:
             return
@@ -103,8 +139,8 @@ class ManagementScreen(screen.Screen):
                 f"[bold]Selected:[/bold]\n{student['first_name']} "
                 f"{student['last_name']}\nID: {student['student_id']}")
 
-    # Handle button press
     async def on_button_pressed(self, event: widgets.Button.Pressed) -> None:
+        """Respond to button presses."""
         if event.button.id == "add-student":
             await self.action_add_student()
         elif event.button.id == "import-csv":
@@ -117,6 +153,9 @@ class ManagementScreen(screen.Screen):
             self.action_email_qr(all_students=False)
         elif event.button.id == "email-all-qr":
             self.action_email_qr(all_students=True)
+        elif event.button.id == "generate-qr-codes":
+            self._add_progress_bar(None, "Generate QR Codes")
+            self.generate_qr_codes()
 
     async def action_add_student(self) -> None:
         """Show the student dialog and add a new student."""
@@ -145,8 +184,10 @@ class ManagementScreen(screen.Screen):
         student = self.dbase.get_student_by_id(self.selected_student_id)
         if student is None:
             return
+        else:
+            student_dict = dict(student)
         attendance = self.dbase.get_attendance_count_by_id(self.selected_student_id)
-        student["attendance"] = attendance
+        student_dict["attendance"] = attendance
 
         def on_dialog_closed(data: dict | None):
             if data is None or self.selected_student_id is None:
@@ -177,7 +218,7 @@ class ManagementScreen(screen.Screen):
             self.load_student_data()
 
         await self.app.push_screen(
-            modals.StudentDialog(student_data=student), callback=on_dialog_closed
+            modals.StudentDialog(student_data=student_dict), callback=on_dialog_closed
         )
 
     async def action_delete_student(self) -> None:
@@ -206,63 +247,74 @@ class ManagementScreen(screen.Screen):
             callback=on_confirm_closed,
         )
 
+    @textual.work(thread=True)
+    async def generate_qr_codes(self) -> None:
+        """Generate all QR codes."""
+        if config.settings.qr_code_dir is None:
+            self.update_status(
+                "[red] Cannot generated QR codes because "
+                "no QR code path is defined in config file.[/]")
+            return
+        qr_generator = qr_code_generator.generate_all_qr_codes(
+            config.settings.qr_code_dir, self.dbase)
+        total_students = next(qr_generator)[1]
+        self.app.call_from_thread(lambda: self._update_progress_bar(total_students, 0))
+        failed_codes = []
+        for student_id, status in qr_generator:
+            if not status:
+                failed_codes.append(student_id)
+            self.app.call_from_thread(self._advance_progress_bar)
+        status_message = (
+            f"[green]Created {total_students - len(failed_codes)} QR Codes in folder "
+            f"{config.settings.qr_code_dir}\n"
+        )
+        if failed_codes:
+            status_message += ("[red]Failed Codes: " + ", ".join(failed_codes) + "[/]")
+        self.update_status(status_message)
+        self.app.call_from_thread(self._remove_progress_bar)
+
     def action_email_qr(self, all_students: bool) -> None:
         if all_students:
             students_to_email = self.dbase.get_all_students()
+            self._add_progress_bar(len(students_to_email), "Send Emails")
         elif self.selected_student_id:
-            students_to_email = [self.dbase.get_student_by_id(self.selected_student_id)]
-        else:
-            return
-
-        # This has to be ran in a worker to not block the UI
-        self.run_worker(self.send_emails_worker(students_to_email), exclusive=False)
-
-    async def send_emails_worker(self, students_to_email: list) -> None:
-        # status_widget = self.query_one("#status-message", Static)
-        success_count = 0
-        fail_count = 0
-
-        for student in students_to_email:
-            if not student["email"]:
-                fail_count += 1
-                continue
-            try:
-                qr_code_path = qr_code_generator.generate_qr_code_image(
-                    student["student_id"], f"{student['student_id']}.png" #, "QRCode"
-                )
-                if qr_code_path is None:
-                    self.update_status(
-                        f"[red]Error generating QR code for"
-                        f"{student['first_name']} {student['last_name']}[/]"
-                    )
-                    return
-                full_name = f"{student['first_name']} {student['last_name']}"
-                sent, msg = emailer.send_email(
-                    student["email"], full_name, qr_code_path)
-                if sent:
-                    success_count += 1
-                else:
-                    fail_count += 1
-                    self.update_status(f"[red]Error sending to {student['email']}: {msg}[/]")
-                # Remove temp file
-                if qr_code_path is not None and qr_code_path.exists():
-                    qr_code_path.unlink()
-
-            except Exception as e:
-                fail_count += 1
+            student = self.dbase.get_student_by_id(self.selected_student_id)
+            if student is None:
                 self.update_status(
-                    f"[red]Error processing {student['first_name']} "
-                    f"{student['last_name']}: {str(e)}[/]")
-                raise(e)
-
-        # Add final msg after all emails are sent
-        final_msg = f"[green]Sent {success_count} emails.[/]"
-        if fail_count > 0:
-            final_msg += (
-                f" [red]Failed to send {fail_count} "
-                "(check SMTP config/student emails).[/]"
+                    f"[red]Unable to locate student {self.selected_student_id}[/]"
+                )
+                return
+            else:
+                students_to_email = [student]
+        else:
+            self.update_status(
+                f"[red]No student selected.[/]"
             )
-        self.update_status(final_msg)
+            return
+        self.send_emails_worker(students_to_email)
+
+    @textual.work(thread=True)
+    async def send_emails_worker(self, students: list[sqlite3.Row]) -> None:
+        """Send QR emails to students."""
+        if config.settings.qr_code_dir is None:
+            self.update_status(
+                "[red] Cannot send emails with QR codes because "
+                "no QR code path is defined in config file.[/]")
+            return
+        email_sender = emailer.send_all_emails(config.settings.qr_code_dir, students)
+        failed_codes = []
+        for student_id, status in email_sender:
+            if not status:
+                failed_codes.append(student_id)
+            self.app.call_from_thread(self._advance_progress_bar)
+        status_message = (
+            f"[green]Sent {len(students) - len(failed_codes)} email messages with "
+            f"QR codes in folder {config.settings.qr_code_dir}\n"
+        )
+        if failed_codes:
+            status_message += ("[red]Failed Emails: " + ", ".join(failed_codes) + "[/]")
+        self.update_status(status_message)
+        self.app.call_from_thread(self._remove_progress_bar)
 
     async def action_import_csv(self) -> None:
         def on_import_closed(imported_students: list | None):

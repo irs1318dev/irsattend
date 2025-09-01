@@ -117,16 +117,20 @@ class DBase:
     def get_all_students(self) -> List[sqlite3.Row]:
         """Retrieve all students from the database."""
         with self.get_db_connection() as conn:
-            cursor = conn.execute("SELECT * FROM students ORDER BY last_name, first_name")
+            cursor = conn.execute("""
+                    SELECT student_id, last_name, first_name, grad_year, email
+                      FROM students
+                  ORDER BY student_id;
+            """)
             return cursor.fetchall()
 
-    def get_student_by_id(self, student_id: str) -> Optional[dict[str, Any]]:
+    def get_student_by_id(self, student_id: str) -> Optional[sqlite3.Row]:
         """Retrieve a student by their ID."""
         with self.get_db_connection() as conn:
             cursor = conn.execute("SELECT * FROM students WHERE student_id = ?", (student_id,))
             if cursor is None:
                 return None
-            return dict(cursor.fetchone())
+            return cursor.fetchone()
 
     def get_attendance_counts(self) -> Dict[str, int]:
         """Get a dictionary of student IDs and their attendance counts."""
@@ -154,7 +158,7 @@ class DBase:
         Returns the timestamp of the removed record if successful."""
         with self.get_db_connection() as conn:
             cursor = conn.execute(
-                """SELECT id, timestamp FROM attendance 
+                """SELECT student_id, timestamp FROM attendance 
                 WHERE student_id = ? 
                 ORDER BY timestamp DESC 
                 LIMIT 1""",

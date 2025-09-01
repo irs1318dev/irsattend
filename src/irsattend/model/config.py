@@ -52,6 +52,15 @@ class Settings:
         if self.config_path is not None:
             self._read_config_file()
 
+
+    @staticmethod
+    def _convert_path_to_absolute(path: pathlib.Path | str) -> pathlib.Path:
+        """Convert relative paths to absolute paths."""
+        if isinstance(path, str):
+            path = pathlib.Path(path)
+        return path if path.is_absolute() else pathlib.Path.cwd() / path
+
+
     @staticmethod
     def _get_full_path(
         path: pathlib.Path,
@@ -84,7 +93,7 @@ class Settings:
         for setting_name, value in file_settngs.items():
             if setting_name in app_settings:
                 if setting_name == "qr_code_dir" and setting_name is not None:
-                    self.qr_code_dir = pathlib.Path(setting_name)
+                    self.qr_code_dir = self._convert_path_to_absolute(setting_name)
                 elif isinstance(value, str) and value.lower() in ["", "none", "null"]:
                     value = None
                 else:

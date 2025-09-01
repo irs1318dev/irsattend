@@ -1,8 +1,11 @@
 Button {
     background: purple;
     color: yellow;
-    min-width: 30;
     border: white;
+}
+
+.attend-main Button {
+    min-width: 30;
 }
 
 FileSelector {

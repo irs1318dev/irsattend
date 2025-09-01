@@ -25,20 +25,6 @@ class IRSAttend(app.App):
     config_path: reactive.reactive[pathlib.Path | None] = reactive.reactive(None)
     message = reactive.reactive("Debugging messages will show up here!")
 
-
-    def on_mount(self) -> None:
-        """Called when the app is first mounted."""
-        self.db_path = config.settings.db_path
-        self.config_path = config.settings.config_path
-
-        def _exit_if_no_pw(success: bool | None) -> None:
-            if not success or success is None:
-                self.exit(message="Incorrect password.")
-
-        pw_dialog.PasswordPrompt.show(
-            submit_callback=_exit_if_no_pw,
-            exit_on_cancel=True)
-
     def compose(self) -> app.ComposeResult:
         """Add widgets to screen."""
         yield widgets.Header()
@@ -54,17 +40,24 @@ class IRSAttend(app.App):
                 yield widgets.Button(
                     "Register New Students",
                     id="main-register-students",
+                    classes="attend-main",
                     tooltip="Get a new student's info and generate a QR code."
                 )
-                yield widgets.Button("View Attendance Records", id="main-view-records")
+                yield widgets.Button(
+                    "View Attendance Records",
+                    id="main-view-records",
+                    classes="attend-main"
+                )
         
         # Database Controls
         with containers.HorizontalGroup(classes="outer"):
             yield widgets.Label("Current Database: ", classes="config-row")
             yield widgets.Label(str(config.settings.db_path), id="main-config-db-path")
             with containers.HorizontalGroup(id="main-database-buttons", classes="config"):
-                yield widgets.Button("Create New Database File", id="main-create-database")
-                yield widgets.Button("Select Database", id="main-select-database")
+                yield widgets.Button("Create New Database File", id="main-create-database",
+                    classes="attend-main")
+                yield widgets.Button("Select Database", id="main-select-database",
+                    classes="attend-main")
 
         # Configuration Controls
         with containers.HorizontalGroup(classes="outer"):
@@ -73,18 +66,48 @@ class IRSAttend(app.App):
             with containers.HorizontalGroup(classes="config"):
                 yield widgets.Button(
                     "Create New Settings File",
-                    classes="dock-right",
+                    classes="dock-right attend-main",
                     id="main-create-settings"
         )
                 yield widgets.Button(
                     "Select Settings File",
-                    classes="dock-right",
+                    classes="dock-right attend-main",
                     id="main-select-settings"
         )
         yield widgets.Label(
             "Nothing to see here!", id="main-status-message", classes="app-alert")
         yield widgets.Footer()
         print("Compose is done!!")
+
+    def on_mount(self) -> None:
+        """Called when the app is first mounted."""
+        self.db_path = config.settings.db_path
+        self.config_path = config.settings.config_path
+
+        # #### Password disabled for development. TODO: Re-enable for distribution.
+        # def _exit_if_no_pw(success: bool | None) -> None:
+        #     if not success or success is None:
+        #         self.exit(message="Incorrect password.")
+
+        # pw_dialog.PasswordPrompt.show(
+        #     submit_callback=_exit_if_no_pw,
+        #     exit_on_cancel=True)
+        
+    def check_action(self, action: str, parameters: tuple[object, ...]) -> bool | None:
+        """Disable navigation actions when other screens are active."""
+        if len(self.screen_stack) == 1:
+            return True
+        if isinstance(self.screen_stack[-1], scan_screen.ScanScreen):
+            return False
+        match action:
+            case "register_students":
+                return not isinstance(
+                    self.screen_stack[-1],
+                    management_screen.ManagementScreen
+                )
+            case _:
+                return True
+
 
     def watch_message(self) -> None:
         """Update the status message on changes."""
