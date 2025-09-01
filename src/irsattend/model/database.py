@@ -6,7 +6,7 @@ import re
 import sqlite3
 from typing import Any, List, Optional, Dict
 
-from irsattend.db import models
+from irsattend.model import db_tables
 
 
 class DBaseError(Exception):
@@ -46,8 +46,8 @@ class DBase:
         """Creates the database tables if they don't already exist."""
         conn = self.get_db_connection()
         cursor = conn.cursor()
-        cursor.execute(models.STUDENT_TABLE_SCHEMA)
-        cursor.execute(models.ATTENDANCE_TABLE_SCHEMA)
+        cursor.execute(db_tables.STUDENT_TABLE_SCHEMA)
+        cursor.execute(db_tables.ATTENDANCE_TABLE_SCHEMA)
         conn.commit()
         conn.close()
 

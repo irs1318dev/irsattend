@@ -47,16 +47,10 @@ class Settings:
 
     def update_from_args(self, args: argparse.Namespace) -> None:
         """Read settings."""
-        if hasattr(args, "db_path"):
-            self.db_path = self._get_full_path(args.db_path, DB_FILE_NAME)
-        else:
-            self.db_path = None
-        if hasattr(args, "config_path"):
-            self.config_path = self._get_full_path(args.config_path, CONFIG_FILE_NAME)
+        self.db_path = self._get_full_path(args.db_path, DB_FILE_NAME)
+        self.config_path = self._get_full_path(args.config_path, CONFIG_FILE_NAME)
+        if self.config_path is not None:
             self._read_config_file()
-        else:
-            self.config_path = None
-
 
     @staticmethod
     def _get_full_path(
@@ -76,7 +70,7 @@ class Settings:
             full_path = path
         else:
             full_path = cwd / path
-        if not full_path.is_file():
+        if not full_path.is_file() or not full_path.exists():
             full_path = None
         return full_path
     

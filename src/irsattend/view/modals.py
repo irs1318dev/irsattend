@@ -1,7 +1,5 @@
 import csv
-import hashlib
 import os
-from irsattend import config
 from textual.app import ComposeResult
 from textual.widgets import Label, Input, Static, Button
 from textual.validation import ValidationResult, Validator
@@ -21,41 +19,6 @@ class IsInteger(Validator):
         if value and not value.isdigit():
             return self.failure("Must be a valid year (e.g., 2025).")
         return self.success()
-
-
-class PasswordPrompt(ModalScreen):
-    """A modal screen to ask for the management password."""
-
-    def compose(self) -> ComposeResult:
-        with Vertical(id="password-dialog"):
-            yield Label("Enter Management Password")
-            yield Input(password=True, id="password-input")
-            yield Static("", id="password-error")
-            with Horizontal(id="password-actions"):
-                yield Button("Submit", variant="primary", id="submit-password")
-                yield Button("Cancel", id="cancel-password")
-
-    def on_mount(self) -> None:
-        self.query_one("#password-input", Input).focus()
-
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "submit-password":
-            self.check_password()
-        elif event.button.id == "cancel-password":
-            self.app.pop_screen()
-
-    def on_input_submitted(self, event: Input.Submitted) -> None:
-        self.check_password()
-
-    def check_password(self) -> None:
-        password = self.query_one("#password-input", Input).value
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
-        error_msg = self.query_one("#password-error", Static)
-        if hashed_password == config.settings.password_hash:
-            self.dismiss(True)  # Dismiss with success
-        else:
-            error_msg.update("[bold red]Incorrect Password[/]")
-            self.query_one("#password-input", Input).value = ""
 
 
 class StudentDialog(ModalScreen):

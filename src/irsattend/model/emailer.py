@@ -6,7 +6,7 @@ from email.mime.image import MIMEImage
 import os
 from typing import cast
 
-from irsattend import config
+from irsattend.model import config
 
 
 def send_email(

@@ -3,13 +3,11 @@ import sqlite3
 
 from textual import app, binding, containers, screen, widgets
 
-from irsattend import config, emailer
-from irsattend.db import database
-from irsattend.scanner import qr_code_generator
-from irsattend.ui import modals
+from irsattend.model import config, database, emailer, qr_code_generator
+from irsattend.view import modals
 
 
-class ManagementView(screen.Screen):
+class ManagementScreen(screen.Screen):
     """Add, delete, and edit students."""
     dbase: database.DBase
     """Connection to Sqlite Database."""
@@ -101,7 +99,7 @@ class ManagementView(screen.Screen):
         )
 
         if student:
-            self.update_status(
+            self.update_selected(
                 f"[bold]Selected:[/bold]\n{student['first_name']} "
                 f"{student['last_name']}\nID: {student['student_id']}")
 
@@ -295,3 +293,6 @@ class ManagementView(screen.Screen):
     def update_status(self, message: str) -> None:
         """Update the text in the status widget."""
         self.query_one("#status-message", widgets.Static).update(message)
+
+    def update_selected(self, message: str) -> None:
+        self.query_one("#selection-indicator", widgets.Static).update(message)

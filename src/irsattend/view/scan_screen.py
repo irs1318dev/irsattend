@@ -1,21 +1,22 @@
-
+"""Turn on camera and scan QR Codes."""
 import asyncio
 
 import cv2
 
+import textual
 from textual import app, containers, message, screen, widgets
 
-from irsattend import config
-from irsattend.db import database
-from irsattend.scanner import qr_code_reader
+from irsattend.model import config
+from irsattend.model import database
+from irsattend.view import pw_dialog
 
 
-class ScanView(screen.Screen):
+class ScanScreen(screen.Screen):
     """UI for scanning QR codes while taking attendance."""
 
     CSS_PATH = "../styles/main.tcss"
     BINDINGS = [
-        ("m", "show_management", "Management"),  # TODO password modal to switch
+        ("q", "exit_scan_mode", "Quit QR Code Scan Mode."),  # TODO password modal to switch
     ]
 
     def __init__(self) -> None:
@@ -38,7 +39,7 @@ class ScanView(screen.Screen):
     def on_mount(self) -> None:
         self.scanned = set()  # Prevent code from being scanned more than once.
         self.log_widget = self.query_one("#attendance-log", widgets.RichLog)
-        self.scan_task = self.run_worker(self.scan_qr_codes(), exclusive=False)
+        self.scan_task = self.scan_qr_codes()
 
 
     def on_unmount(self) -> None:
@@ -47,7 +48,7 @@ class ScanView(screen.Screen):
         # if hasattr(self, "camera"):
         #     self.camera.release()
 
-    # This has to be async to not block the UI
+    @textual.work(exclusive=False)
     async def scan_qr_codes(self) -> None:
         """Open video window and capture QR codes."""
         vcap = cv2.VideoCapture(config.settings.camera_number)
@@ -55,20 +56,21 @@ class ScanView(screen.Screen):
         qr_data = None
         while True:
             _, img = vcap.read()
-            cv2.imshow("QRCODEscanner", img)
+            window_title = "Scan QR Codes (Click on window and press q to exit)"
+            cv2.imshow(window_title, img)
             data, bbox, straight_code = detector.detectAndDecode(img)
             if data:
-                print("QR-CODE:", data)
                 qr_data = data
                 if qr_data not in self.scanned:
                     self.scanned.add(qr_data)
                     self.post_message(self.QrCodeFound(qr_data))
-                    await asyncio.sleep(1)  # Allow log to update.
+                    await asyncio.sleep(0.1)  # Allow log to update.
             wait_key = cv2.waitKey(50)
             if wait_key in [ord("q"), ord("Q")]:
                 break
         vcap.release()
         cv2.destroyAllWindows()
+        await self.run_action("exit_scan_mode")
 
     async def on_scan_view_qr_code_found(self, message: QrCodeFound) -> None:
         """Add an attendance record to the database."""
@@ -92,12 +94,15 @@ class ScanView(screen.Screen):
         # Allow student to scan again after 15 seconds.
         self.set_timer(2, lambda: self.scanned.discard(student_id))
 
-    def action_show_management(self) -> None:
-        from .management_view import ManagementView
-        from .modals import PasswordPrompt
-
-        def on_password_result(success: bool | None) -> None:
+    def action_exit_scan_mode(self) -> None:
+        """Require a password to exit QR code scan mode."""
+        def _exit_on_success(success: bool | None) -> None:
             if success:
-                self.app.push_screen(ManagementView())
-
-        self.app.push_screen(PasswordPrompt(), callback=on_password_result)
+                self.app.pop_screen()
+            else:
+                self.scan_qr_codes()
+        
+        pw_dialog.PasswordPrompt.show(
+            submit_callback=_exit_on_success,
+            exit_on_cancel=False
+        )

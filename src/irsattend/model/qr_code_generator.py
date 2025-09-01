@@ -4,7 +4,7 @@ from typing import Optional
 
 import segno
 
-from irsattend import config
+from irsattend.model import config
 
 
 def generate_qr_code_image(data: str, filename: str) -> Optional[pathlib.Path]:

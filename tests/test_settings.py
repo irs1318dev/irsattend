@@ -6,7 +6,8 @@ import pathlib
 import rich
 
 import irsattend
-from irsattend import config, main
+from irsattend.model import config
+from irsattend.view import main_app
 
 
 DATA_PATH = pathlib.Path(__file__).parent / "data"

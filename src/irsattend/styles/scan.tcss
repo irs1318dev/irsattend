@@ -1,0 +1,31 @@
+/* Styles for scan_view.py */
+
+Button {
+    min-width: unset
+}
+
+
+Screen {
+    layout: vertical;
+}
+
+#main-container {
+    height: 1fr;
+    layout: horizontal;
+}
+#camera-container {
+    width: 50%;
+    border: round white;
+    padding: 1;
+}
+#log-container {
+    width: 50%;
+    padding: 0 1;
+    border: round white;
+}
+.log-title {
+    width: 100%;
+    text-align: center;
+    background: $primary;
+    color: $text;
+}

@@ -1,27 +1,89 @@
-
-
-
-Screen {
-    layout: vertical;
+Button {
+    background: purple;
+    color: yellow;
+    min-width: 30;
+    border: white;
 }
 
-#main-container {
-    height: 1fr;
-    layout: horizontal;
+FileSelector {
+    border: yellow;
 }
-#camera-container {
-    width: 50%;
-    border: round white;
-    padding: 1;
+
+Input {
+    background: darkslategrey;
 }
-#log-container {
-    width: 50%;
-    padding: 0 1;
-    border: round white;
+
+VerticalGroup {
+    width: 30;
 }
-.log-title {
-    width: 100%;
+
+.app-alert {
     text-align: center;
-    background: $primary;
-    color: $text;
+    background: indigo;
+    color: thistle;
+    border: thistle;
+}
+
+.cancel {
+    background: gold;
+    color: indigo;
+}
+
+.config {
+    align-horizontal: right;
+}
+
+.config-row {
+    text-style: bold;
+    color: yellow;
+    height: 3;
+}
+
+.field-label {
+    color: yellow;
+    align-vertical: bottom
+}
+
+.ok {
+    background: indigo;
+}
+
+.outer {
+    width: 100%;
+    border: yellow;
+}
+
+#intro-top-menu {
+    align-horizontal: center
+}
+
+/* Password Prompt Dialog */
+PasswordPrompt {
+    align: center middle;
+}
+
+#password-dialog {
+    grid-size: 2;
+    grid-gutter: 1 2;
+    grid-rows: 1fr 1fr 1fr;
+    padding: 0 1;
+    width: 60;
+    height: 11;
+    border: thick $primary 80%;
+    background: $surface;
+}
+
+#password-actions {
+    align: center middle;
+}
+
+#password-dialog Label {
+    column-span: 2;
+    width: 100%;
+    content-align: center middle;
+}
+
+#password-error {
+    column-span: 2;
+    content-align: center middle;
 }

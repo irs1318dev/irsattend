@@ -1,4 +1,4 @@
-# Main database schema
+"""Database table definitions."""
 
 STUDENT_TABLE_SCHEMA = """
 CREATE TABLE IF NOT EXISTS students (
