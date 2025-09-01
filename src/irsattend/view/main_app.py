@@ -84,14 +84,13 @@ class IRSAttend(app.App):
         self.db_path = config.settings.db_path
         self.config_path = config.settings.config_path
 
-        # #### Password disabled for development. TODO: Re-enable for distribution.
-        # def _exit_if_no_pw(success: bool | None) -> None:
-        #     if not success or success is None:
-        #         self.exit(message="Incorrect password.")
+        def _exit_if_no_pw(success: bool | None) -> None:
+            if not success or success is None:
+                self.exit(message="Incorrect password.")
 
-        # pw_dialog.PasswordPrompt.show(
-        #     submit_callback=_exit_if_no_pw,
-        #     exit_on_cancel=True)
+        pw_dialog.PasswordPrompt.show(
+            submit_callback=_exit_if_no_pw,
+            exit_on_cancel=True)
         
     def check_action(self, action: str, parameters: tuple[object, ...]) -> bool | None:
         """Disable navigation actions when other screens are active."""

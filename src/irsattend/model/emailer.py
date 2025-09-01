@@ -1,12 +1,13 @@
 """Send QR Code Emails."""
 from collections.abc import Iterator
-from email.mime import  image, multipart, text
+from email import encoders
+from email.mime import base, image, multipart, text
 import pathlib
 import sqlite3
 import smtplib
 from typing import cast
 
-from irsattend.model import config, database, qr_code_generator
+from irsattend.model import config, qr_code_generator
 
 
 class EmailError(Exception):
@@ -22,12 +23,11 @@ def send_all_emails(
         qr_path = qr_folder / f"{student["student_id"]}.png"
         if not qr_path.exists():
             qr_code_generator.generate_qr_code_image(student["student_id"], qr_path)
-        qr_image = _get_qr_image(qr_path)
         try:
             send_email(
                 student["email"],
                 f"{student['first_name']} {student['last_name']}",
-                qr_image
+                qr_path
             )
         except (
             smtplib.SMTPAuthenticationError, smtplib.SMTPAuthenticationError,
@@ -36,27 +36,12 @@ def send_all_emails(
             yield student["student_id"], 1
         else:
             yield student["student_id"], 1
-        
-
-def _get_qr_image(qr_code_path: pathlib.Path) -> image.MIMEImage:
-    """Open QR Codde image file and create email image object."""
-    with open(qr_code_path, "rb") as fp:
-        img = image.MIMEImage(fp.read())
-    img.add_header("Content-ID", "<qr_code>")
-    # Send QR code both inline and as file attachment (easy to save in gallary).
-    img.add_header(
-        "Content-Disposition", "inline", filename=qr_code_path.name
-    )
-    img.add_header(
-        "Content-Disposition", "attachment", filename=qr_code_path.name
-        )
-    return img
 
 
 def send_email(
     email: str,
     student_name: str,
-    qr_code_img: image.MIMEImage
+    qr_code_path: pathlib.Path
 ) -> tuple[bool, str]:
     """
     Sends an email with a QR Code to a student.
@@ -82,27 +67,65 @@ def send_email(
         smtp_password = cast(str, config.settings.smtp_password)
         email_sender_name = cast(str, config.settings.email_sender_name)
         smtp_port = cast(int, config.settings.smtp_port)
-
     # Create email
     msg = multipart.MIMEMultipart("related")
     msg["Subject"] = "Your Attendance Pass"
     msg["From"] = f"{email_sender_name} <{smtp_username}>"
     msg["To"] = email
-
     # Email using HTML, makes it look nicer
     html_body = f"""
     <!DOCTYPE html>
     <html>
     <head>
         <style>
-            body {{ font-family: 'Arial', sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }}
-            .container {{ max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }}
-            .header {{ background: #662382; background: linear-gradient(135deg,rgba(102, 35, 130, 1) 39%, rgba(249, 178, 52, 1) 100%); color: white; padding: 30px; text-align: center; }}
-            .header h1 {{ margin: 0; font-size: 24px; font-weight: bold; color: #fff; }}
-            .content {{ padding: 30px; background-color: #eee; text-align: center; }}
-            .pass-container {{ text-align: center; margin: 30px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px; }}
-            .pass-container img {{ max-width: 100%; height: auto; border: 2px solid #e9ecef; border-radius: 12px; }}
-            .footer {{ background-color: #f8f9fa; padding: 20px; text-align: center; color: #6c757d; font-size: 14px; }}
+            body {{
+                font-family: 'Arial',
+                sans-serif;
+                margin: 0;
+                padding: 20px;
+                background-color: #f5f5f5; }}
+            .container {{
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: white;
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1); }}
+            .header {{
+                background: #662382;
+                background:
+                    linear-gradient(135deg,rgba(102, 35, 130, 1) 39%,
+                    rgba(249, 178, 52, 1) 100%);
+                color: white;
+                padding: 30px;
+                text-align: center; }}
+            .header h1 {{
+                margin: 0;
+                font-size: 24px;
+                font-weight: bold;
+                color: #fff; }}
+            .content {{
+                padding: 30px;
+                background-color:
+                #eee; text-align:
+                # center; }}
+            .pass-container {{
+                text-align: center;
+                margin: 30px 0;
+                padding: 20px;
+                background-color: #f8f9fa;
+                border-radius: 8px; }}
+            .pass-container img {{
+                max-width: 100%;
+                height: auto;
+                border: 2px solid #e9ecef;
+                border-radius: 12px; }}
+            .footer {{
+                background-color: #f8f9fa;
+                padding: 20px;
+                text-align: center;
+                color: #6c757d;
+                font-size: 14px; }}
         </style>
     </head>
     <body>
@@ -113,15 +136,18 @@ def send_email(
             </div>
             <div class="content">
                 <h2>Hello {student_name}! 👋</h2>
-                <p>Your attendance pass is ready! This pass is unique to you and will be used to track your attendance at every meeting.</p>
-                <p>Please star this email or take a screenshot of your QR code for personal safekeeping.</p>
+                <p>Your attendance pass is ready! This pass is unique to you and
+                will be used to track your attendance at every meeting.</p>
+                <p>Please star this email or save the attached image file
+                to a convenient location on your phone.</p>
 
                 <div class="pass-container">
                     <h3>Your Attendance Pass:</h3>
                     <img src="cid:qr_code" alt="Your personal pass">
                 </div>
 
-                <p><strong>Important:</strong> This pass is personal to you. You are not to share it with others.</p>
+                <p><strong>Important:</strong> This pass is personal to you.
+                You are not to share it with others.</p>
             </div>
             <div class="footer">
                 <p>IRS 1318 Robotics Team | Attendance Management System</p>
@@ -132,9 +158,21 @@ def send_email(
     </html>
     """
     msg.attach(text.MIMEText(html_body, "html"))
-    msg.attach(qr_code_img)
-
-    # Note: IHS WIFI blocks gmail.
+    with open(qr_code_path, "rb") as fp:
+        img = image.MIMEImage(fp.read())
+    img.add_header("Content-ID", "<qr_code>")
+    img.add_header(
+        "Content-Disposition", "inline", filename=qr_code_path.name
+    )
+    msg.attach(img)
+    # Also send QR code as attachment, to make it easy to save to gallary.
+    with open(qr_code_path, "rb") as fp:
+        attachment = base.MIMEBase("application", "octet-stream")
+        attachment.set_payload(fp.read())
+    encoders.encode_base64(attachment)
+    attachment.add_header("Content-Disposition", "attachment", filename="irsattend.jpg")
+    msg.attach(attachment)
+    # Note: IHS WIFI has been known to block email.
     if smtp_port == 465:
         with smtplib.SMTP_SSL(smtp_server, smtp_port) as server:
             server.login(smtp_username, smtp_password)
@@ -146,11 +184,3 @@ def send_email(
             server.send_message(msg)
 
     return True, "Email sent successfully."
-    # except smtplib.SMTPAuthenticationError as e:
-    #     return False, f"SMTP Authentication failed: {str(e)}"
-    # except smtplib.SMTPServerDisconnected as e:
-    #     return False, f"SMTP Server disconnected: {str(e)}"
-    # except smtplib.SMTPException as e:
-    #     return False, f"SMTP error: {str(e)}"
-    # except Exception as e:
-    #     return False, f"Failed to send email: {str(e)}"

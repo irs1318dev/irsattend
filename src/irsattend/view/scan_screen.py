@@ -72,7 +72,7 @@ class ScanScreen(screen.Screen):
         cv2.destroyAllWindows()
         await self.run_action("exit_scan_mode")
 
-    async def on_scan_view_qr_code_found(self, message: QrCodeFound) -> None:
+    async def on_scan_screen_qr_code_found(self, message: QrCodeFound) -> None:
         """Add an attendance record to the database."""
         student_id = message.code
         student = self.dbase.get_student_by_id(student_id)

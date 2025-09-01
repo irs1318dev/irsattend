@@ -1,11 +1,15 @@
+"""Modal dialog definitions."""
+from collections.abc import Sequence
 import csv
 import os
+
 from textual.app import ComposeResult
 from textual.widgets import Label, Input, Static, Button
 from textual.validation import ValidationResult, Validator
 from textual.screen import ModalScreen
 from textual.containers import Vertical, Horizontal
 
+from irsattend.model import config, database
 
 class NotEmpty(Validator):
     def validate(self, value: str) -> ValidationResult:
@@ -157,7 +161,7 @@ class CSVImportDialog(ModalScreen):
             yield Label("CSV Format Requirements:")
             yield Static("The CSV file must have these column headers (first row):")
             yield Static(
-                '[yellow]"ID", "Last Name", "First Name", "Email", "Grad Year"[/yellow]'
+                '[yellow]"Last Name", "First Name", "Email", "Grad Year"[/yellow]'
             )
             yield Static(
                 "[bold red]All fields are required - no empty values allowed.[/bold red]"
@@ -183,77 +187,60 @@ class CSVImportDialog(ModalScreen):
         self.start_import()
 
     def start_import(self) -> None:
+        """Import information from a CSV file."""
         csv_path = self.query_one("#csv-path", Input).value.strip()
         status_widget = self.query_one("#csv-import-status", Static)
-
         if not csv_path:
             status_widget.update("[red]Please enter a file path.[/]")
             return
-
         if not os.path.exists(csv_path):
             status_widget.update("[red]File not found.[/]")
             return
-
-        try:
-            imported_students = []
-
-            with open(csv_path, "r", newline="", encoding="utf-8") as csvfile:
-                reader = csv.DictReader(csvfile)
-
-                # Check if required columns exist
-                required_columns = [
-                    "ID",
-                    "Last Name",
-                    "First Name",
-                    "Email",
-                    "Grad Year",
-                ]
-                missing_columns = [
-                    col for col in required_columns if col not in reader.fieldnames
-                ]
-
-                if missing_columns:
-                    status_widget.update(
-                        f"[red]Missing columns: {', '.join(missing_columns)}[/]"
-                    )
-                    return
-
-                for row_num, row in enumerate(
-                    reader, start=2
-                ):  # Start at 2 since row 1 is headers
-                    # Check if all rows exist
-                    field_validators = {
-                        "ID": NotEmpty(),
-                        "First Name": NotEmpty(),
-                        "Last Name": NotEmpty(),
-                        "Email": NotEmpty(),
-                        "Grad Year": IsInteger(),
-                    }
-
-                    for field_name, validator in field_validators.items():
-                        field_value = row[field_name].strip()
-                        validation_result = validator.validate(field_value)
-                        if not validation_result.is_valid:
-                            status_widget.update(
-                                f"[red]Row {row_num}: {field_name} - {validation_result.failure_description}[/]"
-                            )
-                            return
-
-                    student_data = {
-                        "student_id": row["ID"].strip(),
-                        "first_name": row["First Name"].strip(),
-                        "last_name": row["Last Name"].strip(),
-                        "email": row["Email"].strip(),
-                        "grad_year": int(row["Grad Year"].strip()),
-                    }
-
-                    imported_students.append(student_data)
-
-            if not imported_students:
-                status_widget.update("[red]No valid data found in CSV.[/]")
+        imported_students = []
+        with open(csv_path, "r", newline="", encoding="utf-8") as csvfile:
+            reader = csv.DictReader(csvfile)
+            if not isinstance(reader.fieldnames, Sequence):
                 return
-
-            self.dismiss(imported_students)
-
-        except Exception as e:
-            status_widget.update(f"[red]Error reading CSV: {str(e)}[/]")
+            required_columns = [
+                "Last Name",
+                "First Name",
+                "Email",
+                "Grad Year",
+            ]
+            missing_columns = [
+                col for col in required_columns if col not in reader.fieldnames
+            ]
+            if missing_columns:
+                status_widget.update(
+                    f"[red]Missing columns: {', '.join(missing_columns)}[/]"
+                )
+                return
+            # Start at 2 since row 1 is headers
+            for row_num, row in enumerate(reader, start=2): 
+                # Check if all rows exist
+                field_validators = {
+                    "First Name": NotEmpty(),
+                    "Last Name": NotEmpty(),
+                    "Email": NotEmpty(),
+                    "Grad Year": IsInteger(),
+                }
+                for field_name, validator in field_validators.items():
+                    field_value = row[field_name].strip()
+                    validation_result = validator.validate(field_value)
+                    if not validation_result.is_valid:
+                        status_widget.update(
+                            f"[red]Row {row_num}: {field_name} - "
+                            f"{validation_result.failure_description}[/]"
+                        )
+                        return
+                student_data = {
+                    "first_name": row["First Name"].strip(),
+                    "last_name": row["Last Name"].strip(),
+                    "email": row["Email"].strip(),
+                    "grad_year": int(row["Grad Year"].strip()),
+                }
+                imported_students.append(student_data)
+        if not imported_students:
+            status_widget.update("[red]No valid data found in CSV.[/]")
+            return
+        self.dismiss(imported_students)

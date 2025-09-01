@@ -41,28 +41,38 @@ class ManagementScreen(screen.Screen):
                     )
                     yield widgets.Static()
                     yield widgets.Button(
-                        "Add Student", variant="success", id="add-student")
+                        "Add Student", variant="success", id="add-student",
+                        tooltip="Add a new student to the database.")
                     yield widgets.Button(
-                        "Import from CSV", variant="success", id="import-csv")
+                        "Import from CSV", variant="success", id="import-csv",
+                        tooltip="Import students from a CSV file.")
                     yield widgets.Button(
-                        "Edit Selected", id="edit-student", disabled=True)
+                        "Edit Selected", id="edit-student", disabled=True,
+                        tooltip="Edit data for a student.")
                     yield widgets.Button(
                         "Delete Selected",
                         variant="error",
                         id="delete-student",
                         disabled=True,
+                        tooltip="Deleted a student."
                     )
                     yield widgets.Static()
                     yield widgets.Label("Communication")
-                    yield widgets.Button("Generate QR Codes", id="generate-qr-codes")
                     yield widgets.Button(
-                        "Email QR Code to Selected", id="email-qr", disabled=True
+                        "Generate QR Codes",
+                        id="generate-qr-codes",
+                        tooltip=(
+                            "Generate QR codes for all students and "
+                            "save them to the QR code folder.")
                     )
-                    yield widgets.Button("Email All QR Codes", id="email-all-qr")
-                    yield widgets.Static(
-                        id="status-message", classes="status"
-                    )  # To be used for error and success messages
-
+                    yield widgets.Button(
+                        "Email QR Code to Selected", id="email-qr", disabled=True,
+                        tooltip="Email a QR code to the selected student."
+                    )
+                    yield widgets.Button(
+                        "Email All QR Codes", id="email-all-qr",
+                        tooltip="Email QR codes to ALL students.")
+                    yield widgets.Static(id="status-message", classes="status")
         yield widgets.Footer()
 
     def on_mount(self) -> None:
