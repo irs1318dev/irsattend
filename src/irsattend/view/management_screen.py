@@ -262,7 +262,7 @@ class ManagementScreen(screen.Screen):
         """Generate all QR codes."""
         if config.settings.qr_code_dir is None:
             self.update_status(
-                "[red] Cannot generated QR codes because "
+                "[red] Cannot generate QR codes because "
                 "no QR code path is defined in config file.[/]")
             return
         qr_generator = qr_code_generator.generate_all_qr_codes(

@@ -131,6 +131,8 @@ class IRSAttend(app.App):
     @textual.on(widgets.Button.Pressed, "#main-select-database")
     def action_select_database(self):
         """Select a different database file or create a new one."""
+        # Make sure only one file selector is open at a time
+        self._close_any_file_selector()
         self.mount(file_widgets.FileSelector(
             pathlib.Path.cwd(),
             [".db", ".sqlite3"],
@@ -142,6 +144,8 @@ class IRSAttend(app.App):
     @textual.on(widgets.Button.Pressed, "#main-create-database")
     def action_create_database(self):
         """Select a different database file or create a new one."""
+        # Make sure only one file selector is open at a time
+        self._close_any_file_selector()
         self.mount(file_widgets.FileSelector(
             pathlib.Path.cwd(),
             [".db", ".sqlite3"],
@@ -153,6 +157,8 @@ class IRSAttend(app.App):
     @textual.on(widgets.Button.Pressed, "#main-select-settings")
     def action_select_settings(self):
         """Go to the settings management screen."""
+        # Make sure only one file selector is open at a time
+        self._close_any_file_selector()
         self.mount(file_widgets.FileSelector(
             pathlib.Path.cwd(),
             [".toml"],
@@ -164,6 +170,8 @@ class IRSAttend(app.App):
     @textual.on(widgets.Button.Pressed, "#main-create-settings")
     def action_create_settings(self):
         """Go to the settings management screen."""
+        # Make sure only one file selector is open at a time
+        self._close_any_file_selector()
         self.mount(file_widgets.FileSelector(
             pathlib.Path.cwd(),
             [".toml"],
@@ -207,3 +215,11 @@ class IRSAttend(app.App):
     def watch_config_path(self, config_path: str) -> None:
         """update the config path label."""
         self.query_one("#main-settings-path", widgets.Label).update(str(config_path))
+
+    def _close_any_file_selector(self) -> None:
+        """Close any existing FileSelector widget to prevent duplicates."""
+        try:
+            for selector in self.query(file_widgets.FileSelector):
+                selector.remove()
+        except Exception:
+            pass
