@@ -8,6 +8,7 @@ from irsattend.model import config
 
 class PasswordPrompt(screen.ModalScreen[bool]):
     """A modal screen to ask for the management password."""
+    CSS_PATH = "../styles/modal.tcss"
 
     exit_on_cancel: bool
     """Exit from application when dialog canceled if true."""
