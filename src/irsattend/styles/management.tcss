@@ -35,28 +35,34 @@ Button {
     height: 100%;
     padding: 0 1;
 }
+
 #student-table {
     width: 100%;
     height: 100%;
 }
+
 #student-table > .datatable--cursor {
     background: $primary 30%;
     color: $text;
     border: solid $primary;
 }
+
 #student-table > .datatable--cursor:hover {
     background: $primary 50%;
 }
+
 #actions-container {
     width: 30%;
     height: 100%;
     padding: 0 2;
     border-left: solid $primary;
 }
+
 #actions-container Button {
     width: 100%;
     margin: 1 0;
 }
+
 .selection-info {
     background: $surface;
     border: round $primary;
@@ -65,6 +71,7 @@ Button {
     text-align: center;
     min-height: 4;
 }
+
 .status {
     margin-top: 1;
     color: $warning;
