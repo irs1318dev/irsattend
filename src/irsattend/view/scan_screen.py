@@ -57,7 +57,10 @@ class ScanScreen(screen.Screen):
         while True:
             _, img = vcap.read()
             window_title = "Scan QR Codes (Click on window and press q to exit)"
-            cv2.imshow(window_title, img)
+            # Mirror view for display
+            disp_img = cv2.flip(img, 1)
+            cv2.imshow(window_title, disp_img)
+
             data, bbox, straight_code = detector.detectAndDecode(img)
             if data:
                 qr_data = data
