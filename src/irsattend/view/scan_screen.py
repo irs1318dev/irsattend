@@ -55,13 +55,16 @@ class ScanScreen(screen.Screen):
         detector = cv2.QRCodeDetector()
         qr_data = None
         while True:
-            _, img = vcap.read()
-            window_title = "Scan QR Codes (Click on window and press q to exit)"
-            # Mirror view for display
-            disp_img = cv2.flip(img, 1)
-            cv2.imshow(window_title, disp_img)
+            try:
+                _, img = vcap.read()
+                window_title = "Scan QR Codes (Click on window and press q to exit)"
+                # Mirror view for display
+                disp_img = cv2.flip(img, 1)
+                cv2.imshow(window_title, disp_img)
 
-            data, bbox, straight_code = detector.detectAndDecode(img)
+                data, bbox, straight_code = detector.detectAndDecode(img)
+            except cv2.error:
+                continue
             if data:
                 qr_data = data
                 if qr_data not in self.scanned:
