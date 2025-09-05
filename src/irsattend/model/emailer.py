@@ -5,6 +5,7 @@ from email.mime import base, image, multipart, text
 import pathlib
 import sqlite3
 import smtplib
+import time
 from typing import cast
 
 from irsattend.model import config, qr_code_generator
@@ -36,6 +37,12 @@ def send_all_emails(
             yield student["student_id"], 1
         else:
             yield student["student_id"], 1
+        time.sleep(0.5)  # Experimental
+        # Several emails were not sent when emails sent to entire team on 3 Sep 2025.
+        #   Of 105 students, only 94 emails were actually sent, but there were no
+        #   errors. Our hypothesis is that Gmail didn't like us sending many emails
+        #   in quick succession, and that adding a short pause between each email
+        #   might address the problem.
 
 
 def send_email(

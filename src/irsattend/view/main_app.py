@@ -107,7 +107,6 @@ class IRSAttend(app.App):
             case _:
                 return True
 
-
     def watch_message(self) -> None:
         """Update the status message on changes."""
         status_label = self.query_one("#main-status-message", widgets.Label)
