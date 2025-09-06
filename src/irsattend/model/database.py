@@ -1,16 +1,25 @@
 """Connect to the Sqlite database and run queries."""
+from collections.abc import Sequence
 import datetime
 import pathlib
 import random
 import re
 import sqlite3
-from typing import Any, List, Optional, Dict
+from typing import Any, Optional
+
+import polars as pl
 
 from irsattend.model import db_tables
 
 
 class DBaseError(Exception):
     """Error occurred when working with database."""
+
+
+def dict_factory(cursor: sqlite3.Cursor, row: Sequence) -> dict[str, Any]:
+    """Create a dictionary row factory."""
+    fields = [column[0] for column in cursor.description]
+    return {key: value for key, value in zip(fields, row)}
 
 
 class DBase:
@@ -20,25 +29,25 @@ class DBase:
 
     def __init__(
         self,
-        db_path: Optional[pathlib.Path],
+        db_path: pathlib.Path,
         create_new: bool = False
     ) -> None:
         """Set database path."""
-        if db_path is None:
-            raise DBaseError("db_path is None. Can't locate database file.")
-        else:
-            self.db_path = db_path
+        self.db_path = db_path
         if create_new:
             if self.db_path.exists():
                 raise DBaseError(
-                    f"Databae file at {db_path} does not exist and create_new is False.")
+                    f"Cannot create new database at {db_path}, file already exists.")
             else:
                 self.create_tables()
 
-    def get_db_connection(self) -> sqlite3.Connection:
+    def get_db_connection(self, as_dict=False) -> sqlite3.Connection:
         """Get connection to the SQLite database. Create DB if it doesn't exist."""
         conn = sqlite3.connect(self.db_path)
-        conn.row_factory = sqlite3.Row
+        if as_dict:
+            conn.row_factory = dict_factory
+        else:
+            conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA foreign_keys = ON;")
         return conn
 
@@ -114,7 +123,7 @@ class DBase:
             conn.execute("DELETE FROM students WHERE student_id = ?", (student_id,))
             conn.commit()
 
-    def get_all_students(self) -> List[sqlite3.Row]:
+    def get_all_students(self) -> list[sqlite3.Row]:
         """Retrieve all students from the database."""
         with self.get_db_connection() as conn:
             cursor = conn.execute("""
@@ -123,6 +132,13 @@ class DBase:
                   ORDER BY student_id;
             """)
             return cursor.fetchall()
+        
+    def get_student_ids(self) -> list[str]:
+        """Get a list of student IDs."""
+        with self.get_db_connection() as conn:
+            cursor = conn.execute(
+                "SELECT student_id FROM students ORDER BY student_id;")
+            return [row[0] for row in cursor]
 
     def get_student_by_id(self, student_id: str) -> Optional[sqlite3.Row]:
         """Retrieve a student by their ID."""
@@ -132,7 +148,7 @@ class DBase:
                 return None
             return cursor.fetchone()
 
-    def get_attendance_counts(self) -> Dict[str, int]:
+    def get_attendance_counts(self) -> dict[str, int]:
         """Get a dictionary of student IDs and their attendance counts."""
         with self.get_db_connection() as conn:
             cursor = conn.execute(
@@ -212,3 +228,41 @@ class DBase:
                 (student_id, today_start),
             )
             return cursor.fetchone() is not None
+        
+    def get_attendance_dataframe(self) -> pl.DataFrame:
+        """Get a Polars dataframe with attendance data."""
+        return pl.read_database(
+            "SELECT * FROM attendance ORDER BY timestamp;",
+            self.get_db_connection()
+        )
+    
+    def merge_database(self, incoming: "DBase") -> None:
+        """Insert contents of another database."""
+        current_student_ids = set(self.get_student_ids())
+        incoming_students = incoming.get_all_students()
+        with self.get_db_connection() as main_conn:
+            for student in incoming_students:
+                if student["student_id"] not in current_student_ids:
+                    main_conn.execute("""
+                    INSERT INTO students
+                                (student_id, first_name, last_name, email, grad_year)
+                        VALUES (:student_id, :first_name, :last_name, :email,
+                               :grad_year)
+                        ON CONFLICT(email) DO NOTHING;
+                    """,
+                    dict(student),
+                )
+        incoming_conn = incoming.get_db_connection(as_dict=True)
+        incoming_attendance = incoming_conn.execute("SELECT * FROM attendance;")
+        for appearance in incoming_attendance:
+            try:
+                with self.get_db_connection() as db_conn:
+                    db_conn.execute("""
+                            INSERT INTO attendance
+                                        (student_id, event_type, timestamp)
+                                VALUES (:student_id, :event_type, :timestamp);
+                    """,
+                    appearance
+                    )
+            except sqlite3.IntegrityError as err:
+                print(err)
