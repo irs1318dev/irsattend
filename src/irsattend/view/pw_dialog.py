@@ -1,5 +1,4 @@
 """Prompt user for a password."""
-from collections.abc import Callable
 import hashlib
 
 from textual import app, containers, screen, widgets

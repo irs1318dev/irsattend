@@ -14,6 +14,10 @@ from irsattend.view import pw_dialog
 class ScanScreen(screen.Screen):
     """UI for scanning QR codes while taking attendance."""
 
+    _scanned: set[str]
+    """Recently scanned student IDs."""
+
+
     CSS_PATH = "../styles/main.tcss"
     BINDINGS = [
         ("q", "exit_scan_mode", "Quit QR Code Scan Mode."),  # TODO password modal to switch
@@ -22,6 +26,8 @@ class ScanScreen(screen.Screen):
     def __init__(self) -> None:
         """Initialize databae connection."""
         super().__init__()
+        if config.settings.db_path is None:
+            raise database.DBaseError("No database file selected.")
         self.dbase = database.DBase(config.settings.db_path)
 
     class QrCodeFound(message.Message):
@@ -37,7 +43,7 @@ class ScanScreen(screen.Screen):
         yield widgets.Footer()
 
     def on_mount(self) -> None:
-        self.scanned = set()  # Prevent code from being scanned more than once.
+        self._scanned = set()  # Prevent code from being scanned more than once.
         self.log_widget = self.query_one("#attendance-log", widgets.RichLog)
         self.scan_task = self.scan_qr_codes()
 
@@ -67,8 +73,8 @@ class ScanScreen(screen.Screen):
                 continue
             if data:
                 qr_data = data
-                if qr_data not in self.scanned:
-                    self.scanned.add(qr_data)
+                if qr_data not in self._scanned:
+                    self._scanned.add(qr_data)
                     self.post_message(self.QrCodeFound(qr_data))
                     await asyncio.sleep(0.1)  # Allow log to update.
             wait_key = cv2.waitKey(50)
@@ -84,7 +90,7 @@ class ScanScreen(screen.Screen):
         student = self.dbase.get_student_by_id(student_id)
         if not student:
             self.log_widget.write(
-                f"[yellow]Unknown ID scanned,\nplease talk to a mentor.[/]"
+                "[yellow]Unknown ID scanned,\nplease talk to a mentor.[/]"
             )
             return
         student_name = f"{student['first_name']} {student['last_name']}"
@@ -98,7 +104,7 @@ class ScanScreen(screen.Screen):
                     f"checked in at {timestamp.strftime('%H:%M:%S')}[/]"
                 )
         # Allow student to scan again after 15 seconds.
-        self.set_timer(2, lambda: self.scanned.discard(student_id))
+        self.set_timer(2, lambda: self._scanned.discard(student_id))
 
     def action_exit_scan_mode(self) -> None:
         """Require a password to exit QR code scan mode."""

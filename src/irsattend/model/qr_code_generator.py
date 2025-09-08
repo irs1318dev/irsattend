@@ -1,11 +1,10 @@
 from collections.abc import Iterator
 import pathlib
 import shutil
-from typing import Optional
 
 import segno
 
-from irsattend.model import config, database
+from irsattend.model import database
 
 
 class QrError(Exception):

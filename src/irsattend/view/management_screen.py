@@ -1,5 +1,6 @@
 """View roster and add new students."""
 import sqlite3
+from typing import Optional
 
 import textual
 import textual.css.query
@@ -11,8 +12,11 @@ from irsattend.view import modals
 
 class ManagementScreen(screen.Screen):
     """Add, delete, and edit students."""
+
     dbase: database.DBase
     """Connection to Sqlite Database."""
+    _selected_student_id: Optional[str]
+    """Currently selected student."""
 
     CSS_PATH = "../styles/management.tcss"
     BINDINGS = [
@@ -22,6 +26,8 @@ class ManagementScreen(screen.Screen):
     def __init__(self) -> None:
         """Initialize the databae connection."""
         super().__init__()
+        if config.settings.db_path is None:
+            raise database.DBaseError("No database file selected.")
         self.dbase = database.DBase(config.settings.db_path)
 
     def compose(self) -> app.ComposeResult:
@@ -83,7 +89,7 @@ class ManagementScreen(screen.Screen):
             "ID", "Last Name", "First Name", "Email", "Grad Year", "Attendance Count"
         )
         self.load_student_data()
-        self.selected_student_id = None
+        self._selected_student_id = None
 
     def _add_progress_bar(self, total: int | None, name: str) -> widgets.ProgressBar:
         """Add a progress bar for sending emails or generating QR Codes."""
@@ -134,12 +140,12 @@ class ManagementScreen(screen.Screen):
 
     def on_data_table_row_selected(self, event: widgets.DataTable.RowSelected) -> None:
         """Select a row in the datatable."""
-        self.selected_student_id = event.row_key.value
-        if self.selected_student_id is None:
+        self._selected_student_id = event.row_key.value
+        if self._selected_student_id is None:
             return
         self.query_one("#edit-student", widgets.Button).disabled = False
         self.query_one("#delete-student", widgets.Button).disabled = False
-        student = self.dbase.get_student_by_id(self.selected_student_id)
+        student = self.dbase.get_student_by_id(self._selected_student_id)
         self.query_one("#email-qr", widgets.Button).disabled = not (
             student and student["email"]
         )
@@ -189,18 +195,18 @@ class ManagementScreen(screen.Screen):
         await self.app.push_screen(modals.StudentDialog(), callback=on_dialog_closed)
 
     async def action_edit_student(self) -> None:
-        if self.selected_student_id is None:
+        if self._selected_student_id is None:
             return
-        student = self.dbase.get_student_by_id(self.selected_student_id)
+        student = self.dbase.get_student_by_id(self._selected_student_id)
         if student is None:
             return
         else:
             student_dict = dict(student)
-        attendance = self.dbase.get_attendance_count_by_id(self.selected_student_id)
+        attendance = self.dbase.get_attendance_count_by_id(self._selected_student_id)
         student_dict["attendance"] = attendance
 
         def on_dialog_closed(data: dict | None):
-            if data is None or self.selected_student_id is None:
+            if data is None or self._selected_student_id is None:
                 return
             # Remove attendance from data before updating student info
             attendance_count = data.pop("attendance", None)
@@ -209,18 +215,18 @@ class ManagementScreen(screen.Screen):
             if attendance_count is not None:
                 current_attendance = attendance
                 if attendance_count == 0:
-                    self.dbase.remove_all_attendance_records(self.selected_student_id)
+                    self.dbase.remove_all_attendance_records(self._selected_student_id)
                 elif attendance_count > 0:
                     difference = attendance_count - current_attendance
                     if difference > 0:
                         # This means we need to add more records
                         for _ in range(difference):
-                            self.dbase.add_attendance_record(self.selected_student_id)
+                            self.dbase.add_attendance_record(self._selected_student_id)
                     elif difference < 0:
                         # This means we need to remove records
                         for _ in range(abs(difference)):
                             self.dbase.remove_last_attendance_record(
-                                self.selected_student_id
+                                self._selected_student_id
                             )
                     self.update_status("[green]Student updated successfully.[/]")
             else:
@@ -232,20 +238,20 @@ class ManagementScreen(screen.Screen):
         )
 
     async def action_delete_student(self) -> None:
-        if self.selected_student_id is None:
+        if self._selected_student_id is None:
             return
-        student = self.dbase.get_student_by_id(self.selected_student_id)
+        student = self.dbase.get_student_by_id(self._selected_student_id)
         if student is None:
             return
         student_name = f"{student['first_name']} {student['last_name']}"
 
         def on_confirm_closed(confirmed: bool | None):
             if confirmed:
-                if self.selected_student_id is not None:
-                    self.dbase.delete_student(self.selected_student_id)
+                if self._selected_student_id is not None:
+                    self.dbase.delete_student(self._selected_student_id)
                 self.load_student_data()
                 self.update_status("[green]Student deleted successfully.[/]")
-                self.selected_student_id = None
+                self._selected_student_id = None
                 self.query_one("#edit-student", widgets.Button).disabled = True
                 self.query_one("#delete-student", widgets.Button).disabled = True
                 self.query_one("#selection-indicator", widgets.Static).update(
@@ -287,18 +293,18 @@ class ManagementScreen(screen.Screen):
         if all_students:
             students_to_email = self.dbase.get_all_students()
             self._add_progress_bar(len(students_to_email), "Send Emails")
-        elif self.selected_student_id:
-            student = self.dbase.get_student_by_id(self.selected_student_id)
+        elif self._selected_student_id:
+            student = self.dbase.get_student_by_id(self._selected_student_id)
             if student is None:
                 self.update_status(
-                    f"[red]Unable to locate student {self.selected_student_id}[/]"
+                    f"[red]Unable to locate student {self._selected_student_id}[/]"
                 )
                 return
             else:
                 students_to_email = [student]
         else:
             self.update_status(
-                f"[red]No student selected.[/]"
+                "[red]No student selected.[/]"
             )
             return
         self.send_emails_worker(students_to_email)

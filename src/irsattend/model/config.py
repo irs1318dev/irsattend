@@ -1,7 +1,9 @@
 """Manage configuration settings for the IRS Attend application."""
 import argparse
 import dataclasses
+import datetime
 import enum
+import functools
 import pathlib
 import shutil
 import tomllib
@@ -30,12 +32,14 @@ class ConfigError(Exception):
 class Settings:
     """Configuration data for irsattend application.
     
-    password_hash is a SHA256 hash creaeted with the hashlib library. The
+    password_hash is a SHA256 hash created with the hashlib library. The
     default password is 1318.
     """
     db_path: Optional[pathlib.Path] = None
     config_path: Optional[pathlib.Path] = None
     qr_code_dir: Optional[pathlib.Path] = None
+    schoolyear_start_month_and_day: tuple[int, int] = (9, 1)
+    build_start_month_and_day: tuple[int, int] = (1, 1)
     password_hash: Optional[str] = (
         "095eaa09cd36d1f1e7a963c9ad618edab13f466882c9027ab81ffc18b0eb727e") # 1318
     camera_number: int = 0
@@ -44,6 +48,33 @@ class Settings:
     smtp_username: Optional[str] = None
     smtp_password: Optional[str] = None
     email_sender_name: Optional[str] = None
+
+    @functools.cached_property
+    def schoolyear_start_date(self) -> datetime.date:
+        """Date on which current season started."""
+        current_year = datetime.date.today().year
+        schoolyear_start = datetime.date(
+            year=current_year,
+            month=self.schoolyear_start_month_and_day[0],
+            day=self.schoolyear_start_month_and_day[1]
+        )
+        if datetime.date.today() >= schoolyear_start:
+            return schoolyear_start
+        else:
+            return schoolyear_start.replace(year=current_year - 1)
+        
+    @functools.cached_property
+    def buildseason_start_date(self) -> datetime.date:
+        """Date on current build_season started or will start."""
+        buildseason_start = self.schoolyear_start_date.replace(
+            month=self.build_start_month_and_day[0],
+            day=self.build_start_month_and_day[1]
+        )
+        if buildseason_start < self.schoolyear_start_date:
+            buildseason_start = buildseason_start.replace(
+                year=buildseason_start.year + 1
+            )
+        return buildseason_start
 
     def update_from_args(self, args: argparse.Namespace) -> None:
         """Read settings."""
@@ -73,6 +104,7 @@ class Settings:
         point to an existing file.
         """
         cwd = pathlib.Path.cwd()
+        full_path: Optional[pathlib.Path] = None
         if path is None:
             full_path = cwd / default_file_name
         elif path.is_absolute():
@@ -93,7 +125,7 @@ class Settings:
         for setting_name, value in file_settngs.items():
             if setting_name in app_settings:
                 if setting_name == "qr_code_dir" and setting_name is not None:
-                    self.qr_code_dir = self._convert_path_to_absolute(setting_name)
+                    self.qr_code_dir = self._convert_path_to_absolute(value)
                 elif isinstance(value, str) and value.lower() in ["", "none", "null"]:
                     value = None
                 else:

@@ -9,7 +9,6 @@ from textual.validation import ValidationResult, Validator
 from textual.screen import ModalScreen
 from textual.containers import Vertical, Horizontal
 
-from irsattend.model import config, database
 
 class NotEmpty(Validator):
     def validate(self, value: str) -> ValidationResult:
@@ -136,7 +135,7 @@ class DeleteConfirmDialog(ModalScreen):
         with Vertical(id="delete-dialog"):
             yield Label("[bold red]Confirm Deletion[/bold red]")
             yield Static()
-            yield Label(f"Are you sure you want to delete:")
+            yield Label("Are you sure you want to delete:")
             yield Label(f"[bold]{self.student_name}[/bold]")
             yield Label(f"ID: {self.student_id}")
             yield Static()
@@ -233,7 +232,7 @@ class CSVImportDialog(ModalScreen):
                     if not validation_result.is_valid:
                         status_widget.update(
                             f"[red]Row {row_num}: {field_name} - "
-                            f"{validation_result.failure_description}[/]"
+                            f"{validation_result.failure_descriptions}[/]"
                         )
                         return
                 student_data = {
