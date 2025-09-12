@@ -26,6 +26,11 @@ class DBase:
     """Read and write to database."""
     db_path: pathlib.Path
     """Path to Sqlite database."""
+    underscore_pattern: re.Pattern = re.compile(r"[\s\-]+")
+    """Replace whitespace and dashes with an underscore."""
+    remove_pattern: re.Pattern = re.compile(r"[.!?;,:']+")
+    """Remove punctuation."""
+
 
     def __init__(
         self,
@@ -40,6 +45,11 @@ class DBase:
                     f"Cannot create new database at {db_path}, file already exists.")
             else:
                 self.create_tables()
+        else:
+            if not db_path.exists():
+                raise DBaseError(
+                    f"Database file at {db_path} does not exist."
+                )
 
     def get_db_connection(self, as_dict=False) -> sqlite3.Connection:
         """Get connection to the SQLite database. Create DB if it doesn't exist."""
@@ -60,6 +70,11 @@ class DBase:
         conn.commit()
         conn.close()
 
+    def _clean_name(self, name: str) -> str:
+        """Replace dashes and spaces with an underscore and remove punctuation."""
+        name = self.remove_pattern.sub("", name)
+        return self.underscore_pattern.sub("_", name)
+
     def generate_unique_student_id(
             self,
             first_name: str,
@@ -67,12 +82,11 @@ class DBase:
             grad_year: int
         ) -> str:
         """Generate a unique 8-digit student ID."""
-        id_ = (
+        first_name = self._clean_name(first_name)
+        last_name = self._clean_name(last_name)
+        return (
             f"{last_name.strip().lower()}-{first_name.strip().lower()}"
             f"-{grad_year}-{random.randint(1, 999):03}")
-        no_punctuation_id = re.sub(r"[.!?;,:]+", "", id_)  # Remove punctuation
-        final_id = re.sub(r"\s+", "_", no_punctuation_id)  # Remove internal whitespace
-        return final_id
 
     def add_student(
         self,
@@ -147,6 +161,12 @@ class DBase:
             if cursor is None:
                 return None
             return cursor.fetchone()
+        
+    def import_students_from_csv(self, csv_path: pathlib.Path) -> None:
+        """Load students from a CSV file."""
+        studentdf = pl.read_csv(csv_path)
+        for row in studentdf.iter_rows(named=True):
+            self.add_student(**row)
 
     def get_attendance_counts(self) -> dict[str, int]:
         """Get a dictionary of student IDs and their attendance counts."""
