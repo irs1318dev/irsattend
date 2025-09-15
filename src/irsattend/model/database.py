@@ -70,20 +70,22 @@ class DBase:
         conn.commit()
         conn.close()
 
-    def _clean_name(self, name: str) -> str:
+    @classmethod
+    def _clean_name(cls, name: str) -> str:
         """Replace dashes and spaces with an underscore and remove punctuation."""
-        name = self.remove_pattern.sub("", name)
-        return self.underscore_pattern.sub("_", name)
+        name = cls.remove_pattern.sub("", name)
+        return cls.underscore_pattern.sub("_", name)
 
+    @classmethod
     def generate_unique_student_id(
-            self,
+            cls,
             first_name: str,
             last_name: str,
             grad_year: int
         ) -> str:
         """Generate a unique 8-digit student ID."""
-        first_name = self._clean_name(first_name)
-        last_name = self._clean_name(last_name)
+        first_name = cls._clean_name(first_name)
+        last_name = cls._clean_name(last_name)
         return (
             f"{last_name.strip().lower()}-{first_name.strip().lower()}"
             f"-{grad_year}-{random.randint(1, 999):03}")
@@ -224,13 +226,18 @@ class DBase:
     def add_attendance_record(
         self,
         student_id: str,
-    ) -> Optional[datetime.datetime]:  # Will also be used in mgmt to manually add a record
+        timestamp: Optional[datetime.datetime] = None
+    ) -> Optional[datetime.datetime]:
         """Add an attendance record for a student.
-        Returns the timestamp of when added if successful."""
-        timestamp = datetime.datetime.now()
+
+        Returns:
+            Date and time when attendance was recorded.
+        """
+        if timestamp is None:
+            timestamp = datetime.datetime.now()
         with self.get_db_connection() as conn:
             conn.execute(
-                "INSERT INTO attendance (student_id, timestamp) VALUES (?, ?)",
+                "INSERT INTO attendance (student_id, timestamp) VALUES (?, ?);",
                 (student_id, timestamp),
             )
             conn.commit()
