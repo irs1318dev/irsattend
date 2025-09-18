@@ -29,7 +29,7 @@ def empty_output_folder() -> pathlib.Path:
 @pytest.fixture
 def empty_database(empty_output_folder: pathlib.Path) -> database.DBase:
     """An empty IrsAttend database, with tables created."""
-    return database.DBase(OUTPUT_FOLDER / "testattend.db", create_new=True)
+    return database.DBase(OUTPUT_FOLDER / "teststudents.db", create_new=True)
 
 
 @pytest.fixture
@@ -37,3 +37,11 @@ def dbase_with_students(empty_database: database.DBase) -> database.DBase:
     """Database with students."""
     empty_database.import_students_from_csv(DATA_FOLDER / "test-students.csv")
     return empty_database
+
+
+@pytest.fixture
+def dbase_with_raps(request) -> database.DBase:
+    """Database with students and RAPs (robotics appearances)."""
+    dbname = "testattend.db"
+    shutil.copyfile(DATA_FOLDER / dbname, OUTPUT_FOLDER / dbname)
+    return database.DBase(OUTPUT_FOLDER / dbname)

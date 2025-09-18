@@ -75,13 +75,13 @@ class StudentDialog(ModalScreen):
                 validators=[NotEmpty(), IsInteger()],
             )
             yield Static()
-            if self.student_data:
-                with Horizontal():
-                    yield Label(
-                        "Attendance Count: " + str(self.count), id="attendance-label"
-                    )
-                    yield Button("+", variant="success", id="add-attendance")
-                    yield Button("-", variant="error", id="remove-attendance")
+            # if self.student_data:
+            #     with Horizontal():
+            #         yield Label(
+            #             "Attendance Count: " + str(self.count), id="attendance-label"
+            #         )
+            #         yield Button("+", variant="success", id="add-attendance")
+            #         yield Button("-", variant="error", id="remove-attendance")
             with Horizontal(id="attendance-actions"):
                 yield Button("Save", variant="primary", id="save-student")
                 yield Button("Cancel", id="cancel-student")

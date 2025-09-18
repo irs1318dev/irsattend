@@ -15,7 +15,7 @@ class IRSAttend(app.App):
     TITLE = "IRS 1318 Attendance System"
     BINDINGS = [
         ("a", "take_attendance", "Take Attendance"),
-        ("r", "register_students", "Register Students"),
+        ("s", "manage_students", "Manage Students"),
         ("v", "view_records", "View Attendance Records"),
     ]
     SCREENS = {
@@ -38,8 +38,8 @@ class IRSAttend(app.App):
                     tooltip="Scan some QR Codes!",
                 )
                 yield widgets.Button(
-                    "Register New Students",
-                    id="main-register-students",
+                    "Manage Students",
+                    id="main-manage-students",
                     classes="attend-main",
                     tooltip="Get a new student's info and generate a QR code."
                 )
@@ -99,7 +99,7 @@ class IRSAttend(app.App):
         if isinstance(self.screen_stack[-1], scan_screen.ScanScreen):
             return False
         match action:
-            case "register_students":
+            case "manage_students":
                 return not isinstance(
                     self.screen_stack[-1],
                     management_screen.ManagementScreen
@@ -117,8 +117,8 @@ class IRSAttend(app.App):
         """Put application in attenance mode, so students can scan QR codes."""
         self.app.push_screen(scan_screen.ScanScreen())
 
-    @textual.on(widgets.Button.Pressed, "#main-register-students")
-    def action_register_students(self):
+    @textual.on(widgets.Button.Pressed, "#main-manage-students")
+    def action_manage_students(self):
         """Go to register students screen."""
         self.app.push_screen(management_screen.ManagementScreen())
 

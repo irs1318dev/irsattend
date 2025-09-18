@@ -170,15 +170,19 @@ class DBase:
         for row in studentdf.iter_rows(named=True):
             self.add_student(**row)
 
-    def get_attendance_counts(self) -> dict[str, int]:
+    def get_attendance_counts(self, since: datetime.date) -> dict[str, int]:
         """Get a dictionary of student IDs and their attendance counts."""
         with self.get_db_connection() as conn:
-            cursor = conn.execute(
-                """SELECT student_id, COUNT(student_id) as count
-                FROM attendance
-                GROUP BY student_id"""
+            cursor = conn.execute("""
+                    SELECT student_id, COUNT(student_id) as apperances
+                      FROM attendance
+                     WHERE timestamp >= ?
+                  GROUP BY student_id
+                  ORDER BY student_id;
+            """,
+            (since,)
             )
-            return {row["student_id"]: row["count"] for row in cursor.fetchall()}
+            return {row["student_id"]: row["appearances"] for row in cursor.fetchall()}
 
     def get_attendance_count_by_id(self, student_id: str) -> int:
         """Retrieve a student's attendance count by their ID."""

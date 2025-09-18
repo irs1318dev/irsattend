@@ -126,7 +126,6 @@ class ManagementScreen(screen.Screen):
         """Load student data into the datatable widget."""
         self.table.clear()
         students = self.dbase.get_all_students()
-        counts = self.dbase.get_attendance_counts()
         for student in students:
             self.table.add_row(
                 student["student_id"],
@@ -134,7 +133,6 @@ class ManagementScreen(screen.Screen):
                 student["first_name"],
                 student["email"] or "N/A",
                 str(student["grad_year"]) if student["grad_year"] else "N/A",
-                str(counts.get(student["student_id"], 0)),
                 key=student["student_id"],
             )
 

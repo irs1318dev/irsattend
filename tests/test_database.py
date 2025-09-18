@@ -1,4 +1,5 @@
 """Test Sqlite database functionality."""
+import datetime
 import pathlib
 import re
 
@@ -67,5 +68,30 @@ def test_load_students_from_csv(dbase_with_students: database.DBase) -> None:
         assert 2020 <= grad_year <= 2030
         assert "@" in student["email"]
         assert "." in student["email"]
+
+
+def test_attendance_table(dbase_with_raps) -> None:
+    """Attendance table has many rows and 5 columns of data."""
+    # Act
+    rapdf = dbase_with_raps.get_attendance_dataframe()
+    # Assert
+    print(rapdf.shape)
+    assert rapdf.shape[0] > 4000
+    assert rapdf.shape[1] == 5
+
+def test_attendance_counts(dbase_with_raps: database.DBase) -> None:
+    """Get count of student appearances."""
+    # Act
+    season_counts = dbase_with_raps.get_attendance_counts(datetime.date(2025, 9, 1))
+    build_counts = dbase_with_raps.get_attendance_counts(datetime.date(2026, 1, 1))
+    # Assert
+    assert len(season_counts) == len(build_counts)
+    for student_id in season_counts:
+        assert student_id in build_counts
+        assert isinstance(season_counts[student_id], int)
+        assert isinstance(build_counts[student_id], int)
+        assert season_counts[student_id] >= build_counts[student_id]
+        assert build_counts[student_id] >= 0
+
 
     
