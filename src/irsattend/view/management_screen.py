@@ -7,7 +7,7 @@ import textual.css.query
 from textual import app, binding, containers, screen, widgets
 
 from irsattend.model import config, database, emailer, qr_code_generator
-from irsattend.view import modals
+from irsattend.view import modals, confirm_dialogs
 
 
 class ManagementScreen(screen.Screen):
@@ -164,9 +164,9 @@ class ManagementScreen(screen.Screen):
         elif event.button.id == "delete-student":
             await self.action_delete_student()
         elif event.button.id == "email-qr":
-            self.action_email_qr(all_students=False)
+            await self.action_email_qr(all_students=False)
         elif event.button.id == "email-all-qr":
-            self.action_email_qr(all_students=True)
+            await self.action_email_qr(all_students=True)
         elif event.button.id == "generate-qr-codes":
             self._add_progress_bar(None, "Generate QR Codes")
             self.generate_qr_codes()
@@ -257,7 +257,7 @@ class ManagementScreen(screen.Screen):
                 )
 
         await self.app.push_screen(
-            modals.DeleteConfirmDialog(student_name, student["student_id"]),
+            confirm_dialogs.DeleteConfirmDialog(student_name, student["student_id"]),
             callback=on_confirm_closed,
         )
 
@@ -287,7 +287,16 @@ class ManagementScreen(screen.Screen):
         self.update_status(status_message)
         self.app.call_from_thread(self._remove_progress_bar)
 
-    def action_email_qr(self, all_students: bool) -> None:
+    async def action_email_qr(self, all_students: bool) -> None:
+        """Email QR codes to students."""
+
+        def _email_all_students(confirmed: bool | None) -> None:
+            if confirmed:
+                self.send_emails_worker(students_to_email)
+                self.update_status(
+                f"[green]Emailed QR codes to {len(students_to_email)}[/]"
+            )
+
         if all_students:
             students_to_email = self.dbase.get_all_students()
             self._add_progress_bar(len(students_to_email), "Send Emails")
@@ -305,7 +314,14 @@ class ManagementScreen(screen.Screen):
                 "[red]No student selected.[/]"
             )
             return
-        self.send_emails_worker(students_to_email)
+        
+        if all_students:
+            await self.app.push_screen(
+                confirm_dialogs.GeneralConfirmDialog("email all students"),
+                callback=_email_all_students
+            )
+        else:
+            self.send_emails_worker(students_to_email)
 
     @textual.work(thread=True)
     async def send_emails_worker(self, students: list[sqlite3.Row]) -> None:

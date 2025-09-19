@@ -77,11 +77,11 @@ StudentDialog.add-mode #student-dialog {
 }
 
 /* Delete Confirmation Dialog */
-DeleteConfirmDialog {
+ModalScreen.confirm-dialog {
     align: center middle;
 }
 
-#delete-dialog {
+Vertical.confirm-dialog {
     width: 50;
     height: 18;
     border: thick $error 80%;
@@ -89,7 +89,7 @@ DeleteConfirmDialog {
     padding: 1;
 }
 
-#delete-dialog Horizontal {
+.confirm-dialog Horizontal {
     margin-top: 1;
     align: center middle;
 }

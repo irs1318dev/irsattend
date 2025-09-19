@@ -122,36 +122,6 @@ class StudentDialog(ModalScreen):
             self.dismiss(None)
 
 
-class DeleteConfirmDialog(ModalScreen):
-    """A confirmation dialog for deleting students."""
-    CSS_PATH = "../styles/modal.tcss"
-
-    def __init__(self, student_name: str, student_id: str) -> None:
-        self.student_name = student_name
-        self.student_id = student_id
-        super().__init__()
-
-    def compose(self) -> ComposeResult:
-        with Vertical(id="delete-dialog"):
-            yield Label("[bold red]Confirm Deletion[/bold red]")
-            yield Static()
-            yield Label("Are you sure you want to delete:")
-            yield Label(f"[bold]{self.student_name}[/bold]")
-            yield Label(f"ID: {self.student_id}")
-            yield Static()
-            yield Label("[yellow]This action cannot be undone![/yellow]")
-            yield Static()
-            with Horizontal():
-                yield Button("Delete", variant="error", id="confirm-delete")
-                yield Button("Cancel", variant="primary", id="cancel-delete")
-
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "confirm-delete":
-            self.dismiss(True)
-        elif event.button.id == "cancel-delete":
-            self.dismiss(False)
-
-
 class CSVImportDialog(ModalScreen):
     """A dialog for importing students from CSV."""
     CSS_PATH = "../styles/modal.tcss"
