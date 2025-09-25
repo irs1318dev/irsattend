@@ -10,7 +10,7 @@ from irsattend.model import config, database, emailer, qr_code_generator
 from irsattend.view import modals, confirm_dialogs
 
 
-class ManagementScreen(screen.Screen):
+class StudentScreen(screen.Screen):
     """Add, delete, and edit students."""
 
     dbase: database.DBase

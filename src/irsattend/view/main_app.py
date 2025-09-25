@@ -5,7 +5,8 @@ import textual
 from textual import app, containers, reactive, widgets
 
 from irsattend.model import config, database
-from irsattend.view import file_widgets, management_screen, pw_dialog, scan_screen
+from irsattend.view import (
+    attendance_screen, file_widgets, pw_dialog, scan_screen, student_screen)
 
 
 class IRSAttend(app.App):
@@ -19,7 +20,7 @@ class IRSAttend(app.App):
         ("v", "view_records", "View Attendance Records"),
     ]
     SCREENS = {
-        "management": management_screen.ManagementScreen,
+        "students": student_screen.StudentScreen,
     }
     db_path: reactive.reactive[pathlib.Path | None] = reactive.reactive(None)
     config_path: reactive.reactive[pathlib.Path | None] = reactive.reactive(None)
@@ -102,7 +103,7 @@ class IRSAttend(app.App):
             case "manage_students":
                 return not isinstance(
                     self.screen_stack[-1],
-                    management_screen.ManagementScreen
+                    student_screen.StudentScreen
                 )
             case _:
                 return True
@@ -120,12 +121,12 @@ class IRSAttend(app.App):
     @textual.on(widgets.Button.Pressed, "#main-manage-students")
     def action_manage_students(self):
         """Go to register students screen."""
-        self.app.push_screen(management_screen.ManagementScreen())
+        self.app.push_screen(student_screen.StudentScreen())
 
     @textual.on(widgets.Button.Pressed, "#main-view-records")
     def action_view_records(self):
         """View attendance records."""
-        self.message = "Viewing attendance records is not yet implemented."
+        self.app.push_screen(attendance_screen.AttendanceScreen())
 
     @textual.on(widgets.Button.Pressed, "#main-select-database")
     def action_select_database(self):

@@ -40,6 +40,9 @@ def test_empty_database(empty_database: database.DBase) -> None:
     assert len(tables) == 3
     assert "students" in tables
     assert "attendance" in tables
+    # Must close connection or fixtures won't be able to delete Sqlite3 file when
+    #   setting up for other tests.
+    conn.close()  
 
 
 def test_nonexistant_database_raises_error(empty_output_folder: pathlib.Path) -> None:
@@ -55,7 +58,7 @@ def test_existing_database_raises_error_on_create_new(empty_database) -> None:
     with pytest.raises(database.DBaseError):
         database.DBase(empty_database.db_path, create_new=True)
 
-    
+
 def test_load_students_from_csv(dbase_with_students: database.DBase) -> None:
     """Load test students from a CSV file."""
     students = dbase_with_students.get_all_students()
@@ -70,20 +73,21 @@ def test_load_students_from_csv(dbase_with_students: database.DBase) -> None:
         assert "." in student["email"]
 
 
-def test_attendance_table(dbase_with_raps) -> None:
+def test_attendance_table(dbase_with_apps) -> None:
     """Attendance table has many rows and 5 columns of data."""
     # Act
-    rapdf = dbase_with_raps.get_attendance_dataframe()
+    rapdf = dbase_with_apps.get_attendance_dataframe()
     # Assert
     print(rapdf.shape)
     assert rapdf.shape[0] > 4000
     assert rapdf.shape[1] == 5
 
-def test_attendance_counts(dbase_with_raps: database.DBase) -> None:
+
+def test_attendance_counts(dbase_with_apps: database.DBase) -> None:
     """Get count of student appearances."""
     # Act
-    season_counts = dbase_with_raps.get_attendance_counts(datetime.date(2025, 9, 1))
-    build_counts = dbase_with_raps.get_attendance_counts(datetime.date(2026, 1, 1))
+    season_counts = dbase_with_apps.get_attendance_counts(datetime.date(2025, 9, 1))
+    build_counts = dbase_with_apps.get_attendance_counts(datetime.date(2026, 1, 1))
     # Assert
     assert len(season_counts) == len(build_counts)
     for student_id in season_counts:
@@ -94,4 +98,10 @@ def test_attendance_counts(dbase_with_raps: database.DBase) -> None:
         assert build_counts[student_id] >= 0
 
 
-    
+def test_attendance_report_data(dbase_with_apps: database.DBase) -> None:
+    """Get info for student attendance report."""
+    # Act
+    cursor = dbase_with_apps.get_student_attendance_data()
+    # Assert
+    for row in cursor:
+        rich.print(dict(row))

@@ -1,4 +1,5 @@
 """Pytest fixtures."""
+from collections.abc import Generator
 import pathlib
 import shutil
 
@@ -40,8 +41,8 @@ def dbase_with_students(empty_database: database.DBase) -> database.DBase:
 
 
 @pytest.fixture
-def dbase_with_raps(request) -> database.DBase:
-    """Database with students and RAPs (robotics appearances)."""
+def dbase_with_apps(request) -> database.DBase:
+    """Database with students and appearances."""
     dbname = "testattend.db"
     shutil.copyfile(DATA_FOLDER / dbname, OUTPUT_FOLDER / dbname)
     return database.DBase(OUTPUT_FOLDER / dbname)

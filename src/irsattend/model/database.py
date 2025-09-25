@@ -9,7 +9,7 @@ from typing import Any, Optional
 
 import polars as pl
 
-from irsattend.model import db_tables
+from irsattend.model import config, db_tables
 
 
 class DBaseError(Exception):
@@ -20,6 +20,28 @@ def dict_factory(cursor: sqlite3.Cursor, row: Sequence) -> dict[str, Any]:
     """Create a dictionary row factory."""
     fields = [column[0] for column in cursor.description]
     return {key: value for key, value in zip(fields, row)}
+
+
+def adapt_date_iso(val: datetime.date) -> str:
+    """Adapt datetime.date to ISO 8601 date."""
+    return val.isoformat()
+
+
+def adapt_datetime_iso(val: datetime.datetime) -> str:
+    """Adapt datetime.datetime to timezone-naive ISO 8601 date."""
+    return val.replace(tzinfo=None).isoformat()
+
+
+# Sqlite converts Python datetime.date and datetime.datetime objects to
+#   ISO-8601-formatted strings automatically. But as of Python 3.12, this
+#   behavior is deprecated, which means the Python developers will remove this
+#   behavior in a future version of Python and we should stop relying on it.
+# The register_adapter function calls explicity tell Sqlite how to convert date
+#   and datetime objects to text values that can be stored in Sqlite.
+#   Omitting these two lines results in deprecation warnings when we run the
+#   applicatin or tests.
+sqlite3.register_adapter(datetime.date, adapt_date_iso)
+sqlite3.register_adapter(datetime.datetime, adapt_datetime_iso)
 
 
 class DBase:
@@ -170,11 +192,45 @@ class DBase:
         for row in studentdf.iter_rows(named=True):
             self.add_student(**row)
 
+    def get_student_attendance_data(self) -> sqlite3.Cursor:
+        """Join students and attendance table and get current season data."""
+        # An 'app' is an appearance.
+        query = """
+                WITH year_apps AS (
+                    SELECT student_id, COUNT(student_id) as apps
+                      FROM attendance
+                     WHERE timestamp >= :year_start
+                  GROUP BY student_id
+                ),
+                build_apps AS (
+                    SELECT student_id, COUNT(student_id) as apps
+                      FROM attendance
+                     WHERE timestamp >= :build_start
+                  GROUP BY student_id
+                )
+                SELECT s.student_id, s.last_name, s.first_name, s.grad_year,
+                       COALESCE(y.apps, 0) AS year_apps,
+                       COALESCE(b.apps, 0) AS build_apps
+                  FROM students AS s
+             LEFT JOIN year_apps AS y
+                    ON y.student_id = s.student_id
+            LEFT JOIN build_apps AS b
+                    ON b.student_id = s.student_id
+              ORDER BY last_name, first_name;
+        """
+        with self.get_db_connection() as conn:
+            cursor = conn.execute(
+                query, {
+                    "year_start": config.settings.schoolyear_start_date,
+                    "build_start": config.settings.buildseason_start_date
+                })
+        return cursor
+
     def get_attendance_counts(self, since: datetime.date) -> dict[str, int]:
         """Get a dictionary of student IDs and their attendance counts."""
         with self.get_db_connection() as conn:
             cursor = conn.execute("""
-                    SELECT student_id, COUNT(student_id) as apperances
+                    SELECT student_id, COUNT(student_id) as checkins
                       FROM attendance
                      WHERE timestamp >= ?
                   GROUP BY student_id
@@ -182,7 +238,7 @@ class DBase:
             """,
             (since,)
             )
-            return {row["student_id"]: row["appearances"] for row in cursor.fetchall()}
+            return {row["student_id"]: row["checkins"] for row in cursor.fetchall()}
 
     def get_attendance_count_by_id(self, student_id: str) -> int:
         """Retrieve a student's attendance count by their ID."""
