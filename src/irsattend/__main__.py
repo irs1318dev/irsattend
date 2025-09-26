@@ -22,22 +22,53 @@ def build_parser() -> argparse.ArgumentParser:
         type=pathlib.Path,
         default=None
     )
+    parser.set_defaults(func=None)
+    subparsers = parser.add_subparsers()
+    sync_parser = subparsers.add_parser(
+        "sync-roster",
+        help="Synchronize attendance data with the student roster."
+    )
+    sync_group = sync_parser.add_mutually_exclusive_group(required=True)
+    sync_group.add_argument(
+        "-i", "--student-ids",
+        help="Send student IDs to the team's Google Sheet roster.",
+        type=pathlib.Path
+    )
+    sync_group.add_argument(
+        "-a", "--attendance-data",
+        help="Send attendance to the team's Google Sheet roster.",
+        type=pathlib.Path
+    )
+    sync_parser.set_defaults(func=sync_data)
     return parser
 
 
-def set_config(args: Optional[argparse.Namespace] = None) -> None:
+def sync_data(args: argparse.Namespace) -> None:
+    """Synchronize attendance data with other applications."""
+    if args.student_ids is not None:
+        print("Sync student IDs!")
+    elif args.attendance_data is not None:
+        print("Syncing attendance data!")
+
+
+
+def set_config(args: Optional[argparse.Namespace] = None) -> argparse.Namespace:
     """Assign config settings from command line args."""
     if args is None:
         parser = build_parser()
         args = parser.parse_args()
     config.settings.update_from_args(args)
+    return args
 
 
 def run_app() -> None:
     """Function to run the app, used for the setup.py entry_point."""
-    set_config()
-    app = irsattend.view.main_app.IRSAttend()
-    app.run()
+    args = set_config()
+    if args.func is None:
+        app = irsattend.view.main_app.IRSAttend()
+        app.run()
+    else:
+        args.func(args)
 
 if __name__ == "__main__":
     run_app()
