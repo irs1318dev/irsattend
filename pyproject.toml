@@ -35,4 +35,4 @@ dev = [
 ]
 
 [project.scripts]
-attend = "irsattend.__main__:run_app"
+attend = "irsattend.__main__:main"

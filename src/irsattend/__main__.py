@@ -3,72 +3,96 @@ import argparse
 import pathlib
 from typing import Optional
 
-from irsattend.model import config
+from irsattend.model import config, database, google_tools
 import irsattend.view.main_app
 
 
 def build_parser() -> argparse.ArgumentParser:
     """Define command line arguments."""
     parser = argparse.ArgumentParser(prog="IRS Attendance Program")
-    parser.add_argument(
+    subparsers = parser.add_subparsers()
+    app_parser = subparsers.add_parser(
+        "app",
+        help="Run IRS Attendance application."
+    )
+    app_parser.set_defaults(func=run_app)
+    app_parser.add_argument(
         "-d", "--db_path",
         help="Path to attendance database",
         type=pathlib.Path,
         default=None
     )
-    parser.add_argument(
+    app_parser.add_argument(
         "-c", "--config_path",
         help="Path to config file",
         type=pathlib.Path,
         default=None
     )
     parser.set_defaults(func=None)
-    subparsers = parser.add_subparsers()
+
     sync_parser = subparsers.add_parser(
         "sync-roster",
         help="Synchronize attendance data with the student roster."
     )
+    sync_parser.set_defaults(func=sync_data)
     sync_group = sync_parser.add_mutually_exclusive_group(required=True)
     sync_group.add_argument(
         "-i", "--student-ids",
+        action="store_true",
         help="Send student IDs to the team's Google Sheet roster.",
-        type=pathlib.Path
     )
     sync_group.add_argument(
         "-a", "--attendance-data",
+        action="store_true",
         help="Send attendance to the team's Google Sheet roster.",
-        type=pathlib.Path
     )
-    sync_parser.set_defaults(func=sync_data)
+    sync_parser.add_argument(
+        "config_path",
+        type=pathlib.Path,
+        help="Path to roster configuration file."
+    )
+    sync_parser.add_argument(
+        "db_path",
+        type=pathlib.Path,
+        help="Path to attendance Sqlite file."
+    )
     return parser
+
+
+def run_app(args: argparse.Namespace) -> None:
+    """Run the IRS Attendane TUI application."""
+    if hasattr(args, "config_path") and args.config_path is not None:
+        config.settings.update_from_args(args)
+    app = irsattend.view.main_app.IRSAttend()
+    app.run()
 
 
 def sync_data(args: argparse.Namespace) -> None:
     """Synchronize attendance data with other applications."""
+    config_path = to_absolute_path(args.config_path)
+    db_path = to_absolute_path(args.db_path)
+    dbase = database.DBase(db_path)
+    updater = google_tools.SheetUpdater(config_path, dbase)
     if args.student_ids is not None:
-        print("Sync student IDs!")
+        print("updating Student IDs")
+        updater.insert_student_ids()
     elif args.attendance_data is not None:
-        print("Syncing attendance data!")
+        print("Syncing attendance data!", args.attendance_data)
 
 
-
-def set_config(args: Optional[argparse.Namespace] = None) -> argparse.Namespace:
-    """Assign config settings from command line args."""
-    if args is None:
-        parser = build_parser()
-        args = parser.parse_args()
-    config.settings.update_from_args(args)
-    return args
+def to_absolute_path(path: pathlib.Path) -> pathlib.Path:
+    """Convert relative paths to absolute paths."""
+    if not path.is_absolute():
+        path = pathlib.Path.cwd() / path
+    return path
 
 
-def run_app() -> None:
+def main() -> None:
     """Function to run the app, used for the setup.py entry_point."""
-    args = set_config()
-    if args.func is None:
-        app = irsattend.view.main_app.IRSAttend()
-        app.run()
-    else:
-        args.func(args)
+    parser = build_parser()
+    args = parser.parse_args()
+    args.func(args)
+
 
 if __name__ == "__main__":
-    run_app()
+    main()
