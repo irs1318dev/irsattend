@@ -3,6 +3,8 @@ import argparse
 import pathlib
 from typing import Optional
 
+import rich
+
 from irsattend.model import config, database, google_tools
 import irsattend.view.main_app
 
@@ -73,11 +75,14 @@ def sync_data(args: argparse.Namespace) -> None:
     db_path = to_absolute_path(args.db_path)
     dbase = database.DBase(db_path)
     updater = google_tools.SheetUpdater(config_path, dbase)
-    if args.student_ids is not None:
+    rich.print(args)
+    if args.student_ids:
         print("updating Student IDs")
         updater.insert_student_ids()
-    elif args.attendance_data is not None:
-        print("Syncing attendance data!", args.attendance_data)
+    elif args.attendance_data:
+        print("Syncing attendance data!")
+        updater.backup_database_file()
+        updater.insert_attendance_info()
 
 
 def to_absolute_path(path: pathlib.Path) -> pathlib.Path:

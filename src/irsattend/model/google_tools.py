@@ -1,7 +1,9 @@
 """Tools for working with Google documents."""
+import datetime
 import json
 import pathlib
 import rich
+import sqlite3
 from typing import Any, Optional
 import yaml
 
@@ -66,6 +68,7 @@ class SheetUpdater:
             self.dbase = database.DBase(dbase)
         else:
             self.dbase = dbase
+        self.backup_folder = pathlib.Path(settings["backup_folder"])
 
     @property
     def worksheet_titles(self) -> list[str]:
@@ -188,3 +191,13 @@ class SheetUpdater:
             {"range": build_ref, "values": build_checkins}
         ]
         self.roster_sheet.batch_update(batch_data)
+
+    def backup_database_file(self) -> None:
+        """Copy the attendance database and save to a folder."""
+        # filename includes timestamp in YYYYMMDD_HHMM format
+        now = datetime.datetime.now().strftime("%Y%m%d_%H%M")
+        backup_path = self.backup_folder / f"attendenance-backup-{now}.sqlite3"
+        source_conn = self.dbase.get_db_connection()
+        target_conn = sqlite3.connect(backup_path)
+        source_conn.backup(target_conn)
+        

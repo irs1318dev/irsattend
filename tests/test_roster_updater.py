@@ -50,6 +50,17 @@ def test_update_attendance_data() -> None:
     updater.insert_attendance_info()
 
 
+def test_db_backup() -> None:
+    """Send attendance data to the roster."""
+    # Arrange
+    dbase = database.DBase(REAL_DBASE_PATH)
+    updater = google_tools.SheetUpdater(SETTINGS_PATH, dbase)
+    print()
+    # Act
+    updater.backup_database_file()
+
+
+
 
 
 
