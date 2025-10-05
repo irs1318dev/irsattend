@@ -19,7 +19,6 @@ def test_read_config() -> None:
     args.db_path = DATA_PATH / "irsattend.db"
     # Act
     config.settings.update_from_args(args)
-    rich.print(args)
     # Assert
     assert isinstance(config.settings.qr_code_dir, pathlib.Path)
     assert config.settings.qr_code_dir.name == "qr_codes"

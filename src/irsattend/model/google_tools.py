@@ -144,7 +144,7 @@ class SheetUpdater:
         return student_ids
 
     def insert_student_ids(self) -> None:
-        """Insert student IDs into the roster's stuent identifier column."""
+        """Insert student IDs into the roster's student identifier column."""
         student_ids = self._get_student_ids_from_database()
         roster_lnames = self.get_mapped_col_data("last_name")
         roster_fnames = self.get_mapped_col_data("first_name")
@@ -159,9 +159,32 @@ class SheetUpdater:
             student_id = student_ids.get(key)
             roster_ids.append(student_id)
         roster_id_ref = self.get_mapped_col_ref("student_id", len(roster_ids))
-        rich.print(roster_ids)
         batch_data = [{"range": roster_id_ref, "values": [[id_] for id_ in roster_ids]}]
-        self.roster_sheet.batch_update(batch_data)           
+        self.roster_sheet.batch_update(batch_data)
 
-
-
+    def insert_attendance_info(self) -> None:
+        """Insert attendance data into the Google Sheet roster."""
+        roster_ids = self.get_mapped_col_data("student_id")
+        if roster_ids is None:
+            return
+        attendance_info = {
+            stu["student_id"]: (stu["year_checkins"], stu["build_checkins"])
+            for stu in self.dbase.get_student_attendance_data()
+        }
+        year_checkins = []
+        build_checkins = []
+        for student_id in roster_ids:
+            if student_id in attendance_info:
+                checkins = attendance_info[student_id]
+                year_checkins.append([checkins[0]])
+                build_checkins.append([checkins[1]])
+            else:
+                year_checkins.append([None])
+                build_checkins.append([None])
+        season_ref = self.get_mapped_col_ref("school_year_checkins", len(roster_ids))
+        build_ref = self.get_mapped_col_ref("build_season_checkins", len(roster_ids))
+        batch_data = [
+            {"range": season_ref, "values": year_checkins},
+            {"range": build_ref, "values": build_checkins}
+        ]
+        self.roster_sheet.batch_update(batch_data)

@@ -40,5 +40,16 @@ def test_student_ids() -> None:
     # rich.print(updater._get_student_ids_from_database())
 
 
+def test_update_attendance_data() -> None:
+    """Send attendance data to the roster."""
+    # Arrange
+    dbase = database.DBase(REAL_DBASE_PATH)
+    updater = google_tools.SheetUpdater(SETTINGS_PATH, dbase)
+    print()
+    # Act
+    updater.insert_attendance_info()
+
+
+
 
 

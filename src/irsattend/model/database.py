@@ -196,25 +196,25 @@ class DBase:
         """Join students and attendance table and get current season data."""
         # An 'app' is an appearance.
         query = """
-                WITH year_apps AS (
-                    SELECT student_id, COUNT(student_id) as apps
+                WITH year_checkins AS (
+                    SELECT student_id, COUNT(student_id) as checkins
                       FROM attendance
                      WHERE timestamp >= :year_start
                   GROUP BY student_id
                 ),
-                build_apps AS (
-                    SELECT student_id, COUNT(student_id) as apps
+                build_checkins AS (
+                    SELECT student_id, COUNT(student_id) as checkins
                       FROM attendance
                      WHERE timestamp >= :build_start
                   GROUP BY student_id
                 )
                 SELECT s.student_id, s.last_name, s.first_name, s.grad_year,
-                       COALESCE(y.apps, 0) AS year_apps,
-                       COALESCE(b.apps, 0) AS build_apps
+                       COALESCE(y.checkins, 0) AS year_checkins,
+                       COALESCE(b.checkins, 0) AS build_checkins
                   FROM students AS s
-             LEFT JOIN year_apps AS y
+             LEFT JOIN year_checkins AS y
                     ON y.student_id = s.student_id
-            LEFT JOIN build_apps AS b
+            LEFT JOIN build_checkins AS b
                     ON b.student_id = s.student_id
               ORDER BY last_name, first_name;
         """
