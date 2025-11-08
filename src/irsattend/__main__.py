@@ -81,7 +81,7 @@ def sync_data(args: argparse.Namespace) -> None:
         updater.insert_student_ids()
     elif args.attendance_data:
         print("Syncing attendance data!")
-        updater.backup_database_file()
+        # updater.backup_database_file()
         updater.insert_attendance_info()
 
 
