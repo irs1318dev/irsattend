@@ -105,3 +105,33 @@ def test_attendance_report_data(dbase_with_apps: database.DBase) -> None:
     # Assert
     for row in cursor:
         rich.print(dict(row))
+
+
+def test_to_dict(dbase_with_apps: database.DBase) -> None:
+    """Save database contents to a JSON file."""
+    # Act
+    data = dbase_with_apps.to_dict()
+    # Assert
+    tables = ["students", "attendance"]
+    assert len(data) == len(tables)
+    assert all(col in data for col in tables)
+    for table in tables:
+        assert isinstance(data[table], list)
+        assert len(data[table]) >= 10
+
+
+def test_from_dict(
+    dbase_with_apps: database.DBase,
+    empty_database2: database.DBase
+) -> None:
+    """Import student data from a dictionay into an empty database."""
+    # Arrange
+    exported_data = dbase_with_apps.to_dict()
+    # Act
+    empty_database2.load_from_dict(exported_data)
+    # Assert
+    students = empty_database2.get_all_students(as_dict=True)
+    assert len(students) == len(dbase_with_apps.get_all_students())
+    attendance = empty_database2.get_all_attendance_records(as_dict=True)
+    assert len(attendance) == len(dbase_with_apps.get_all_attendance_records())
+

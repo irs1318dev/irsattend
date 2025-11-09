@@ -13,7 +13,7 @@ DATA_FOLDER = TEST_FOLDER / "data"
 OUTPUT_FOLDER = TEST_FOLDER / "output"
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def empty_output_folder() -> pathlib.Path:
     """Create an empty output folder, or clear out folder if already exists."""
     if OUTPUT_FOLDER.exists():
@@ -41,8 +41,14 @@ def dbase_with_students(empty_database: database.DBase) -> database.DBase:
 
 
 @pytest.fixture
-def dbase_with_apps(request) -> database.DBase:
+def dbase_with_apps(empty_output_folder: pathlib.Path) -> database.DBase:
     """Database with students and appearances."""
     dbname = "testattend.db"
     shutil.copyfile(DATA_FOLDER / dbname, OUTPUT_FOLDER / dbname)
     return database.DBase(OUTPUT_FOLDER / dbname)
+
+
+@pytest.fixture
+def empty_database2(empty_output_folder: pathlib.Path) -> database.DBase:
+    """An empty IrsAttend database, with tables created."""
+    return database.DBase(OUTPUT_FOLDER / "teststudents2.db", create_new=True)

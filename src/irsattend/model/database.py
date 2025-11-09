@@ -161,9 +161,9 @@ class DBase:
             conn.execute("DELETE FROM students WHERE student_id = ?", (student_id,))
             conn.commit()
 
-    def get_all_students(self) -> list[sqlite3.Row]:
+    def get_all_students(self, as_dict: bool = False) -> list[sqlite3.Row]:
         """Retrieve all students from the database."""
-        with self.get_db_connection() as conn:
+        with self.get_db_connection(as_dict) as conn:
             cursor = conn.execute("""
                     SELECT student_id, last_name, first_name, grad_year, email
                       FROM students
@@ -323,6 +323,17 @@ class DBase:
             self.get_db_connection()
         )
     
+    def get_all_attendance_records(self, as_dict: bool = False) -> list[sqlite3.Row]:
+        """Get all data from the attendance table."""
+        query = """
+                SELECT attendance_id, student_id, event_date, event_type, timestamp
+                  FROM attendance
+              ORDER BY timestamp;
+        """
+        with self.get_db_connection(as_dict) as conn:
+            return conn.execute(query).fetchall()
+
+    
     def merge_database(self, incoming: "DBase") -> None:
         """Insert contents of another database."""
         current_student_ids = set(self.get_student_ids())
@@ -353,3 +364,54 @@ class DBase:
                     )
             except sqlite3.IntegrityError as err:
                 print(err)
+
+    def to_dict(self) -> dict[str, dict[str, list[str | int | None]]]:
+        """Save database contents to a JSON file.
+        
+        Returns:
+            Contents of the database as a Python dictionary.
+            {
+                "students": {
+                    "columns": [
+                        "student_id", "first_name", "last_name", "grad_year", "email"
+                    ]
+                    "values": [<list of lists, where each list contains column values>]       
+                }
+                "attendance": {
+                    "columns": ["student_id", "event_type", "timestamp"]
+                    "values": [<list of lists, where each list contains column values>]   
+                    ]
+                }
+            }
+        """
+        db_data = {}
+        db_data["students"] = self.get_all_students(as_dict=True)
+        attends = self.get_all_attendance_records(as_dict=True)
+        excluded_columns = ["attendance_id", "event_date"]
+        db_data["attendance"] = [
+            {col: val for col, val in row.items() if col not in excluded_columns}
+            for row in attends
+        ]
+        return db_data
+    
+    def load_from_dict(
+        self,
+        db_data_dict: dict[str, dict[str, list[str | int | None]]]
+    ) -> None:
+        """Import data into the Sqlite database."""
+        student_query = """
+            INSERT INTO students
+                        (student_id, first_name, last_name, email, grad_year)
+                 VALUES (:student_id, :first_name, :last_name, :email, :grad_year);
+        """
+        with self.get_db_connection() as conn:
+            conn.executemany(student_query, db_data_dict["students"])
+        attendance_query = """
+            INSERT INTO attendance
+                        (student_id, event_type, timestamp)
+                 VALUES (:student_id, :event_type, :timestamp);
+        """
+        with self.get_db_connection() as conn:
+            conn.executemany(attendance_query, db_data_dict["attendance"])
+
+

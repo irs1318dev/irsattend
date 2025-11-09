@@ -24,3 +24,14 @@ CREATE TABLE IF NOT EXISTS attendance (
 );
 """
 
+EVENT_TABLE_SCHEMA = """
+CREATE TABLE IF NOT EXISTS events (
+    event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_date TEXT NOT NULL,
+    event_type TEXT NOT NULL,
+    description TEXT,
+    CONSTRAINT event_date_type_constraint UNIQUE(event_date, event_type)
+)
+
+"""
+

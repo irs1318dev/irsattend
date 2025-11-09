@@ -33,13 +33,13 @@ VerticalGroup {
 }
 
 .config {
-    align-horizontal: right;
+    align-horizontal: left;
+    padding: 1;
 }
 
 .config-row {
     text-style: bold;
     color: yellow;
-    height: 3;
 }
 
 .field-label {
