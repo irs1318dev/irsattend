@@ -29,3 +29,14 @@ class EventScreen(screen.Screen):
         if config.settings.db_path is None:
             raise database.DBaseError("No database file selected.")
         self.dbase = database.DBase(config.settings.db_path)
+
+    def compose(self) -> app.ComposeResult:
+        """Add the datatable and other controls to the screen."""
+        yield widgets.Header()
+        yield widgets.Button("Scan for Meetings", id="events-scan")
+        yield widgets.DataTable(id="attendance-table")
+        yield widgets.Footer()
+
+    @textual.on(widgets.Button.Pressed, "#events-scan")
+    def action_scan_for_events(self) -> None:
+        self.dbase.scan_for_new_events()

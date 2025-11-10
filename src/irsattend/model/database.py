@@ -436,8 +436,12 @@ class DBase:
     def scan_for_new_events(
         self,
         event_type: db_tables.EventType = db_tables.EventType.MEETING
-    ) -> None:
-        """Scan attendance records for new events."""
+    ) -> int:
+        """Scan attendance table for missing events, add them to events table.
+        
+        Returns:
+            The number of rows added to the events table.
+        """
         events = set(
             (row["event_date"], row["event_type"])
             for row in self.get_events(as_dict=True)
@@ -450,13 +454,22 @@ class DBase:
         """
         with self.get_db_connection(as_dict=True) as conn:
             possible_events =  conn.execute(possible_new_event_query).fetchall()
-        events_to_add: list[dict[str, str]] = {}
+        events_to_add: list[dict[str, str]] = []
         for poss_event in possible_events:
             if (poss_event["event_date"], poss_event["event_type"]) not in events:
-                event_date = datetime.datetime.fromisoformat(poss_event["event_date"])
                 events_to_add.append({
                     "event_date": poss_event["event_date"],
-                    "event_type": poss_event["event_type"],
-                    "description": event_date.strftime()
+                    "event_type": str(event_type)
                 })
+        insert_event_query = """
+            INSERT INTO events
+                        (event_date, event_type)
+                 VALUES (:event_date, :event_type);
+        """
+        with self.get_db_connection() as conn:
+            cursor = conn.cursor()
+            cursor.executemany(insert_event_query, events_to_add)
+            rows_added = cursor.rowcount
+        return rows_added
+
         

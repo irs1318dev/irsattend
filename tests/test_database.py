@@ -37,7 +37,7 @@ def test_empty_database(empty_database: database.DBase) -> None:
     query = "SELECT name FROM sqlite_schema WHERE type = 'table';"
     with empty_database.get_db_connection() as conn:
         tables = set(row["name"] for row in conn.execute(query))
-    assert len(tables) == 3
+    assert len(tables) == 4
     assert "students" in tables
     assert "attendance" in tables
     # Must close connection or fixtures won't be able to delete Sqlite3 file when
@@ -80,7 +80,7 @@ def test_attendance_table(dbase_with_apps) -> None:
     # Assert
     print(rapdf.shape)
     assert rapdf.shape[0] > 4000
-    assert rapdf.shape[1] == 5
+    assert rapdf.shape[1] == 6
 
 
 def test_attendance_counts(dbase_with_apps: database.DBase) -> None:
@@ -140,5 +140,4 @@ def test_scan_event(dbase_with_apps: database.DBase) -> None:
     """Scan attendance records for missing events."""
     # Act
     atts = dbase_with_apps.scan_for_new_events()
-    rich.print(atts)
 

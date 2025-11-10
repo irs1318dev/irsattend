@@ -7,7 +7,9 @@ from textual import app, containers, reactive, widgets
 
 from irsattend.model import config, database
 from irsattend.view import (
-    attendance_screen, file_widgets, pw_dialog, scan_screen, student_screen)
+    attendance_screen, event_screen, file_widgets, pw_dialog, scan_screen,
+    student_screen
+)
 
 
 class IRSAttend(app.App):
@@ -122,22 +124,27 @@ class IRSAttend(app.App):
             exit_on_cancel=True)
     
     @textual.on(widgets.Button.Pressed, "#main-take-attendance")
-    def action_take_attendance(self):
+    def action_take_attendance(self) -> None:
         """Put application in attenance mode, so students can scan QR codes."""
         self.app.push_screen(scan_screen.ScanScreen())
 
     @textual.on(widgets.Button.Pressed, "#main-manage-students")
-    def action_manage_students(self):
+    def action_manage_students(self) -> None:
         """Go to register students screen."""
         self.app.push_screen(student_screen.StudentScreen())
 
     @textual.on(widgets.Button.Pressed, "#main-view-records")
-    def action_view_records(self):
+    def action_view_records(self) -> None:
         """View attendance records."""
         self.app.push_screen(attendance_screen.AttendanceScreen())
 
+    @textual.on(widgets.Button.Pressed, "#main-manage-events")
+    def action_manage_events(self) -> None:
+        """Go to event management screen."""
+        self.app.push_screen(event_screen.EventScreen())
+
     @textual.on(widgets.Button.Pressed, "#main-select-database")
-    def action_select_database(self):
+    def action_select_database(self) -> None:
         """Select a different database file or create a new one."""
         self._close_any_file_selector()
         self.mount(file_widgets.FileSelector(
@@ -154,7 +161,7 @@ class IRSAttend(app.App):
         self.db_path = db_path
 
     @textual.on(widgets.Button.Pressed, "#main-create-database")
-    def action_create_database(self):
+    def action_create_database(self) -> None:
         """Select a different database file or create a new one.
 
         Method `_on_file_selector_file_selected` is called when file selected.
