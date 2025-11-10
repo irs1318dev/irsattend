@@ -89,6 +89,7 @@ class DBase:
         cursor = conn.cursor()
         cursor.execute(db_tables.STUDENT_TABLE_SCHEMA)
         cursor.execute(db_tables.ATTENDANCE_TABLE_SCHEMA)
+        cursor.execute(db_tables.EVENT_TABLE_SCHEMA)
         conn.commit()
         conn.close()
 
@@ -286,7 +287,8 @@ class DBase:
     def add_attendance_record(
         self,
         student_id: str,
-        timestamp: Optional[datetime.datetime] = None
+        timestamp: Optional[datetime.datetime] = None,
+        event_type: db_tables.EventType = db_tables.EventType.MEETING
     ) -> Optional[datetime.datetime]:
         """Add an attendance record for a student.
 
@@ -297,8 +299,12 @@ class DBase:
             timestamp = datetime.datetime.now()
         with self.get_db_connection() as conn:
             conn.execute(
-                "INSERT INTO attendance (student_id, timestamp) VALUES (?, ?);",
-                (student_id, timestamp),
+                """
+                        INSERT INTO attendance
+                                    (student_id, timestamp, event_type)
+                             VALUES (?, ?);
+                """,
+                (student_id, timestamp, str(event_type)),
             )
             conn.commit()
         return timestamp
@@ -396,7 +402,7 @@ class DBase:
     
     def load_from_dict(
         self,
-        db_data_dict: dict[str, dict[str, list[str | int | None]]]
+        db_data_dict: dict[str, list[dict[str, str | int | None]]]
     ) -> None:
         """Import data into the Sqlite database."""
         student_query = """
@@ -414,4 +420,43 @@ class DBase:
         with self.get_db_connection() as conn:
             conn.executemany(attendance_query, db_data_dict["attendance"])
 
+    def get_events(
+        self,
+        as_dict: bool = False
+    ) -> list[dict[str, Any] | sqlite3.Row]:
+        """Get all records from the events table."""
+        query = """
+                SELECT event_id, event_date, event_type, description
+                  FROM events
+              ORDER BY event_date, event_type;
+        """
+        with self.get_db_connection(as_dict) as conn:
+            return conn.execute(query).fetchall()
 
+    def scan_for_new_events(
+        self,
+        event_type: db_tables.EventType = db_tables.EventType.MEETING
+    ) -> None:
+        """Scan attendance records for new events."""
+        events = set(
+            (row["event_date"], row["event_type"])
+            for row in self.get_events(as_dict=True)
+        )
+        possible_new_event_query = """
+            SELECT event_date, event_type
+              FROM attendance
+          GROUP BY event_date, event_type
+          ORDER BY event_date;
+        """
+        with self.get_db_connection(as_dict=True) as conn:
+            possible_events =  conn.execute(possible_new_event_query).fetchall()
+        events_to_add: list[dict[str, str]] = {}
+        for poss_event in possible_events:
+            if (poss_event["event_date"], poss_event["event_type"]) not in events:
+                event_date = datetime.datetime.fromisoformat(poss_event["event_date"])
+                events_to_add.append({
+                    "event_date": poss_event["event_date"],
+                    "event_type": poss_event["event_type"],
+                    "description": event_date.strftime()
+                })
+        

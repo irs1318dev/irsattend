@@ -135,3 +135,10 @@ def test_from_dict(
     attendance = empty_database2.get_all_attendance_records(as_dict=True)
     assert len(attendance) == len(dbase_with_apps.get_all_attendance_records())
 
+
+def test_scan_event(dbase_with_apps: database.DBase) -> None:
+    """Scan attendance records for missing events."""
+    # Act
+    atts = dbase_with_apps.scan_for_new_events()
+    rich.print(atts)
+

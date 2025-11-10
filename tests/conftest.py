@@ -45,7 +45,9 @@ def dbase_with_apps(empty_output_folder: pathlib.Path) -> database.DBase:
     """Database with students and appearances."""
     dbname = "testattend.db"
     shutil.copyfile(DATA_FOLDER / dbname, OUTPUT_FOLDER / dbname)
-    return database.DBase(OUTPUT_FOLDER / dbname)
+    dbase = database.DBase(OUTPUT_FOLDER / dbname)
+    # dbase.create_tables()  # Uncomment line if new tables are added to schema.
+    return dbase
 
 
 @pytest.fixture

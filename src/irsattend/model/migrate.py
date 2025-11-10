@@ -50,3 +50,17 @@ def to_0_2_0(
             """,
             appearance
             )
+
+def to_0_3_0(source_db_path: pathlib.Path) -> None:
+    """Migrate database from version 0.2.0 to 0.3.0.
+
+    Database is upgraded in place.
+    
+    ## Events Table
+    * Add an events table.
+    """
+    if not source_db_path.exists():
+        raise database.DBaseError(
+            f"Source sqlite3 file does not exist at {source_db_path}")
+    dbase = database.DBase(source_db_path)
+    dbase.create_tables()
