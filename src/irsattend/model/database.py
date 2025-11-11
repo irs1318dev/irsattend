@@ -371,29 +371,23 @@ class DBase:
             except sqlite3.IntegrityError as err:
                 print(err)
 
-    def to_dict(self) -> dict[str, dict[str, list[str | int | None]]]:
+    def to_dict(self) -> dict[str, list[dict[str, list[str | int | None]]]]:
         """Save database contents to a JSON file.
         
         Returns:
-            Contents of the database as a Python dictionary.
-            {
-                "students": {
-                    "columns": [
-                        "student_id", "first_name", "last_name", "grad_year", "email"
-                    ]
-                    "values": [<list of lists, where each list contains column values>]       
-                }
-                "attendance": {
-                    "columns": ["student_id", "event_type", "timestamp"]
-                    "values": [<list of lists, where each list contains column values>]   
-                    ]
-                }
-            }
+            Contents of the database as a Python dictionary. Format:
+            {<table_name>: [{<col_name>: <col_value>}]}
         """
         db_data = {}
         db_data["students"] = self.get_all_students(as_dict=True)
+        events = self.get_events(as_dict=True)
+        excluded_columns = ["event_id", "day_of_week"]
+        db_data["events"] = [
+            {col: val for col, val in row.items() if col not in excluded_columns}
+            for row in events
+        ]
         attends = self.get_all_attendance_records(as_dict=True)
-        excluded_columns = ["attendance_id", "event_date"]
+        excluded_columns = ["attendance_id", "event_date", "day_of_week"]
         db_data["attendance"] = [
             {col: val for col, val in row.items() if col not in excluded_columns}
             for row in attends
@@ -410,15 +404,20 @@ class DBase:
                         (student_id, first_name, last_name, email, grad_year)
                  VALUES (:student_id, :first_name, :last_name, :email, :grad_year);
         """
-        with self.get_db_connection() as conn:
-            conn.executemany(student_query, db_data_dict["students"])
         attendance_query = """
             INSERT INTO attendance
                         (student_id, event_type, timestamp)
                  VALUES (:student_id, :event_type, :timestamp);
         """
+        event_query = """
+            INSERT INTO events
+                        (event_date, event_type, description)
+                 VALUES (:event_date, :event_type, :description);
+        """
         with self.get_db_connection() as conn:
+            conn.executemany(student_query, db_data_dict["students"])
             conn.executemany(attendance_query, db_data_dict["attendance"])
+            conn.executemany(event_query, db_data_dict["events"])
 
     def get_events(
         self,

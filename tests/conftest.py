@@ -1,5 +1,6 @@
 """Pytest fixtures."""
-from collections.abc import Generator
+from collections.abc import Iterator
+import json
 import pathlib
 import shutil
 
@@ -13,7 +14,7 @@ DATA_FOLDER = TEST_FOLDER / "data"
 OUTPUT_FOLDER = TEST_FOLDER / "output"
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def empty_output_folder() -> pathlib.Path:
     """Create an empty output folder, or clear out folder if already exists."""
     if OUTPUT_FOLDER.exists():
@@ -28,10 +29,11 @@ def empty_output_folder() -> pathlib.Path:
 
 
 @pytest.fixture
-def empty_database(empty_output_folder: pathlib.Path) -> database.DBase:
+def empty_database(empty_output_folder: pathlib.Path) -> Iterator[database.DBase]:
     """An empty IrsAttend database, with tables created."""
-    return database.DBase(OUTPUT_FOLDER / "teststudents.db", create_new=True)
-
+    dbase = database.DBase(OUTPUT_FOLDER / "testdatabase.db", create_new=True)
+    yield dbase
+    del dbase
 
 @pytest.fixture
 def dbase_with_students(empty_database: database.DBase) -> database.DBase:
@@ -41,13 +43,12 @@ def dbase_with_students(empty_database: database.DBase) -> database.DBase:
 
 
 @pytest.fixture
-def dbase_with_apps(empty_output_folder: pathlib.Path) -> database.DBase:
+def dbase_with_apps(empty_database: database.DBase) -> database.DBase:
     """Database with students and appearances."""
-    dbname = "testattend.db"
-    shutil.copyfile(DATA_FOLDER / dbname, OUTPUT_FOLDER / dbname)
-    dbase = database.DBase(OUTPUT_FOLDER / dbname)
-    # dbase.create_tables()  # Uncomment line if new tables are added to schema.
-    return dbase
+    with open(DATA_FOLDER / "testdata.json") as jfile:
+        attendance_data = json.load(jfile)
+    empty_database.load_from_dict(attendance_data)
+    return empty_database
 
 
 @pytest.fixture

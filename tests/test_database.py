@@ -1,5 +1,6 @@
 """Test Sqlite database functionality."""
 import datetime
+import json
 import pathlib
 import re
 
@@ -73,12 +74,11 @@ def test_load_students_from_csv(dbase_with_students: database.DBase) -> None:
         assert "." in student["email"]
 
 
-def test_attendance_table(dbase_with_apps) -> None:
+def test_attendance_table(dbase_with_apps: database.DBase) -> None:
     """Attendance table has many rows and 5 columns of data."""
     # Act
     rapdf = dbase_with_apps.get_attendance_dataframe()
     # Assert
-    print(rapdf.shape)
     assert rapdf.shape[0] > 4000
     assert rapdf.shape[1] == 6
 
@@ -110,14 +110,18 @@ def test_attendance_report_data(dbase_with_apps: database.DBase) -> None:
 def test_to_dict(dbase_with_apps: database.DBase) -> None:
     """Save database contents to a JSON file."""
     # Act
+    dbase_with_apps.scan_for_new_events()
     data = dbase_with_apps.to_dict()
     # Assert
-    tables = ["students", "attendance"]
+    tables = ["students", "attendance", "events"]
     assert len(data) == len(tables)
     assert all(col in data for col in tables)
     for table in tables:
         assert isinstance(data[table], list)
         assert len(data[table]) >= 10
+
+    with open(dbase_with_apps.db_path.parent / "testdata.json", "wt") as jfile:
+        json.dump(data, jfile, indent=2)
 
 
 def test_from_dict(
