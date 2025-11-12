@@ -2,7 +2,6 @@
 import datetime
 import json
 import pathlib
-import re
 
 import polars as pl
 import pytest
@@ -31,19 +30,19 @@ DATA_FOLDER = pathlib.Path(__file__).parent / "data"
 #     attendance_df = main_db.get_attendance_dataframe()
 #     attendance_df.write_excel(DATA_FOLDER / "main-0_2_0.xlsx")
 
-
 def test_empty_database(empty_database: database.DBase) -> None:
     """Create an empty IrsAttend database."""
     # Assert
     query = "SELECT name FROM sqlite_schema WHERE type = 'table';"
     with empty_database.get_db_connection() as conn:
         tables = set(row["name"] for row in conn.execute(query))
+    conn.close()  
     assert len(tables) == 4
     assert "students" in tables
     assert "attendance" in tables
     # Must close connection or fixtures won't be able to delete Sqlite3 file when
     #   setting up for other tests.
-    conn.close()  
+
 
 
 def test_nonexistant_database_raises_error(empty_output_folder: pathlib.Path) -> None:
@@ -60,34 +59,19 @@ def test_existing_database_raises_error_on_create_new(empty_database) -> None:
         database.DBase(empty_database.db_path, create_new=True)
 
 
-def test_load_students_from_csv(dbase_with_students: database.DBase) -> None:
-    """Load test students from a CSV file."""
-    students = dbase_with_students.get_all_students()
-    assert len(students) > 100
-    id_pattern = re.compile(r"\w+-\w+-\d{4}-\d{3}")
-    for student in students:
-        assert id_pattern.fullmatch(student["student_id"]) is not None
-        grad_year = student["grad_year"]
-        assert isinstance(grad_year, int)
-        assert 2020 <= grad_year <= 2030
-        assert "@" in student["email"]
-        assert "." in student["email"]
-
-
-def test_attendance_table(dbase_with_apps: database.DBase) -> None:
+def test_attendance_table(full_dbase: database.DBase) -> None:
     """Attendance table has many rows and 5 columns of data."""
     # Act
-    rapdf = dbase_with_apps.get_attendance_dataframe()
+    rapdf = full_dbase.get_attendance_dataframe()
     # Assert
     assert rapdf.shape[0] > 4000
     assert rapdf.shape[1] == 6
 
-
-def test_attendance_counts(dbase_with_apps: database.DBase) -> None:
+def test_attendance_counts(full_dbase: database.DBase) -> None:
     """Get count of student appearances."""
     # Act
-    season_counts = dbase_with_apps.get_attendance_counts(datetime.date(2025, 9, 1))
-    build_counts = dbase_with_apps.get_attendance_counts(datetime.date(2026, 1, 1))
+    season_counts = full_dbase.get_attendance_counts(datetime.date(2025, 9, 1))
+    build_counts = full_dbase.get_attendance_counts(datetime.date(2026, 1, 1))
     # Assert
     assert len(season_counts) == len(build_counts)
     for student_id in season_counts:
@@ -98,20 +82,20 @@ def test_attendance_counts(dbase_with_apps: database.DBase) -> None:
         assert build_counts[student_id] >= 0
 
 
-def test_attendance_report_data(dbase_with_apps: database.DBase) -> None:
+def test_attendance_report_data(full_dbase: database.DBase) -> None:
     """Get info for student attendance report."""
     # Act
-    cursor = dbase_with_apps.get_student_attendance_data()
+    cursor = full_dbase.get_student_attendance_data()
     # Assert
     for row in cursor:
         rich.print(dict(row))
+    cursor.connection.close()
 
 
-def test_to_dict(dbase_with_apps: database.DBase) -> None:
+def test_to_dict(full_dbase: database.DBase) -> None:
     """Save database contents to a JSON file."""
     # Act
-    dbase_with_apps.scan_for_new_events()
-    data = dbase_with_apps.to_dict()
+    data = full_dbase.to_dict()
     # Assert
     tables = ["students", "attendance", "events"]
     assert len(data) == len(tables)
@@ -120,28 +104,28 @@ def test_to_dict(dbase_with_apps: database.DBase) -> None:
         assert isinstance(data[table], list)
         assert len(data[table]) >= 10
 
-    with open(dbase_with_apps.db_path.parent / "testdata.json", "wt") as jfile:
+    with open(full_dbase.db_path.parent / "testdata.json", "wt") as jfile:
         json.dump(data, jfile, indent=2)
 
 
 def test_from_dict(
-    dbase_with_apps: database.DBase,
+    full_dbase: database.DBase,
     empty_database2: database.DBase
 ) -> None:
     """Import student data from a dictionay into an empty database."""
     # Arrange
-    exported_data = dbase_with_apps.to_dict()
+    exported_data = full_dbase.to_dict()
     # Act
     empty_database2.load_from_dict(exported_data)
     # Assert
     students = empty_database2.get_all_students(as_dict=True)
-    assert len(students) == len(dbase_with_apps.get_all_students())
+    assert len(students) == len(full_dbase.get_all_students())
     attendance = empty_database2.get_all_attendance_records(as_dict=True)
-    assert len(attendance) == len(dbase_with_apps.get_all_attendance_records())
+    assert len(attendance) == len(full_dbase.get_all_attendance_records())
 
 
-def test_scan_event(dbase_with_apps: database.DBase) -> None:
+def test_scan_event(noevents_dbase: database.DBase) -> None:
     """Scan attendance records for missing events."""
     # Act
-    atts = dbase_with_apps.scan_for_new_events()
+    atts = noevents_dbase.scan_for_new_events()
 

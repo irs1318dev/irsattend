@@ -85,12 +85,10 @@ class DBase:
 
     def create_tables(self):
         """Creates the database tables if they don't already exist."""
-        conn = self.get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute(db_tables.STUDENT_TABLE_SCHEMA)
-        cursor.execute(db_tables.ATTENDANCE_TABLE_SCHEMA)
-        cursor.execute(db_tables.EVENT_TABLE_SCHEMA)
-        conn.commit()
+        with self.get_db_connection() as conn:
+            conn.execute(db_tables.STUDENT_TABLE_SCHEMA)
+            conn.execute(db_tables.ATTENDANCE_TABLE_SCHEMA)
+            conn.execute(db_tables.EVENT_TABLE_SCHEMA)
         conn.close()
 
     @classmethod
@@ -136,6 +134,7 @@ class DBase:
                         VALUES (?, ?, ?, ?, ?);""",
                 (student_id, first_name, last_name, email, grad_year),
             )
+        conn.close()
         return student_id
     
     def update_student(
@@ -154,44 +153,42 @@ class DBase:
                 WHERE student_id = ?""",
                 (first_name, last_name, email, grad_year, student_id),
             )
-            conn.commit()
+        conn.close()
 
     def delete_student(self, student_id: str):
         """Delete a student and their attendance records."""
         with self.get_db_connection() as conn:
             conn.execute("DELETE FROM students WHERE student_id = ?", (student_id,))
-            conn.commit()
+        conn.close()
 
     def get_all_students(self, as_dict: bool = False) -> list[sqlite3.Row]:
         """Retrieve all students from the database."""
-        with self.get_db_connection(as_dict) as conn:
-            cursor = conn.execute("""
-                    SELECT student_id, last_name, first_name, grad_year, email
-                      FROM students
-                  ORDER BY student_id;
-            """)
-            return cursor.fetchall()
+        conn = self.get_db_connection(as_dict)
+        cursor = conn.execute("""
+                SELECT student_id, last_name, first_name, grad_year, email
+                    FROM students
+                ORDER BY student_id;
+        """)
+        students = cursor.fetchall()
+        conn.close()
+        return students
         
     def get_student_ids(self) -> list[str]:
         """Get a list of student IDs."""
-        with self.get_db_connection() as conn:
-            cursor = conn.execute(
-                "SELECT student_id FROM students ORDER BY student_id;")
-            return [row[0] for row in cursor]
+        conn = self.get_db_connection()
+        cursor = conn.execute(
+            "SELECT student_id FROM students ORDER BY student_id;")
+        student_ids = [row[0] for row in cursor]
+        conn.close()
+        return student_ids
 
     def get_student_by_id(self, student_id: str) -> Optional[sqlite3.Row]:
         """Retrieve a student by their ID."""
-        with self.get_db_connection() as conn:
-            cursor = conn.execute("SELECT * FROM students WHERE student_id = ?", (student_id,))
-            if cursor is None:
-                return None
-            return cursor.fetchone()
-        
-    def import_students_from_csv(self, csv_path: pathlib.Path) -> None:
-        """Load students from a CSV file."""
-        studentdf = pl.read_csv(csv_path)
-        for row in studentdf.iter_rows(named=True):
-            self.add_student(**row)
+        conn = self.get_db_connection()
+        cursor = conn.execute("SELECT * FROM students WHERE student_id = ?", (student_id,))
+        student = None if cursor is None else cursor.fetchone()
+        conn.close()
+        return student
 
     def get_student_attendance_data(self) -> sqlite3.Cursor:
         """Join students and attendance table and get current season data."""
@@ -219,38 +216,41 @@ class DBase:
                     ON b.student_id = s.student_id
               ORDER BY last_name, first_name;
         """
-        with self.get_db_connection() as conn:
-            cursor = conn.execute(
-                query, {
-                    "year_start": config.settings.schoolyear_start_date,
-                    "build_start": config.settings.buildseason_start_date
-                })
+        conn = self.get_db_connection()
+        cursor = conn.execute(
+            query, {
+                "year_start": config.settings.schoolyear_start_date,
+                "build_start": config.settings.buildseason_start_date
+            })
         return cursor
 
     def get_attendance_counts(self, since: datetime.date) -> dict[str, int]:
         """Get a dictionary of student IDs and their attendance counts."""
-        with self.get_db_connection() as conn:
-            cursor = conn.execute("""
-                    SELECT student_id, COUNT(student_id) as checkins
-                      FROM attendance
-                     WHERE timestamp >= ?
-                  GROUP BY student_id
-                  ORDER BY student_id;
-            """,
-            (since,)
-            )
-            return {row["student_id"]: row["checkins"] for row in cursor.fetchall()}
+        conn = self.get_db_connection()
+        cursor = conn.execute("""
+                SELECT student_id, COUNT(student_id) as checkins
+                    FROM attendance
+                    WHERE timestamp >= ?
+                GROUP BY student_id
+                ORDER BY student_id;
+        """,
+        (since,)
+        )
+        counts = {row["student_id"]: row["checkins"] for row in cursor.fetchall()}
+        conn.close()
+        return counts
 
     def get_attendance_count_by_id(self, student_id: str) -> int:
         """Retrieve a student's attendance count by their ID."""
-        with self.get_db_connection() as conn:
-            cursor = conn.execute(
-                """SELECT COUNT(student_id) as count
-                FROM attendance WHERE student_id = ?""",
-                (student_id,),
-            )
-            result = cursor.fetchone()
-            return result["count"] if result else 0
+        conn = self.get_db_connection()
+        cursor = conn.execute(
+            """SELECT COUNT(student_id) as count
+            FROM attendance WHERE student_id = ?""",
+            (student_id,),
+        )
+        attendance_count = cursor.fetchone()
+        conn.close()
+        return attendance_count["count"] if attendance_count else 0
 
     def remove_last_attendance_record(self, student_id: str) -> Optional[datetime.datetime]:
         """Remove the most recent attendance record for a student.
@@ -271,8 +271,8 @@ class DBase:
                     (record["student_id"],))
                 conn.commit()
                 return record["timestamp"]
-
-            return None
+        conn.close()
+        return None
 
     def remove_all_attendance_records(self, student_id: str) -> int:
         """Remove all attendance records for a student.
@@ -281,8 +281,9 @@ class DBase:
             cursor = conn.execute(
                 "DELETE FROM attendance WHERE student_id = ?", (student_id,)
             )
-            conn.commit()
-            return cursor.rowcount
+            rowcount = cursor.rowcount
+        conn.close()
+        return rowcount
 
     def add_attendance_record(
         self,
@@ -306,7 +307,7 @@ class DBase:
                 """,
                 (student_id, timestamp, str(event_type)),
             )
-            conn.commit()
+        conn.close()
         return timestamp
 
     def has_attended_today(self, student_id: str) -> bool:
@@ -315,19 +316,22 @@ class DBase:
 
         # Get the start of today (for v2, we can add other ways to calculate meetings)
         today_start = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        with self.get_db_connection() as conn:
-            cursor = conn.execute(
-                "SELECT 1 FROM attendance WHERE student_id = ? AND timestamp >= ?",
-                (student_id, today_start),
-            )
-            return cursor.fetchone() is not None
+        conn = self.get_db_connection()
+        cursor = conn.execute(
+            "SELECT 1 FROM attendance WHERE student_id = ? AND timestamp >= ?",
+            (student_id, today_start),
+        )
+        has_attended = cursor.fetchone() is not None
+        conn.close()
+        return has_attended
         
     def get_attendance_dataframe(self) -> pl.DataFrame:
         """Get a Polars dataframe with attendance data."""
-        return pl.read_database(
-            "SELECT * FROM attendance ORDER BY timestamp;",
-            self.get_db_connection()
-        )
+        conn = self.get_db_connection()
+        dframe = pl.read_database("SELECT * FROM attendance ORDER BY timestamp;", conn)
+        conn.close()
+        return dframe
+
     
     def get_all_attendance_records(self, as_dict: bool = False) -> list[sqlite3.Row]:
         """Get all data from the attendance table."""
@@ -336,8 +340,10 @@ class DBase:
                   FROM attendance
               ORDER BY timestamp;
         """
-        with self.get_db_connection(as_dict) as conn:
-            return conn.execute(query).fetchall()
+        conn = self.get_db_connection(as_dict)
+        records = conn.execute(query).fetchall()
+        conn.close()
+        return records
 
     
     def merge_database(self, incoming: "DBase") -> None:
@@ -356,8 +362,10 @@ class DBase:
                     """,
                     dict(student),
                 )
+        main_conn.close()
         incoming_conn = incoming.get_db_connection(as_dict=True)
         incoming_attendance = incoming_conn.execute("SELECT * FROM attendance;")
+        incoming_conn.close()
         for appearance in incoming_attendance:
             try:
                 with self.get_db_connection() as db_conn:
@@ -370,6 +378,8 @@ class DBase:
                     )
             except sqlite3.IntegrityError as err:
                 print(err)
+            finally:
+                db_conn.close()
 
     def to_dict(self) -> dict[str, list[dict[str, list[str | int | None]]]]:
         """Save database contents to a JSON file.
@@ -418,6 +428,7 @@ class DBase:
             conn.executemany(student_query, db_data_dict["students"])
             conn.executemany(attendance_query, db_data_dict["attendance"])
             conn.executemany(event_query, db_data_dict["events"])
+        conn.close()
 
     def get_events(
         self,
@@ -429,8 +440,10 @@ class DBase:
                   FROM events
               ORDER BY event_date, event_type;
         """
-        with self.get_db_connection(as_dict) as conn:
-            return conn.execute(query).fetchall()
+        conn = self.get_db_connection(as_dict)
+        events = conn.execute(query).fetchall()
+        conn.close()
+        return events
 
     def scan_for_new_events(
         self,
@@ -451,8 +464,9 @@ class DBase:
           GROUP BY event_date, event_type
           ORDER BY event_date;
         """
-        with self.get_db_connection(as_dict=True) as conn:
-            possible_events =  conn.execute(possible_new_event_query).fetchall()
+        conn = self.get_db_connection(as_dict=True)
+        possible_events =  conn.execute(possible_new_event_query).fetchall()
+        conn.close()
         events_to_add: list[dict[str, str]] = []
         for poss_event in possible_events:
             if (poss_event["event_date"], poss_event["event_type"]) not in events:
@@ -469,6 +483,7 @@ class DBase:
             cursor = conn.cursor()
             cursor.executemany(insert_event_query, events_to_add)
             rows_added = cursor.rowcount
+        conn.close()
         return rows_added
 
         

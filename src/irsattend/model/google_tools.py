@@ -170,10 +170,12 @@ class SheetUpdater:
         roster_ids = self.get_mapped_col_data("student_id")
         if roster_ids is None:
             return
+        cursor = self.dbase.get_student_attendance_data()
         attendance_info = {
             stu["student_id"]: (stu["year_checkins"], stu["build_checkins"])
-            for stu in self.dbase.get_student_attendance_data()
+            for stu in cursor
         }
+        cursor.connection.close()
         year_checkins = []
         build_checkins = []
         for student_id in roster_ids:

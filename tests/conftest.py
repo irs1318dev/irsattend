@@ -35,23 +35,27 @@ def empty_database(empty_output_folder: pathlib.Path) -> Iterator[database.DBase
     yield dbase
     del dbase
 
+
 @pytest.fixture
-def dbase_with_students(empty_database: database.DBase) -> database.DBase:
-    """Database with students."""
-    empty_database.import_students_from_csv(DATA_FOLDER / "test-students.csv")
+def full_dbase(empty_database: database.DBase) -> database.DBase:
+    """Database with students, appearances, and events."""
+    with open(DATA_FOLDER / "testdata-full.json") as jfile:
+        attendance_data = json.load(jfile)
+    empty_database.load_from_dict(attendance_data)
     return empty_database
 
-
 @pytest.fixture
-def dbase_with_apps(empty_database: database.DBase) -> database.DBase:
-    """Database with students and appearances."""
-    with open(DATA_FOLDER / "testdata.json") as jfile:
+def noevents_dbase(empty_database: database.DBase) -> database.DBase:
+    """Database with students, appearances, and events."""
+    with open(DATA_FOLDER / "testdata-no-events.json") as jfile:
         attendance_data = json.load(jfile)
     empty_database.load_from_dict(attendance_data)
     return empty_database
 
 
 @pytest.fixture
-def empty_database2(empty_output_folder: pathlib.Path) -> database.DBase:
+def empty_database2(empty_output_folder: pathlib.Path) -> Iterator[database.DBase]:
     """An empty IrsAttend database, with tables created."""
-    return database.DBase(OUTPUT_FOLDER / "teststudents2.db", create_new=True)
+    dbase = database.DBase(OUTPUT_FOLDER / "teststudents2.db", create_new=True)
+    yield dbase
+    del dbase

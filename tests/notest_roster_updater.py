@@ -12,19 +12,19 @@ REAL_DBASE_PATH = pathlib.Path(
 )
 
 
-def test_open_settings_and_authorization(dbase_with_apps) -> None:
+def test_open_settings_and_authorization(full_dbase) -> None:
     """Import Google Sheet settings."""
     # Act
-    updater = google_tools.SheetUpdater(SETTINGS_PATH, dbase_with_apps)
+    updater = google_tools.SheetUpdater(SETTINGS_PATH, full_dbase)
     # Arrange
     assert isinstance(updater.roster_sheet_name, str)
     assert updater.roster_sheet_name
 
 
-def test_sheet_titles(dbase_with_apps) -> None:
+def test_sheet_titles(full_dbase) -> None:
     """Get the worksheet titles."""
     # Act
-    updater = google_tools.SheetUpdater(SETTINGS_PATH, dbase_with_apps)
+    updater = google_tools.SheetUpdater(SETTINGS_PATH, full_dbase)
     # Assert
     rich.print(updater.get_mapped_col_data("student_id"))
 
