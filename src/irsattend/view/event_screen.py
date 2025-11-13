@@ -1,13 +1,12 @@
 """Manage team events."""
-import sqlite3
 from typing import Optional
 
-import textual
-import textual.css.query
-from textual import app, binding, containers, screen, widgets
+import rich.text
 
-from irsattend.model import config, database, emailer, qr_code_generator
-from irsattend.view import modals, confirm_dialogs
+import textual
+from textual import app, binding, screen, widgets
+
+from irsattend.model import config, database
 
 
 class EventScreen(screen.Screen):
@@ -49,10 +48,15 @@ class EventScreen(screen.Screen):
         """Load attendance totals into the data table."""
         table = self.query_one("#events-table", widgets.DataTable)
         for col in [
-            ("Date", "event_date"), ("Type", "event_type"), ("Attended", "total")
+            ("Date", "event_date"), ("Day of Week (Monday=1)", "day_of_week"),
+            ("Type", "event_type"), ("Attended", "total")
         ]:
             table.add_column(col[0], key=col[1])
         attend_data = self.dbase.get_event_attendance()
         for row in attend_data:
             table.add_row(
-                row["event_date"], row["event_type"], row["total"])
+                row["event_date"],
+                rich.text.Text(str(row["day_of_week"]), justify="center"),
+                row["event_type"],
+                row["total"]
+            )
