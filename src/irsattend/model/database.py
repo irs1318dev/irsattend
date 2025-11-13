@@ -485,5 +485,28 @@ class DBase:
             rows_added = cursor.rowcount
         conn.close()
         return rows_added
+    
+    def get_event_attendance(self) -> list[dict[str, Any]]:
+        """Get attendance totals by event."""
+        query = """
+                WITH event_attendance AS (
+                        SELECT event_date, day_of_week, event_type,
+                               count(student_id) AS total
+                          FROM attendance
+                      GROUP BY event_date, day_of_week, event_type
+                )
+                SELECT a.event_date, a.day_of_week,
+                       COALESCE(e.event_type, a.event_type) AS event_type,
+                       a.total, e.description
+                  FROM event_attendance AS a
+             LEFT JOIN events AS e
+                    ON a.event_date = e.event_date AND
+                       a.event_type = e.event_type
+              ORDER BY a.event_date;
+        """
+        conn = self.get_db_connection(as_dict=True)
+        event_attendance = conn.execute(query).fetchall()
+        conn.close()
+        return event_attendance
 
         
