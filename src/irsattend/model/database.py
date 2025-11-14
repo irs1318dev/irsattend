@@ -303,7 +303,7 @@ class DBase:
                 """
                         INSERT INTO attendance
                                     (student_id, timestamp, event_type)
-                             VALUES (?, ?);
+                             VALUES (?, ?, ?);
                 """,
                 (student_id, timestamp, str(event_type)),
             )
