@@ -1,5 +1,16 @@
-/* Password Prompt Dialog */
-PasswordPrompt {
+ModalScreen {
+    align: center middle;
+}
+
+.modal-dialog {
+    width: 40;
+    height: 18;
+    content-align: center middle;
+    border: thick $primary 80%;
+    background: $surface;
+}
+
+.dialog-row {
     align: center middle;
 }
 

@@ -23,7 +23,7 @@ class PasswordPrompt(screen.ModalScreen[bool]):
             yield widgets.Label("Enter Management Password")
             yield widgets.Input(password=True, id="password-input")
             yield widgets.Static("", id="password-error")
-            with containers.Horizontal(id="password-actions"):
+            with containers.Horizontal(id="password-actions", classes="dialog-row"):
                 yield widgets.Button("Submit", variant="primary", id="submit-password")
                 yield widgets.Button("Cancel", id="cancel-password")
 

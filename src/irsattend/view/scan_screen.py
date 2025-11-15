@@ -1,21 +1,26 @@
 """Turn on camera and scan QR Codes."""
 import asyncio
+from typing import Optional
 
 import cv2
 
 import textual
 from textual import app, containers, message, screen, widgets
+from textual.widgets import option_list
 
-from irsattend.model import config
-from irsattend.model import database
+from irsattend.model import config, database, db_tables
 from irsattend.view import pw_dialog
 
 
 class ScanScreen(screen.Screen):
     """UI for scanning QR codes while taking attendance."""
 
+    dbase: database.DBase
+    """Sqlte database connection object."""
     _scanned: set[str]
     """Recently scanned student IDs."""
+    event_type: db_tables.EventType
+    """Type of event at which we're taking attendance."""
 
 
     CSS_PATH = "../styles/main.tcss"
@@ -25,6 +30,7 @@ class ScanScreen(screen.Screen):
 
     def __init__(self) -> None:
         """Initialize databae connection."""
+        # 
         super().__init__()
         if config.settings.db_path is None:
             raise database.DBaseError("No database file selected.")
@@ -43,10 +49,10 @@ class ScanScreen(screen.Screen):
         yield widgets.Footer()
 
     def on_mount(self) -> None:
+        """Request type of event then start the scanner."""
         self._scanned = set()  # Prevent code from being scanned more than once.
         self.log_widget = self.query_one("#attendance-log", widgets.RichLog)
-        self.scan_task = self.scan_qr_codes()
-
+        self.app.push_screen(EventTypeDialog(), callback=self.scan_qr_codes)
 
     def on_unmount(self) -> None:
         if hasattr(self, "scan_task"):
@@ -54,9 +60,13 @@ class ScanScreen(screen.Screen):
         # if hasattr(self, "camera"):
         #     self.camera.release()
 
+
     @textual.work(exclusive=False)
-    async def scan_qr_codes(self) -> None:
+    async def scan_qr_codes(self, meeting_type: Optional[db_tables.EventType]) -> None:
         """Open video window and capture QR codes."""
+        if meeting_type is None:
+            self.app.pop_screen()
+            return
         vcap = cv2.VideoCapture(config.settings.camera_number)
         detector = cv2.QRCodeDetector()
         qr_data = None
@@ -118,3 +128,43 @@ class ScanScreen(screen.Screen):
             submit_callback=_exit_on_success,
             exit_on_cancel=False
         )
+
+
+class EventTypeDialog(screen.ModalScreen[Optional[db_tables.EventType]]):
+    """Select the event type when opening scan attendance screen."""
+
+    CSS_PATH = "../styles/modal.tcss"
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.title = "Select Event Type"
+
+    def compose(self) -> app.ComposeResult:
+        """Arrange widgets within the dialog."""
+        with containers.Vertical(id="event-type-dialog", classes="modal-dialog"):
+            yield widgets.Label("Event Type")
+            event_options = widgets.OptionList(
+                *[option_list.Option(t.value.title(), id=t)
+                  for t in db_tables.EventType],
+                id="event-type-option",
+            )
+            yield event_options
+            with containers.Horizontal(classes="dialog-row"):
+                yield widgets.Button("Ok", id="event-type-select-ok-button")
+                yield widgets.Button("Cancel", id="event-type-select-cancel-button")
+        type_map = {opt.id: idx for idx, opt in enumerate(event_options.options)}
+        event_options.highlighted = type_map[db_tables.EventType.MEETING]
+
+    @textual.on(widgets.Button.Pressed, "#event-type-select-ok-button")
+    def on_ok_button_pressed(self) -> None:
+        """Close the dialog and display the QR code scanning screen."""
+        event_type_list = self.query_one("#event-type-option", widgets.OptionList)
+        self.dismiss(event_type_list.options[event_type_list.highlighted])
+
+    @textual.on(widgets.Button.Pressed, "#event-type-select-cancel-button")
+    def on_cancel_button_pressed(self) -> None:
+        """Close the dialog and return to the main screen."""
+        self.dismiss(None)
+
+    
+
