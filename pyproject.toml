@@ -36,6 +36,7 @@ dev = [
     "ruff>=0.12.8",
     "seaborn>=0.13.2",
     "textual-dev>=1.7.0",
+    "ty>=0.0.1a26",
 ]
 
 [project.scripts]

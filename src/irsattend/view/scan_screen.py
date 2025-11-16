@@ -60,13 +60,15 @@ class ScanScreen(screen.Screen):
         # if hasattr(self, "camera"):
         #     self.camera.release()
 
-
     @textual.work(exclusive=False)
-    async def scan_qr_codes(self, meeting_type: Optional[db_tables.EventType]) -> None:
+    async def scan_qr_codes(self, event_type: Optional[db_tables.EventType]) -> None:
         """Open video window and capture QR codes."""
-        if meeting_type is None:
+        if event_type is None:
             self.app.pop_screen()
             return
+        self.event_type = event_type
+        self.dbase.add_event(event_type)
+
         vcap = cv2.VideoCapture(config.settings.camera_number)
         detector = cv2.QRCodeDetector()
         qr_data = None
@@ -87,7 +89,7 @@ class ScanScreen(screen.Screen):
                     self._scanned.add(qr_data)
                     self.post_message(self.QrCodeFound(qr_data))
                     await asyncio.sleep(0.1)  # Allow log to update.
-            wait_key = cv2.waitKey(50)
+            wait_key = cv2.waitKey(50)  # Wait 50 miliseconds for key press.
             if wait_key in [ord("q"), ord("Q")]:
                 break
         vcap.release()
@@ -107,7 +109,10 @@ class ScanScreen(screen.Screen):
         if self.dbase.has_attended_today(student_id):
             self.log_widget.write(f"[orange3]Already attended: {student_name}[/]")
         else:
-            timestamp = self.dbase.add_attendance_record(student_id)
+            timestamp = self.dbase.add_attendance_record(
+                student_id,
+                event_type=self.event_type
+            )
             if timestamp is not None:
                 self.log_widget.write(
                     f"[green]Success: {student_name} "
@@ -159,7 +164,7 @@ class EventTypeDialog(screen.ModalScreen[Optional[db_tables.EventType]]):
     def on_ok_button_pressed(self) -> None:
         """Close the dialog and display the QR code scanning screen."""
         event_type_list = self.query_one("#event-type-option", widgets.OptionList)
-        self.dismiss(event_type_list.options[event_type_list.highlighted])
+        self.dismiss(event_type_list.options[event_type_list.highlighted].id)
 
     @textual.on(widgets.Button.Pressed, "#event-type-select-cancel-button")
     def on_cancel_button_pressed(self) -> None:

@@ -381,7 +381,7 @@ class DBase:
             finally:
                 db_conn.close()
 
-    def to_dict(self) -> dict[str, list[dict[str, list[str | int | None]]]]:
+    def to_dict(self) -> dict[str, list[dict[str, str | int | None]]]:
         """Save database contents to a JSON file.
         
         Returns:
@@ -428,6 +428,28 @@ class DBase:
             conn.executemany(student_query, db_data_dict["students"])
             conn.executemany(attendance_query, db_data_dict["attendance"])
             conn.executemany(event_query, db_data_dict["events"])
+        conn.close()
+
+    def add_event(
+        self,
+        event_type: db_tables.EventType,
+        event_date: Optional[datetime.date] = None,
+        description: Optional[str] = None
+    ) -> None:
+        """Add an event to the events table.
+        
+        Nothing happens if there is already an event on the same date with the
+        same type.
+        """
+        if event_date is None:
+            event_date = datetime.date.today().isoformat()
+        query = """
+                INSERT INTO events (event_date, event_type, description)
+                     VALUES (?, ?, ?)
+                ON CONFLICT DO NOTHING;
+        """
+        with self.get_db_connection() as conn:
+            conn.execute(query, (event_date, event_type.value, description))
         conn.close()
 
     def get_events(

@@ -7,7 +7,7 @@ import polars as pl
 import pytest
 import rich  # noqa: F401
 
-from irsattend.model import database
+from irsattend.model import database, db_tables
 
 
 DATA_FOLDER = pathlib.Path(__file__).parent / "data"
@@ -150,3 +150,52 @@ def test_event_attendance(full_dbase: database.DBase) -> None:
         assert event["total"] >= 0
     rich.print(attend_data)
 
+
+def test_add_event(noevents_dbase: database.DBase) -> None:
+    """Add an event to the events table."""
+    # Arrange
+    edate = datetime.date(2026, 1, 10)
+    desc = "Multiteam kickoff event at Auburn H.S."
+    # Act
+    noevents_dbase.add_event(db_tables.EventType.KICKOFF, edate, desc)
+    # Assert
+    events = noevents_dbase.get_events(as_dict=True)
+    assert len(events) == 1
+    assert events[0]["event_type"] == db_tables.EventType.KICKOFF
+    assert events[0]["event_date"] == edate.isoformat()
+    assert events[0]["description"] == desc
+
+
+def test_add_duplicate_event_does_nothing(noevents_dbase: database.DBase) -> None:
+    """Do not add any records to the events table when event is a duplicate."""
+    # Arrange
+    edate = datetime.date(2026, 1, 10)
+    desc = "Multiteam kickoff event at Auburn H.S."
+    noevents_dbase.add_event(db_tables.EventType.KICKOFF, edate, desc)
+    # Act
+    noevents_dbase.add_event(db_tables.EventType.KICKOFF, edate, "duplicate")
+    # Assert
+    events = noevents_dbase.get_events(as_dict=True)
+    assert len(events) == 1
+    assert events[0]["description"] == desc
+
+
+def test_add_checkin(
+    attendance_test_data: dict[str, list],
+    noevents_dbase: database.DBase
+) -> None:
+    """Add a student checkin."""
+    # Arrange
+    students = attendance_test_data["students"]
+    # Act
+    noevents_dbase.add_attendance_record(
+        students[0]["student_id"],
+        timestamp="2025-11-15 09:00:00",
+        event_type=db_tables.EventType.COMPETITION
+    )
+    # Assert
+    checkins = noevents_dbase.get_all_attendance_records(as_dict=True)
+    assert len(checkins) == 1
+    assert checkins[0]["student_id"] == students[0]["student_id"]
+    assert checkins[0]["event_type"] == db_tables.EventType.COMPETITION.value
+    assert checkins[0]["event_date"] == "2025-11-15"

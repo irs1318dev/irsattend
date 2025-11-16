@@ -28,6 +28,7 @@ def test_sheet_titles(full_dbase) -> None:
     # Assert
     rich.print(updater.get_mapped_col_data("student_id"))
 
+
 def test_student_ids() -> None:
     """Get the worksheet titles."""
     # Arrange

@@ -20,6 +20,7 @@ class EventType(enum.StrEnum):
     KICKOFF = "kickoff"
     MEETING = "meeting"
     NONE = "none"
+    OPPORTUNITY = "opportunity"
     OUTREACH = "outreach"
     VIRTUAL = "virtual"
     VOLUNTEERING = "volunteering"
