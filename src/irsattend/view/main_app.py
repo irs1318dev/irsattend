@@ -191,6 +191,8 @@ class IRSAttend(app.App):
 
     def _export_database_to_file(self, export_path: pathlib.Path) -> None:
         """Export the contents of the sqlite database to a file."""
+        if config.settings.db_path is None:
+            return
         match export_path.suffix.lower():
             case ".json":
                 dbase = database.DBase(config.settings.db_path)
@@ -215,6 +217,8 @@ class IRSAttend(app.App):
 
     def _import_data_from_file(self, import_path: pathlib.Path) -> None:
         """Import data from a JSON file."""
+        if config.settings.db_path is None:
+            return
         match import_path.suffix.lower():
             case ".json":
                 with open(import_path, "rt") as jfile:

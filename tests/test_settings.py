@@ -1,12 +1,9 @@
 """Test command-line args and settings."""
 import argparse
-import dataclasses
 import pathlib
 
-import rich
 
 from irsattend.model import config
-from irsattend.view import main_app
 
 
 DATA_PATH = pathlib.Path(__file__).parent / "data"

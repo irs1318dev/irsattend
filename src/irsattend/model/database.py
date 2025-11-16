@@ -5,7 +5,7 @@ import pathlib
 import random
 import re
 import sqlite3
-from typing import Any, Optional
+from typing import Any, cast, Optional
 
 import polars as pl
 
@@ -161,7 +161,18 @@ class DBase:
             conn.execute("DELETE FROM students WHERE student_id = ?", (student_id,))
         conn.close()
 
-    def get_all_students(self, as_dict: bool = False) -> list[sqlite3.Row]:
+    def get_all_students(self) -> list[sqlite3.Row]:
+        """Retrieve all students from the database."""
+        return cast(list[sqlite3.Row], self._get_all_students())
+    
+    def get_all_students_dict(self) -> list[dict[str, Any]]:
+        """Retrieve all students from the database."""
+        return cast(list[dict[str, Any]], self._get_all_students(as_dict=True))  
+
+    def _get_all_students(
+            self,
+            as_dict: bool = False
+    ) -> list[sqlite3.Row] | list[dict[str, Any]]:
         """Retrieve all students from the database."""
         conn = self.get_db_connection(as_dict)
         cursor = conn.execute("""
@@ -333,14 +344,14 @@ class DBase:
         return dframe
 
     
-    def get_all_attendance_records(self, as_dict: bool = False) -> list[sqlite3.Row]:
+    def get_all_attendance_records_dict(self) -> list[dict[str, Any]]:
         """Get all data from the attendance table."""
         query = """
                 SELECT attendance_id, student_id, event_date, event_type, timestamp
                   FROM attendance
               ORDER BY timestamp;
         """
-        conn = self.get_db_connection(as_dict)
+        conn = self.get_db_connection(as_dict=True)
         records = conn.execute(query).fetchall()
         conn.close()
         return records
@@ -366,6 +377,7 @@ class DBase:
         incoming_conn = incoming.get_db_connection(as_dict=True)
         incoming_attendance = incoming_conn.execute("SELECT * FROM attendance;")
         incoming_conn.close()
+        db_conn: sqlite3.Connection | None = None
         for appearance in incoming_attendance:
             try:
                 with self.get_db_connection() as db_conn:
@@ -379,7 +391,8 @@ class DBase:
             except sqlite3.IntegrityError as err:
                 print(err)
             finally:
-                db_conn.close()
+                if db_conn is not None:
+                    db_conn.close()
 
     def to_dict(self) -> dict[str, list[dict[str, str | int | None]]]:
         """Save database contents to a JSON file.
@@ -389,14 +402,14 @@ class DBase:
             {<table_name>: [{<col_name>: <col_value>}]}
         """
         db_data = {}
-        db_data["students"] = self.get_all_students(as_dict=True)
-        events = self.get_events(as_dict=True)
+        db_data["students"] = self.get_all_students_dict()
+        events = self.get_events_dict()
         excluded_columns = ["event_id", "day_of_week"]
         db_data["events"] = [
             {col: val for col, val in row.items() if col not in excluded_columns}
             for row in events
         ]
-        attends = self.get_all_attendance_records(as_dict=True)
+        attends = self.get_all_attendance_records_dict()
         excluded_columns = ["attendance_id", "event_date", "day_of_week"]
         db_data["attendance"] = [
             {col: val for col, val in row.items() if col not in excluded_columns}
@@ -442,27 +455,24 @@ class DBase:
         same type.
         """
         if event_date is None:
-            event_date = datetime.date.today().isoformat()
+            event_date = datetime.date.today()
         query = """
                 INSERT INTO events (event_date, event_type, description)
                      VALUES (?, ?, ?)
                 ON CONFLICT DO NOTHING;
         """
         with self.get_db_connection() as conn:
-            conn.execute(query, (event_date, event_type.value, description))
+            conn.execute(query, (event_date.isoformat(), event_type.value, description))
         conn.close()
 
-    def get_events(
-        self,
-        as_dict: bool = False
-    ) -> list[dict[str, Any] | sqlite3.Row]:
+    def get_events_dict(self) -> list[dict[str, Any]]:
         """Get all records from the events table."""
         query = """
                 SELECT event_id, event_date, event_type, description
                   FROM events
               ORDER BY event_date, event_type;
         """
-        conn = self.get_db_connection(as_dict)
+        conn = self.get_db_connection(as_dict=True)
         events = conn.execute(query).fetchall()
         conn.close()
         return events
@@ -478,7 +488,7 @@ class DBase:
         """
         events = set(
             (row["event_date"], row["event_type"])
-            for row in self.get_events(as_dict=True)
+            for row in self.get_events_dict()
         )
         possible_new_event_query = """
             SELECT event_date, event_type

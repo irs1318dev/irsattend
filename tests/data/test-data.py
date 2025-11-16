@@ -253,7 +253,6 @@ def _():
     import marimo as mo
     import numpy as np
     import polars as pl
-    import seaborn as sns
 
     from irsattend.model import database
     return database, datetime, enum, mo, np, pathlib, pl, relativedelta

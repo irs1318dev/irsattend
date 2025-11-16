@@ -1,7 +1,6 @@
 """Start the IRS Attendance App."""
 import argparse
 import pathlib
-from typing import Optional
 
 import rich
 

@@ -1,6 +1,6 @@
 """Turn on camera and scan QR Codes."""
 import asyncio
-from typing import Optional
+from typing import cast, Optional
 
 import cv2
 
@@ -17,6 +17,7 @@ class ScanScreen(screen.Screen):
 
     dbase: database.DBase
     """Sqlte database connection object."""
+    log_widget: widgets.RichLog
     _scanned: set[str]
     """Recently scanned student IDs."""
     event_type: db_tables.EventType
@@ -52,23 +53,26 @@ class ScanScreen(screen.Screen):
         """Request type of event then start the scanner."""
         self._scanned = set()  # Prevent code from being scanned more than once.
         self.log_widget = self.query_one("#attendance-log", widgets.RichLog)
-        self.app.push_screen(EventTypeDialog(), callback=self.scan_qr_codes)
+        self.app.push_screen(
+            EventTypeDialog(),
+            callback=self.set_event_type_and_start_scanning
+        )
 
-    def on_unmount(self) -> None:
-        if hasattr(self, "scan_task"):
-            self.scan_task.cancel()
-        # if hasattr(self, "camera"):
-        #     self.camera.release()
-
-    @textual.work(exclusive=False)
-    async def scan_qr_codes(self, event_type: Optional[db_tables.EventType]) -> None:
-        """Open video window and capture QR codes."""
+    def set_event_type_and_start_scanning(
+        self,
+        event_type: Optional[db_tables.EventType]
+    ) -> None:
+        """Set the event type"""
         if event_type is None:
             self.app.pop_screen()
             return
         self.event_type = event_type
         self.dbase.add_event(event_type)
+        self.scan_qr_codes()
 
+    @textual.work(exclusive=False)
+    async def scan_qr_codes(self) -> None:
+        """Open video window and capture QR codes."""
         vcap = cv2.VideoCapture(config.settings.camera_number)
         detector = cv2.QRCodeDetector()
         qr_data = None
@@ -164,7 +168,13 @@ class EventTypeDialog(screen.ModalScreen[Optional[db_tables.EventType]]):
     def on_ok_button_pressed(self) -> None:
         """Close the dialog and display the QR code scanning screen."""
         event_type_list = self.query_one("#event-type-option", widgets.OptionList)
-        self.dismiss(event_type_list.options[event_type_list.highlighted].id)
+        selected_index = event_type_list.highlighted
+        if selected_index is not None:
+            selected_event = cast(
+                db_tables.EventType, event_type_list.options[selected_index].id)
+            self.dismiss(selected_event)
+        else:
+            self.dismiss(None)
 
     @textual.on(widgets.Button.Pressed, "#event-type-select-cancel-button")
     def on_cancel_button_pressed(self) -> None:

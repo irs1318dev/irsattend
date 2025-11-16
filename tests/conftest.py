@@ -1,5 +1,4 @@
 """Pytest fixtures."""
-from collections.abc import Iterator
 import json
 import pathlib
 import shutil

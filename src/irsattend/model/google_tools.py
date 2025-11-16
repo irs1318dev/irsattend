@@ -2,7 +2,6 @@
 import datetime
 import json
 import pathlib
-import rich
 import sqlite3
 from typing import Any, Optional
 import yaml
@@ -117,7 +116,8 @@ class SheetUpdater:
         if col_num is None:
             return None
         else:
-            return (self.mapped_sheet.col_values(col_num))[self.header_row:]
+            col_values = (self.mapped_sheet.col_values(col_num))[self.header_row:]
+            return [v.strip() if isinstance(v, str) else v for v in col_values]
     
     def get_mapped_col_ref(self, field_name: str, length: int) -> Optional[str]:
         """A1 reference that maps to field's first data row."""
@@ -198,7 +198,7 @@ class SheetUpdater:
         """Copy the attendance database and save to a folder."""
         # filename includes timestamp in YYYYMMDD_HHMM format
         now = datetime.datetime.now().strftime("%Y%m%d_%H%M")
-        backup_path = self.backup_folder / f"attendenance-backup-{now}.sqlite3"
+        backup_path = self.backup_folder / f"attendance-backup-{now}.sqlite3"
         source_conn = self.dbase.get_db_connection()
         target_conn = sqlite3.connect(backup_path)
         source_conn.backup(target_conn)

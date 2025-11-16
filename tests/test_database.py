@@ -3,7 +3,6 @@ import datetime
 import json
 import pathlib
 
-import polars as pl
 import pytest
 import rich  # noqa: F401
 
@@ -118,16 +117,16 @@ def test_from_dict(
     # Act
     empty_database2.load_from_dict(exported_data)
     # Assert
-    students = empty_database2.get_all_students(as_dict=True)
-    assert len(students) == len(full_dbase.get_all_students())
-    attendance = empty_database2.get_all_attendance_records(as_dict=True)
-    assert len(attendance) == len(full_dbase.get_all_attendance_records())
+    students = empty_database2.get_all_students_dict()
+    assert len(students) == len(full_dbase.get_all_students_dict())
+    attendance = empty_database2.get_all_attendance_records_dict()
+    assert len(attendance) == len(full_dbase.get_all_attendance_records_dict())
 
 
 def test_scan_event(noevents_dbase: database.DBase) -> None:
     """Scan attendance records for missing events."""
     # Act
-    atts = noevents_dbase.scan_for_new_events()
+    noevents_dbase.scan_for_new_events()
 
 
 def test_event_attendance(full_dbase: database.DBase) -> None:
@@ -159,7 +158,7 @@ def test_add_event(noevents_dbase: database.DBase) -> None:
     # Act
     noevents_dbase.add_event(db_tables.EventType.KICKOFF, edate, desc)
     # Assert
-    events = noevents_dbase.get_events(as_dict=True)
+    events = noevents_dbase.get_events_dict()
     assert len(events) == 1
     assert events[0]["event_type"] == db_tables.EventType.KICKOFF
     assert events[0]["event_date"] == edate.isoformat()
@@ -175,7 +174,7 @@ def test_add_duplicate_event_does_nothing(noevents_dbase: database.DBase) -> Non
     # Act
     noevents_dbase.add_event(db_tables.EventType.KICKOFF, edate, "duplicate")
     # Assert
-    events = noevents_dbase.get_events(as_dict=True)
+    events = noevents_dbase.get_events_dict()
     assert len(events) == 1
     assert events[0]["description"] == desc
 
@@ -190,11 +189,11 @@ def test_add_checkin(
     # Act
     noevents_dbase.add_attendance_record(
         students[0]["student_id"],
-        timestamp="2025-11-15 09:00:00",
+        timestamp=datetime.datetime(2025, 11, 15),
         event_type=db_tables.EventType.COMPETITION
     )
     # Assert
-    checkins = noevents_dbase.get_all_attendance_records(as_dict=True)
+    checkins = noevents_dbase.get_all_attendance_records_dict()
     assert len(checkins) == 1
     assert checkins[0]["student_id"] == students[0]["student_id"]
     assert checkins[0]["event_type"] == db_tables.EventType.COMPETITION.value
