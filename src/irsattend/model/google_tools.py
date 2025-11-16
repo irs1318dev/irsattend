@@ -1,4 +1,5 @@
 """Tools for working with Google documents."""
+
 import datetime
 import json
 import pathlib
@@ -48,9 +49,7 @@ class SheetUpdater:
     """An object that's used to connect to Google accounts."""
 
     def __init__(
-        self,
-        config_path: pathlib.Path,
-        dbase: pathlib.Path | database.DBase
+        self, config_path: pathlib.Path, dbase: pathlib.Path | database.DBase
     ) -> None:
         """Initialize from settings in config file."""
         with open(config_path) as config_file:
@@ -73,12 +72,12 @@ class SheetUpdater:
     def worksheet_titles(self) -> list[str]:
         """List of worksheet titles."""
         return [sheet.title for sheet in self.spreadsheet.worksheets()]
-    
+
     @property
     def mapped_sheet(self) -> gspread.worksheet.Worksheet:
         """Worksheet identified in the column map."""
         return self.spreadsheet.worksheet(self.roster_sheet_name)
-    
+
     @property
     def mapped_header_row(self):
         """Column labels in the header row of the mapped worksheet."""
@@ -86,19 +85,20 @@ class SheetUpdater:
 
     @staticmethod
     def _get_credentials(
-        account_data: str | dict[str, str]
+        account_data: str | dict[str, str],
     ) -> service_account.Credentials:
         """Load Google service account credientials from the database."""
         if isinstance(account_data, str):
             account_data = json.loads(account_data)
-        credentials = (
-            service_account
-            .Credentials
-            .from_service_account_info(account_data))
-        scope = ['https://spreadsheets.google.com/feeds',
-                    'https://www.googleapis.com/auth/drive']
+        credentials = service_account.Credentials.from_service_account_info(
+            account_data
+        )
+        scope = [
+            "https://spreadsheets.google.com/feeds",
+            "https://www.googleapis.com/auth/drive",
+        ]
         return credentials.with_scopes(scope)
-    
+
     def get_mapped_col_number(self, field_name: str) -> Optional[int]:
         """Column number that maps to field."""
         col_number = None
@@ -109,16 +109,16 @@ class SheetUpdater:
             except ValueError:
                 pass
         return col_number
-    
+
     def get_mapped_col_data(self, field_name: str) -> Optional[list[Any]]:
         """Get column values"""
         col_num = self.get_mapped_col_number(field_name)
         if col_num is None:
             return None
         else:
-            col_values = (self.mapped_sheet.col_values(col_num))[self.header_row:]
+            col_values = (self.mapped_sheet.col_values(col_num))[self.header_row :]
             return [v.strip() if isinstance(v, str) else v for v in col_values]
-    
+
     def get_mapped_col_ref(self, field_name: str, length: int) -> Optional[str]:
         """A1 reference that maps to field's first data row."""
         col_number = self.get_mapped_col_number(field_name)
@@ -128,22 +128,22 @@ class SheetUpdater:
             return f"{col_top}:{col_bot}"
         else:
             return None
-        
+
     def rowcol_to_a1(self, row: int, col: int) -> str:
         """Convert row and column numbers to A1 spreadsheet notation."""
         return gspread.utils.rowcol_to_a1(row, col)
-    
+
     def _get_student_ids_from_database(self) -> dict[tuple[str, str, int], str]:
         """Get student IDs as a dict.
-         
+
         Dict keys are a tuple with <last_name>, <first_name>, <grad_year>.
         Dictionary values are student IDs.
         """
         student_ids: dict[tuple[str, str, int], str] = {}
         for row in self.dbase.get_all_students():
-            student_ids[
-                (row["last_name"], row["first_name"], row["grad_year"])
-            ] = row["student_id"]
+            student_ids[(row["last_name"], row["first_name"], row["grad_year"])] = row[
+                "student_id"
+            ]
         return student_ids
 
     def insert_student_ids(self) -> None:
@@ -190,7 +190,7 @@ class SheetUpdater:
         build_ref = self.get_mapped_col_ref("build_season_checkins", len(roster_ids))
         batch_data = [
             {"range": season_ref, "values": year_checkins},
-            {"range": build_ref, "values": build_checkins}
+            {"range": build_ref, "values": build_checkins},
         ]
         self.roster_sheet.batch_update(batch_data)
 
@@ -202,4 +202,3 @@ class SheetUpdater:
         source_conn = self.dbase.get_db_connection()
         target_conn = sqlite3.connect(backup_path)
         source_conn.backup(target_conn)
-        

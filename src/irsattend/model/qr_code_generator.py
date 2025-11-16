@@ -21,11 +21,10 @@ def _clear_folder_contents(folder_path: pathlib.Path) -> None:
 
 
 def generate_all_qr_codes(
-    qr_folder: pathlib.Path,
-    dbase: database.DBase
+    qr_folder: pathlib.Path, dbase: database.DBase
 ) -> Iterator[tuple[str, int]]:
     """Generate QR codes for all students in database.
-    
+
     When first called, yields [["quantity-students", N] where N is the number
     of students for whom QR codes will be generated.
     On subsequent calls, yields [student_id, 1|0] where 1 indicates success and
@@ -46,12 +45,9 @@ def generate_all_qr_codes(
             yield (student["student_id"], 1)
 
 
-def generate_qr_code_image(
-    student_id: str,
-    qr_folder: pathlib.Path
-) -> None:
+def generate_qr_code_image(student_id: str, qr_folder: pathlib.Path) -> None:
     """Generate a QR code and save it to a file.
-    
+
     Raises:
         QrError if file already exists.
     """

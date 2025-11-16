@@ -1,4 +1,5 @@
 """Test command-line args and settings."""
+
 import argparse
 import pathlib
 
@@ -25,9 +26,5 @@ def test_read_config() -> None:
     assert config.settings.buildseason_start_date.month == 1
     assert config.settings.buildseason_start_date.day == 1
     assert (
-        config.settings.buildseason_start_date >
-        config.settings.schoolyear_start_date
+        config.settings.buildseason_start_date > config.settings.schoolyear_start_date
     )
-
-
-

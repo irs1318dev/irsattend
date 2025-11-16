@@ -1,4 +1,5 @@
 """Send QR Code Emails."""
+
 from collections.abc import Iterator
 from email import encoders
 from email.mime import base, image, multipart, text
@@ -16,8 +17,7 @@ class EmailError(Exception):
 
 
 def send_all_emails(
-    qr_folder: pathlib.Path,
-    students: list[sqlite3.Row]
+    qr_folder: pathlib.Path, students: list[sqlite3.Row]
 ) -> Iterator[tuple[str, int]]:
     """Send an email with a QR code to all students."""
     for student in students:
@@ -28,11 +28,12 @@ def send_all_emails(
             send_email(
                 student["email"],
                 f"{student['first_name']} {student['last_name']}",
-                qr_path
+                qr_path,
             )
         except (
-            smtplib.SMTPAuthenticationError, smtplib.SMTPAuthenticationError,
-            smtplib.SMTPException
+            smtplib.SMTPAuthenticationError,
+            smtplib.SMTPAuthenticationError,
+            smtplib.SMTPException,
         ):
             yield student["student_id"], 1
         else:
@@ -46,19 +47,19 @@ def send_all_emails(
 
 
 def send_email(
-    email: str,
-    student_name: str,
-    qr_code_path: pathlib.Path
+    email: str, student_name: str, qr_code_path: pathlib.Path
 ) -> tuple[bool, str]:
     """
     Sends an email with a QR Code to a student.
     """
 
-    if any([
-        config.settings.smtp_server is None,
-        config.settings.smtp_username is None,
-        config.settings.smtp_password is None,
-        config.settings.smtp_port is None]
+    if any(
+        [
+            config.settings.smtp_server is None,
+            config.settings.smtp_username is None,
+            config.settings.smtp_password is None,
+            config.settings.smtp_port is None,
+        ]
     ):
         missing = []
         if config.settings.smtp_server is None:
@@ -168,9 +169,7 @@ def send_email(
     with open(qr_code_path, "rb") as fp:
         img = image.MIMEImage(fp.read())
     img.add_header("Content-ID", "<qr_code>")
-    img.add_header(
-        "Content-Disposition", "inline", filename=qr_code_path.name
-    )
+    img.add_header("Content-Disposition", "inline", filename=qr_code_path.name)
     msg.attach(img)
     # Also send QR code as attachment, to make it easy to save to gallary.
     with open(qr_code_path, "rb") as fp:

@@ -1,4 +1,5 @@
 """Modal dialog definitions."""
+
 from collections.abc import Sequence
 import csv
 import os
@@ -26,6 +27,7 @@ class IsInteger(Validator):
 
 class StudentDialog(ModalScreen):
     """A dialog for adding or editing student details."""
+
     CSS_PATH = "../styles/modal.tcss"
 
     def __init__(self, student_data: dict | None = None) -> None:
@@ -124,6 +126,7 @@ class StudentDialog(ModalScreen):
 
 class CSVImportDialog(ModalScreen):
     """A dialog for importing students from CSV."""
+
     CSS_PATH = "../styles/modal.tcss"
 
     def compose(self) -> ComposeResult:
@@ -188,7 +191,7 @@ class CSVImportDialog(ModalScreen):
                 )
                 return
             # Start at 2 since row 1 is headers
-            for row_num, row in enumerate(reader, start=2): 
+            for row_num, row in enumerate(reader, start=2):
                 # Check if all rows exist
                 field_validators = {
                     "First Name": NotEmpty(),

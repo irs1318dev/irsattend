@@ -1,12 +1,15 @@
 """Prompt user for a password."""
+
 import hashlib
 
 from textual import app, containers, screen, widgets
 
 from irsattend.model import config
 
+
 class PasswordPrompt(screen.ModalScreen[bool]):
     """A modal screen to ask for the management password."""
+
     CSS_PATH = "../styles/modal.tcss"
 
     exit_on_cancel: bool
@@ -55,10 +58,8 @@ class PasswordPrompt(screen.ModalScreen[bool]):
 
     @staticmethod
     def show(
-        submit_callback: screen.ScreenResultCallbackType,
-        exit_on_cancel=True
+        submit_callback: screen.ScreenResultCallbackType, exit_on_cancel=True
     ) -> None:
         """Display the dialog and pass the result to the callback method."""
         password_dialog = PasswordPrompt(exit_on_cancel)
         password_dialog.app.push_screen(password_dialog, callback=submit_callback)
-        

@@ -1,4 +1,5 @@
 """Manage team events."""
+
 from typing import Optional
 
 import rich.text
@@ -48,8 +49,10 @@ class EventScreen(screen.Screen):
         """Load attendance totals into the data table."""
         table = self.query_one("#events-table", widgets.DataTable)
         for col in [
-            ("Date", "event_date"), ("Day of Week (Monday=1)", "day_of_week"),
-            ("Type", "event_type"), ("Attended", "total")
+            ("Date", "event_date"),
+            ("Day of Week (Monday=1)", "day_of_week"),
+            ("Type", "event_type"),
+            ("Attended", "total"),
         ]:
             table.add_column(col[0], key=col[1])
         attend_data = self.dbase.get_event_attendance()
@@ -58,5 +61,5 @@ class EventScreen(screen.Screen):
                 row["event_date"],
                 rich.text.Text(str(row["day_of_week"]), justify="center"),
                 row["event_type"],
-                row["total"]
+                row["total"],
             )

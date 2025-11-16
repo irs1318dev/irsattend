@@ -1,4 +1,5 @@
 """Pytest fixtures."""
+
 import json
 import pathlib
 import shutil
@@ -62,7 +63,7 @@ def empty_database2(empty_output_folder: pathlib.Path) -> database.DBase:
 @pytest.fixture
 def attendance_test_data() -> dict[str, list]:
     """Get test data as a dictionary.
-    
+
     Dictionary has three keys: students, attendance, and events, where each
     key is a list of dictionaries.
     """

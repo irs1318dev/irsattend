@@ -1,4 +1,5 @@
 """Test Sqlite database functionality."""
+
 import datetime
 import json
 import pathlib
@@ -29,19 +30,19 @@ DATA_FOLDER = pathlib.Path(__file__).parent / "data"
 #     attendance_df = main_db.get_attendance_dataframe()
 #     attendance_df.write_excel(DATA_FOLDER / "main-0_2_0.xlsx")
 
+
 def test_empty_database(empty_database: database.DBase) -> None:
     """Create an empty IrsAttend database."""
     # Assert
     query = "SELECT name FROM sqlite_schema WHERE type = 'table';"
     with empty_database.get_db_connection() as conn:
         tables = set(row["name"] for row in conn.execute(query))
-    conn.close()  
+    conn.close()
     assert len(tables) == 4
     assert "students" in tables
     assert "attendance" in tables
     # Must close connection or fixtures won't be able to delete Sqlite3 file when
     #   setting up for other tests.
-
 
 
 def test_nonexistant_database_raises_error(empty_output_folder: pathlib.Path) -> None:
@@ -65,6 +66,7 @@ def test_attendance_table(full_dbase: database.DBase) -> None:
     # Assert
     assert rapdf.shape[0] > 4000
     assert rapdf.shape[1] == 6
+
 
 def test_attendance_counts(full_dbase: database.DBase) -> None:
     """Get count of student appearances."""
@@ -107,10 +109,7 @@ def test_to_dict(full_dbase: database.DBase) -> None:
         json.dump(data, jfile, indent=2)
 
 
-def test_from_dict(
-    full_dbase: database.DBase,
-    empty_database2: database.DBase
-) -> None:
+def test_from_dict(full_dbase: database.DBase, empty_database2: database.DBase) -> None:
     """Import student data from a dictionay into an empty database."""
     # Arrange
     exported_data = full_dbase.to_dict()
@@ -180,8 +179,7 @@ def test_add_duplicate_event_does_nothing(noevents_dbase: database.DBase) -> Non
 
 
 def test_add_checkin(
-    attendance_test_data: dict[str, list],
-    noevents_dbase: database.DBase
+    attendance_test_data: dict[str, list], noevents_dbase: database.DBase
 ) -> None:
     """Add a student checkin."""
     # Arrange
@@ -190,7 +188,7 @@ def test_add_checkin(
     noevents_dbase.add_attendance_record(
         students[0]["student_id"],
         timestamp=datetime.datetime(2025, 11, 15),
-        event_type=db_tables.EventType.COMPETITION
+        event_type=db_tables.EventType.COMPETITION,
     )
     # Assert
     checkins = noevents_dbase.get_all_attendance_records_dict()

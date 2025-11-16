@@ -5,8 +5,10 @@ from textual.widgets import Label, Static, Button
 from textual.screen import ModalScreen
 from textual.containers import Vertical, Horizontal
 
+
 class DeleteConfirmDialog(ModalScreen):
     """A confirmation dialog for deleting students."""
+
     CSS_PATH = "../styles/modal.tcss"
 
     student_name: str
@@ -42,6 +44,7 @@ class DeleteConfirmDialog(ModalScreen):
 
 class GeneralConfirmDialog(ModalScreen):
     """General confirmation dialog."""
+
     CSS_PATH = "../styles/modal.tcss"
 
     message: str

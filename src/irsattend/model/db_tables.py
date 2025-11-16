@@ -11,11 +11,13 @@ Event dates and types.
 
 The day_of_week field is an integer ranging from 1 (Monday) to 7 (Sunday).
 """
+
 import enum
 
 
 class EventType(enum.StrEnum):
     """Types of events at which we take attendance."""
+
     COMPETITION = "competition"
     KICKOFF = "kickoff"
     MEETING = "meeting"
@@ -61,4 +63,3 @@ CREATE TABLE IF NOT EXISTS events (
       CONSTRAINT event_date_type_constraint UNIQUE(event_date, event_type)
 );
 """
-

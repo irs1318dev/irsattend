@@ -1,4 +1,5 @@
 """Main entry point for IRS Attend Application."""
+
 import json
 import pathlib
 
@@ -7,8 +8,12 @@ from textual import app, containers, reactive, widgets
 
 from irsattend.model import config, database
 from irsattend.view import (
-    attendance_screen, event_screen, file_widgets, pw_dialog, scan_screen,
-    student_screen
+    attendance_screen,
+    event_screen,
+    file_widgets,
+    pw_dialog,
+    scan_screen,
+    student_screen,
 )
 
 
@@ -45,69 +50,63 @@ class IRSAttend(app.App):
                     "Manage Students",
                     id="main-manage-students",
                     classes="attend-main",
-                    tooltip="Get a new student's info and generate a QR code."
+                    tooltip="Get a new student's info and generate a QR code.",
                 )
                 yield widgets.Button(
                     "View Attendance Records",
                     id="main-view-records",
-                    classes="attend-main"
+                    classes="attend-main",
                 )
                 yield widgets.Button(
-                    "Manage Events",
-                    id="main-manage-events",
-                    classes="attend-main"
+                    "Manage Events", id="main-manage-events", classes="attend-main"
                 )
-        
+
         # Database Controls
         with containers.VerticalGroup(classes="outer"):
             with containers.HorizontalGroup():
+                yield widgets.Label("Current Database: ", classes="config-row")
                 yield widgets.Label(
-                    "Current Database: ", classes="config-row")
-                yield widgets.Label(
-                    str(config.settings.db_path), id="main-config-db-path")
+                    str(config.settings.db_path), id="main-config-db-path"
+                )
             with containers.HorizontalGroup(
-                id="main-database-buttons",
-                classes="config"
+                id="main-database-buttons", classes="config"
             ):
                 yield widgets.Button(
                     "Create New Database File",
                     id="main-create-database",
-                    classes="attend-main")
-                yield widgets.Button(
-                    "Select Database",
-                    id="main-select-database",
-                    classes="attend-main")
-                yield widgets.Button(
-                    "Export",
-                    id="main-export-database",
-                    classes="attend-main"
+                    classes="attend-main",
                 )
                 yield widgets.Button(
-                    "Import",
-                    id="main-import-database",
-                    classes="attend-main"
+                    "Select Database", id="main-select-database", classes="attend-main"
+                )
+                yield widgets.Button(
+                    "Export", id="main-export-database", classes="attend-main"
+                )
+                yield widgets.Button(
+                    "Import", id="main-import-database", classes="attend-main"
                 )
 
         # Configuration Controls
         with containers.VerticalGroup(classes="outer"):
             with containers.HorizontalGroup():
+                yield widgets.Label("Configuration File: ", classes="config-row")
                 yield widgets.Label(
-                    "Configuration File: ", classes="config-row")
-                yield widgets.Label(
-                    str(config.settings.config_path), id="main-settings-path")
+                    str(config.settings.config_path), id="main-settings-path"
+                )
             with containers.HorizontalGroup(classes="config"):
                 yield widgets.Button(
                     "Create New Settings File",
                     classes="dock-right attend-main",
-                    id="main-create-settings"
-        )
+                    id="main-create-settings",
+                )
                 yield widgets.Button(
                     "Select Settings File",
                     classes="dock-right attend-main",
-                    id="main-select-settings"
-        )
+                    id="main-select-settings",
+                )
         yield widgets.Label(
-            "Nothing to see here!", id="main-status-message", classes="app-alert")
+            "Nothing to see here!", id="main-status-message", classes="app-alert"
+        )
         yield widgets.Footer()
 
     def on_mount(self) -> None:
@@ -120,9 +119,9 @@ class IRSAttend(app.App):
                 self.exit(message="Incorrect password.")
 
         pw_dialog.PasswordPrompt.show(
-            submit_callback=_exit_if_no_pw,
-            exit_on_cancel=True)
-    
+            submit_callback=_exit_if_no_pw, exit_on_cancel=True
+        )
+
     @textual.on(widgets.Button.Pressed, "#main-take-attendance")
     def action_take_attendance(self) -> None:
         """Put application in attenance mode, so students can scan QR codes."""
@@ -147,13 +146,15 @@ class IRSAttend(app.App):
     def action_select_database(self) -> None:
         """Select a different database file or create a new one."""
         self._close_any_file_selector()
-        self.mount(file_widgets.FileSelector(
-            pathlib.Path.cwd(),
-            [".db", ".sqlite3"],
-            create=False,
-            default_filename="irsattend.db",
-            id="main-select-database-file"
-        ))
+        self.mount(
+            file_widgets.FileSelector(
+                pathlib.Path.cwd(),
+                [".db", ".sqlite3"],
+                create=False,
+                default_filename="irsattend.db",
+                id="main-select-database-file",
+            )
+        )
 
     def _select_database(self, db_path: pathlib.Path) -> None:
         """Select a new, existing database file."""
@@ -167,27 +168,31 @@ class IRSAttend(app.App):
         Method `_on_file_selector_file_selected` is called when file selected.
         """
         self._close_any_file_selector()
-        self.mount(file_widgets.FileSelector(
-            pathlib.Path.cwd(),
-            [".db", ".sqlite3"],
-            create=True,
-            default_filename="irsattend.db",
-            id="main-create-database-file"
-        ))
-    
+        self.mount(
+            file_widgets.FileSelector(
+                pathlib.Path.cwd(),
+                [".db", ".sqlite3"],
+                create=True,
+                default_filename="irsattend.db",
+                id="main-create-database-file",
+            )
+        )
+
     @textual.on(widgets.Button.Pressed, "#main-export-database")
     def select_export_file(self):
         """Display a file selection widget for exporting data.
-        
+
         Method `_on_file_selector_file_selected` is called when file selected.
         """
         self._close_any_file_selector()
-        self.mount(file_widgets.FileSelector(
-            pathlib.Path.cwd(),
-            [".json", ".xlsx"],
-            create=True,
-            id="main-export-data-file"
-        ))
+        self.mount(
+            file_widgets.FileSelector(
+                pathlib.Path.cwd(),
+                [".json", ".xlsx"],
+                create=True,
+                id="main-export-data-file",
+            )
+        )
 
     def _export_database_to_file(self, export_path: pathlib.Path) -> None:
         """Export the contents of the sqlite database to a file."""
@@ -201,19 +206,19 @@ class IRSAttend(app.App):
                 self.message = "Exporting JSON file."
             case _:
                 self.message = "Incorrect file type"
-    
+
     @textual.on(widgets.Button.Pressed, "#main-import-database")
     def select_import_file(self):
         """Display a file selection widget for importing data.
-        
+
         Method `_on_file_selector_file_selected` is called when file selected.
         """
         self._close_any_file_selector()
-        self.mount(file_widgets.FileSelector(
-            pathlib.Path.cwd(),
-            [".json", ".xlsx"],
-            id="main-import-data-file"
-        ))
+        self.mount(
+            file_widgets.FileSelector(
+                pathlib.Path.cwd(), [".json", ".xlsx"], id="main-import-data-file"
+            )
+        )
 
     def _import_data_from_file(self, import_path: pathlib.Path) -> None:
         """Import data from a JSON file."""
@@ -229,32 +234,36 @@ class IRSAttend(app.App):
     @textual.on(widgets.Button.Pressed, "#main-select-settings")
     def select_settings_file(self):
         """Display a file selection widget for the application settings file.
-        
+
         Method `_on_file_selector_file_selected` is called when file selected.
         """
         self._close_any_file_selector()
-        self.mount(file_widgets.FileSelector(
-            pathlib.Path.cwd(),
-            [".toml"],
-            create=False,
-            default_filename="irsattend.toml",
-            id="main-select-settings-file"
-        ))
+        self.mount(
+            file_widgets.FileSelector(
+                pathlib.Path.cwd(),
+                [".toml"],
+                create=False,
+                default_filename="irsattend.toml",
+                id="main-select-settings-file",
+            )
+        )
 
     @textual.on(widgets.Button.Pressed, "#main-create-settings")
     def create_settings_file(self):
         """Display a file creation widget for the application settings. file.
-        
+
         Method `_on_file_selector_file_selected` is called when file selected.
         """
         self._close_any_file_selector()
-        self.mount(file_widgets.FileSelector(
-            pathlib.Path.cwd(),
-            [".toml"],
-            create=True,
-            default_filename="irsattend.toml",
-            id="main-create-settings-file"
-        ))
+        self.mount(
+            file_widgets.FileSelector(
+                pathlib.Path.cwd(),
+                [".toml"],
+                create=True,
+                default_filename="irsattend.toml",
+                id="main-create-settings-file",
+            )
+        )
 
     def _select_settings(self, config_path: pathlib.Path) -> None:
         """Select a new settings TOML file."""
@@ -262,8 +271,7 @@ class IRSAttend(app.App):
         self.config_path = config_path
 
     def _on_file_selector_file_selected(
-            self,
-            message: file_widgets.FileSelector.FileSelected
+        self, message: file_widgets.FileSelector.FileSelected
     ) -> None:
         """Update db_path in config and main screen."""
         self.message = f"Selected DB file: {message.path, message.create, message.id}"
@@ -313,8 +321,7 @@ class IRSAttend(app.App):
         match action:
             case "manage_students":
                 return not isinstance(
-                    self.screen_stack[-1],
-                    student_screen.StudentScreen
+                    self.screen_stack[-1], student_screen.StudentScreen
                 )
             case _:
                 return True

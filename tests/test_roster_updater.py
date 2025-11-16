@@ -10,6 +10,7 @@ for additional guidance.
 
 Set the backup_folder setting in the YAML file to tests/ouput folder.
 """
+
 import pathlib
 
 import pytest
@@ -58,7 +59,7 @@ def test_update_attendance_data(full_dbase: database.DBase) -> None:
 
 def test_db_backup(full_dbase: database.DBase) -> None:
     """Send attendance data to the roster.
-    
+
     Set the backup_folder setting in the YAML file to tests/ouput folder or this
     test won't pass.
     """
@@ -71,9 +72,3 @@ def test_db_backup(full_dbase: database.DBase) -> None:
     output_files = [file for file in OUTPUT_PATH.iterdir()]
     assert len(output_files) == 2
     assert any([f.name.startswith("attendance-backup") for f in output_files])
-
-
-
-
-
-

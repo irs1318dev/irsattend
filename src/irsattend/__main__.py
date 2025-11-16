@@ -1,4 +1,5 @@
 """Start the IRS Attendance App."""
+
 import argparse
 import pathlib
 
@@ -12,50 +13,46 @@ def build_parser() -> argparse.ArgumentParser:
     """Define command line arguments."""
     parser = argparse.ArgumentParser(prog="IRS Attendance Program")
     subparsers = parser.add_subparsers()
-    app_parser = subparsers.add_parser(
-        "app",
-        help="Run IRS Attendance application."
-    )
+    app_parser = subparsers.add_parser("app", help="Run IRS Attendance application.")
     app_parser.set_defaults(func=run_app)
     app_parser.add_argument(
-        "-d", "--db_path",
+        "-d",
+        "--db_path",
         help="Path to attendance database",
         type=pathlib.Path,
-        default=None
+        default=None,
     )
     app_parser.add_argument(
-        "-c", "--config_path",
+        "-c",
+        "--config_path",
         help="Path to config file",
         type=pathlib.Path,
-        default=None
+        default=None,
     )
     parser.set_defaults(func=None)
 
     sync_parser = subparsers.add_parser(
-        "sync-roster",
-        help="Synchronize attendance data with the student roster."
+        "sync-roster", help="Synchronize attendance data with the student roster."
     )
     sync_parser.set_defaults(func=sync_data)
     sync_group = sync_parser.add_mutually_exclusive_group(required=True)
     sync_group.add_argument(
-        "-i", "--student-ids",
+        "-i",
+        "--student-ids",
         action="store_true",
         help="Send student IDs to the team's Google Sheet roster.",
     )
     sync_group.add_argument(
-        "-a", "--attendance-data",
+        "-a",
+        "--attendance-data",
         action="store_true",
         help="Send attendance to the team's Google Sheet roster.",
     )
     sync_parser.add_argument(
-        "config_path",
-        type=pathlib.Path,
-        help="Path to roster configuration file."
+        "config_path", type=pathlib.Path, help="Path to roster configuration file."
     )
     sync_parser.add_argument(
-        "db_path",
-        type=pathlib.Path,
-        help="Path to attendance Sqlite file."
+        "db_path", type=pathlib.Path, help="Path to attendance Sqlite file."
     )
     return parser
 

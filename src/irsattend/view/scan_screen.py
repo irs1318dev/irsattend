@@ -1,4 +1,5 @@
 """Turn on camera and scan QR Codes."""
+
 import asyncio
 from typing import cast, Optional
 
@@ -23,15 +24,18 @@ class ScanScreen(screen.Screen):
     event_type: db_tables.EventType
     """Type of event at which we're taking attendance."""
 
-
     CSS_PATH = "../styles/main.tcss"
     BINDINGS = [
-        ("q", "exit_scan_mode", "Quit QR Code Scan Mode."),  # TODO password modal to switch
+        (
+            "q",
+            "exit_scan_mode",
+            "Quit QR Code Scan Mode.",
+        ),  # TODO password modal to switch
     ]
 
     def __init__(self) -> None:
         """Initialize databae connection."""
-        # 
+        #
         super().__init__()
         if config.settings.db_path is None:
             raise database.DBaseError("No database file selected.")
@@ -54,13 +58,11 @@ class ScanScreen(screen.Screen):
         self._scanned = set()  # Prevent code from being scanned more than once.
         self.log_widget = self.query_one("#attendance-log", widgets.RichLog)
         self.app.push_screen(
-            EventTypeDialog(),
-            callback=self.set_event_type_and_start_scanning
+            EventTypeDialog(), callback=self.set_event_type_and_start_scanning
         )
 
     def set_event_type_and_start_scanning(
-        self,
-        event_type: Optional[db_tables.EventType]
+        self, event_type: Optional[db_tables.EventType]
     ) -> None:
         """Set the event type"""
         if event_type is None:
@@ -114,8 +116,7 @@ class ScanScreen(screen.Screen):
             self.log_widget.write(f"[orange3]Already attended: {student_name}[/]")
         else:
             timestamp = self.dbase.add_attendance_record(
-                student_id,
-                event_type=self.event_type
+                student_id, event_type=self.event_type
             )
             if timestamp is not None:
                 self.log_widget.write(
@@ -127,15 +128,15 @@ class ScanScreen(screen.Screen):
 
     def action_exit_scan_mode(self) -> None:
         """Require a password to exit QR code scan mode."""
+
         def _exit_on_success(success: bool | None) -> None:
             if success:
                 self.app.pop_screen()
             else:
                 self.scan_qr_codes()
-        
+
         pw_dialog.PasswordPrompt.show(
-            submit_callback=_exit_on_success,
-            exit_on_cancel=False
+            submit_callback=_exit_on_success, exit_on_cancel=False
         )
 
 
@@ -153,8 +154,10 @@ class EventTypeDialog(screen.ModalScreen[Optional[db_tables.EventType]]):
         with containers.Vertical(id="event-type-dialog", classes="modal-dialog"):
             yield widgets.Label("Event Type")
             event_options = widgets.OptionList(
-                *[option_list.Option(t.value.title(), id=t)
-                  for t in db_tables.EventType],
+                *[
+                    option_list.Option(t.value.title(), id=t)
+                    for t in db_tables.EventType
+                ],
                 id="event-type-option",
             )
             yield event_options
@@ -171,7 +174,8 @@ class EventTypeDialog(screen.ModalScreen[Optional[db_tables.EventType]]):
         selected_index = event_type_list.highlighted
         if selected_index is not None:
             selected_event = cast(
-                db_tables.EventType, event_type_list.options[selected_index].id)
+                db_tables.EventType, event_type_list.options[selected_index].id
+            )
             self.dismiss(selected_event)
         else:
             self.dismiss(None)
@@ -180,6 +184,3 @@ class EventTypeDialog(screen.ModalScreen[Optional[db_tables.EventType]]):
     def on_cancel_button_pressed(self) -> None:
         """Close the dialog and return to the main screen."""
         self.dismiss(None)
-
-    
-

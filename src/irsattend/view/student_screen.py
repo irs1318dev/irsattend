@@ -1,4 +1,5 @@
 """View roster and add new students."""
+
 import sqlite3
 from typing import Optional
 
@@ -47,20 +48,29 @@ class StudentScreen(screen.Screen):
                     )
                     yield widgets.Static()
                     yield widgets.Button(
-                        "Add Student", variant="success", id="add-student",
-                        tooltip="Add a new student to the database.")
+                        "Add Student",
+                        variant="success",
+                        id="add-student",
+                        tooltip="Add a new student to the database.",
+                    )
                     yield widgets.Button(
-                        "Import from CSV", variant="success", id="import-csv",
-                        tooltip="Import students from a CSV file.")
+                        "Import from CSV",
+                        variant="success",
+                        id="import-csv",
+                        tooltip="Import students from a CSV file.",
+                    )
                     yield widgets.Button(
-                        "Edit Selected", id="edit-student", disabled=True,
-                        tooltip="Edit data for a student.")
+                        "Edit Selected",
+                        id="edit-student",
+                        disabled=True,
+                        tooltip="Edit data for a student.",
+                    )
                     yield widgets.Button(
                         "Delete Selected",
                         variant="error",
                         id="delete-student",
                         disabled=True,
-                        tooltip="Deleted a student."
+                        tooltip="Deleted a student.",
                     )
                     yield widgets.Static()
                     yield widgets.Label("Communication")
@@ -69,15 +79,20 @@ class StudentScreen(screen.Screen):
                         id="generate-qr-codes",
                         tooltip=(
                             "Generate QR codes for all students and "
-                            "save them to the QR code folder.")
+                            "save them to the QR code folder."
+                        ),
                     )
                     yield widgets.Button(
-                        "Email QR Code to Selected", id="email-qr", disabled=True,
-                        tooltip="Email a QR code to the selected student."
+                        "Email QR Code to Selected",
+                        id="email-qr",
+                        disabled=True,
+                        tooltip="Email a QR code to the selected student.",
                     )
                     yield widgets.Button(
-                        "Email All QR Codes", id="email-all-qr",
-                        tooltip="Email QR codes to ALL students.")
+                        "Email All QR Codes",
+                        id="email-all-qr",
+                        tooltip="Email QR codes to ALL students.",
+                    )
                     yield widgets.Static(id="status-message", classes="status")
         yield widgets.Footer()
 
@@ -97,7 +112,7 @@ class StudentScreen(screen.Screen):
         container = self.query_one("#actions-container", containers.Vertical)
         container.mount(pbar)
         return pbar
-    
+
     def _update_progress_bar(self, total: int, progress: int) -> None:
         """Update the progress bar."""
         try:
@@ -105,7 +120,7 @@ class StudentScreen(screen.Screen):
         except textual.css.query.NoMatches:
             return
         pbar.update(total=total, progress=progress)
-    
+
     def _advance_progress_bar(self) -> None:
         """Advanced the progress bar one step."""
         try:
@@ -151,7 +166,8 @@ class StudentScreen(screen.Screen):
         if student:
             self.update_selected(
                 f"[bold]Selected:[/bold]\n{student['first_name']} "
-                f"{student['last_name']}\nID: {student['student_id']}")
+                f"{student['last_name']}\nID: {student['student_id']}"
+            )
 
     async def on_button_pressed(self, event: widgets.Button.Pressed) -> None:
         """Respond to button presses."""
@@ -173,6 +189,7 @@ class StudentScreen(screen.Screen):
 
     async def action_add_student(self) -> None:
         """Show the student dialog and add a new student."""
+
         def on_dialog_closed(data: dict | None):
             if data is None:
                 return
@@ -188,8 +205,9 @@ class StudentScreen(screen.Screen):
             else:
                 self.load_student_data()
                 self.query_one("#status-message", widgets.Static).update(
-                    f"[green]Student added successfully. ID: {student_id}[/]")
-                    
+                    f"[green]Student added successfully. ID: {student_id}[/]"
+                )
+
         await self.app.push_screen(modals.StudentDialog(), callback=on_dialog_closed)
 
     async def action_edit_student(self) -> None:
@@ -267,10 +285,12 @@ class StudentScreen(screen.Screen):
         if config.settings.qr_code_dir is None:
             self.update_status(
                 "[red] Cannot generate QR codes because "
-                "no QR code path is defined in config file.[/]")
+                "no QR code path is defined in config file.[/]"
+            )
             return
         qr_generator = qr_code_generator.generate_all_qr_codes(
-            config.settings.qr_code_dir, self.dbase)
+            config.settings.qr_code_dir, self.dbase
+        )
         total_students = next(qr_generator)[1]
         self.app.call_from_thread(lambda: self._update_progress_bar(total_students, 0))
         failed_codes = []
@@ -283,7 +303,7 @@ class StudentScreen(screen.Screen):
             f"{config.settings.qr_code_dir}\n"
         )
         if failed_codes:
-            status_message += ("[red]Failed Codes: " + ", ".join(failed_codes) + "[/]")
+            status_message += "[red]Failed Codes: " + ", ".join(failed_codes) + "[/]"
         self.update_status(status_message)
         self.app.call_from_thread(self._remove_progress_bar)
 
@@ -294,8 +314,8 @@ class StudentScreen(screen.Screen):
             if confirmed:
                 self.send_emails_worker(students_to_email)
                 self.update_status(
-                f"[green]Emailed QR codes to {len(students_to_email)}[/]"
-            )
+                    f"[green]Emailed QR codes to {len(students_to_email)}[/]"
+                )
 
         if all_students:
             students_to_email = self.dbase.get_all_students()
@@ -310,15 +330,13 @@ class StudentScreen(screen.Screen):
             else:
                 students_to_email = [student]
         else:
-            self.update_status(
-                "[red]No student selected.[/]"
-            )
+            self.update_status("[red]No student selected.[/]")
             return
-        
+
         if all_students:
             await self.app.push_screen(
                 confirm_dialogs.GeneralConfirmDialog("email all students"),
-                callback=_email_all_students
+                callback=_email_all_students,
             )
         else:
             self.send_emails_worker(students_to_email)
@@ -329,7 +347,8 @@ class StudentScreen(screen.Screen):
         if config.settings.qr_code_dir is None:
             self.update_status(
                 "[red] Cannot send emails with QR codes because "
-                "no QR code path is defined in config file.[/]")
+                "no QR code path is defined in config file.[/]"
+            )
             return
         email_sender = emailer.send_all_emails(config.settings.qr_code_dir, students)
         failed_codes = []
@@ -342,7 +361,7 @@ class StudentScreen(screen.Screen):
             f"QR codes in folder {config.settings.qr_code_dir}\n"
         )
         if failed_codes:
-            status_message += ("[red]Failed Emails: " + ", ".join(failed_codes) + "[/]")
+            status_message += "[red]Failed Emails: " + ", ".join(failed_codes) + "[/]"
         self.update_status(status_message)
         self.app.call_from_thread(self._remove_progress_bar)
 
@@ -368,7 +387,8 @@ class StudentScreen(screen.Screen):
                     self.update_status(
                         f"[green]Imported {success_count} students.[/] "
                         f" [red]Failed to import {error_count} students. "
-                        "(If they are duplicates, you can ignore this message.)[/]")
+                        "(If they are duplicates, you can ignore this message.)[/]"
+                    )
 
         await self.app.push_screen(modals.CSVImportDialog(), callback=on_import_closed)
 
