@@ -807,7 +807,7 @@
     }
   ],
   "events": [],
-  "attendance": [
+  "checkins": [
     {
       "student_id": "chatterjee-anvi-2027-491",
       "event_type": "meeting",

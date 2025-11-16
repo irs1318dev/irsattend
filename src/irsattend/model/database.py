@@ -83,7 +83,7 @@ class DBase:
         """Creates the database tables if they don't already exist."""
         with self.get_db_connection() as conn:
             conn.execute(db_tables.STUDENT_TABLE_SCHEMA)
-            conn.execute(db_tables.ATTENDANCE_TABLE_SCHEMA)
+            conn.execute(db_tables.CHECKINS_TABLE_SCHEMA)
             conn.execute(db_tables.EVENT_TABLE_SCHEMA)
         conn.close()
 
@@ -195,18 +195,18 @@ class DBase:
         return student
 
     def get_student_attendance_data(self) -> sqlite3.Cursor:
-        """Join students and attendance table and get current season data."""
+        """Join students and checkins table and get current season data."""
         # An 'app' is an appearance.
         query = """
                 WITH year_checkins AS (
                     SELECT student_id, COUNT(student_id) as checkins
-                      FROM attendance
+                      FROM checkins
                      WHERE timestamp >= :year_start
                   GROUP BY student_id
                 ),
                 build_checkins AS (
                     SELECT student_id, COUNT(student_id) as checkins
-                      FROM attendance
+                      FROM checkins
                      WHERE timestamp >= :build_start
                   GROUP BY student_id
                 )
@@ -230,13 +230,13 @@ class DBase:
         )
         return cursor
 
-    def get_attendance_counts(self, since: datetime.date) -> dict[str, int]:
-        """Get a dictionary of student IDs and their attendance counts."""
+    def get_checkin_counts(self, since: datetime.date) -> dict[str, int]:
+        """Get a dictionary of student IDs and their checkin counts."""
         conn = self.get_db_connection()
         cursor = conn.execute(
             """
                 SELECT student_id, COUNT(student_id) as checkins
-                    FROM attendance
+                    FROM checkins
                     WHERE timestamp >= ?
                 GROUP BY student_id
                 ORDER BY student_id;
@@ -247,26 +247,26 @@ class DBase:
         conn.close()
         return counts
 
-    def get_attendance_count_by_id(self, student_id: str) -> int:
-        """Retrieve a student's attendance count by their ID."""
+    def get_checkin_count_by_id(self, student_id: str) -> int:
+        """Retrieve a student's checkin count by their ID."""
         conn = self.get_db_connection()
         cursor = conn.execute(
             """SELECT COUNT(student_id) as count
-            FROM attendance WHERE student_id = ?""",
+            FROM checkins WHERE student_id = ?""",
             (student_id,),
         )
-        attendance_count = cursor.fetchone()
+        checkin_count = cursor.fetchone()
         conn.close()
-        return attendance_count["count"] if attendance_count else 0
+        return checkin_count["count"] if checkin_count else 0
 
-    def remove_last_attendance_record(
+    def remove_last_checkin_record(
         self, student_id: str
     ) -> Optional[datetime.datetime]:
-        """Remove the most recent attendance record for a student.
+        """Remove the most recent checkin record for a student.
         Returns the timestamp of the removed record if successful."""
         with self.get_db_connection() as conn:
             cursor = conn.execute(
-                """SELECT student_id, timestamp FROM attendance 
+                """SELECT student_id, timestamp FROM checkins
                 WHERE student_id = ? 
                 ORDER BY timestamp DESC 
                 LIMIT 1""",
@@ -276,7 +276,7 @@ class DBase:
 
             if record:
                 conn.execute(
-                    "DELETE FROM attendance WHERE student_id = ?",
+                    "DELETE FROM checkins WHERE student_id = ?",
                     (record["student_id"],),
                 )
                 conn.commit()
@@ -284,34 +284,34 @@ class DBase:
         conn.close()
         return None
 
-    def remove_all_attendance_records(self, student_id: str) -> int:
-        """Remove all attendance records for a student.
+    def remove_all_checkin_records(self, student_id: str) -> int:
+        """Remove all checkin records for a student.
         Returns the number of records removed."""
         with self.get_db_connection() as conn:
             cursor = conn.execute(
-                "DELETE FROM attendance WHERE student_id = ?", (student_id,)
+                "DELETE FROM checkins WHERE student_id = ?", (student_id,)
             )
             rowcount = cursor.rowcount
         conn.close()
         return rowcount
 
-    def add_attendance_record(
+    def add_checkin_record(
         self,
         student_id: str,
         timestamp: Optional[datetime.datetime] = None,
         event_type: db_tables.EventType = db_tables.EventType.MEETING,
     ) -> Optional[datetime.datetime]:
-        """Add an attendance record for a student.
+        """Add an checkin record for a student.
 
         Returns:
-            Date and time when attendance was recorded.
+            Date and time when checkin was recorded.
         """
         if timestamp is None:
             timestamp = datetime.datetime.now()
         with self.get_db_connection() as conn:
             conn.execute(
                 """
-                        INSERT INTO attendance
+                        INSERT INTO checkins
                                     (student_id, timestamp, event_type)
                              VALUES (?, ?, ?);
                 """,
@@ -322,7 +322,7 @@ class DBase:
 
     def has_attended_today(self, student_id: str) -> bool:
         """Check if a student has already been marked present today.
-        Must be used before add_attendance_record."""
+        Must be used before add_checkin_record."""
 
         # Get the start of today (for v2, we can add other ways to calculate meetings)
         today_start = datetime.datetime.now().replace(
@@ -330,25 +330,25 @@ class DBase:
         )
         conn = self.get_db_connection()
         cursor = conn.execute(
-            "SELECT 1 FROM attendance WHERE student_id = ? AND timestamp >= ?",
+            "SELECT 1 FROM checkins WHERE student_id = ? AND timestamp >= ?",
             (student_id, today_start),
         )
         has_attended = cursor.fetchone() is not None
         conn.close()
         return has_attended
 
-    def get_attendance_dataframe(self) -> pl.DataFrame:
-        """Get a Polars dataframe with attendance data."""
+    def get_checkins_dataframe(self) -> pl.DataFrame:
+        """Get a Polars dataframe with checkin data."""
         conn = self.get_db_connection()
-        dframe = pl.read_database("SELECT * FROM attendance ORDER BY timestamp;", conn)
+        dframe = pl.read_database("SELECT * FROM checkins ORDER BY timestamp;", conn)
         conn.close()
         return dframe
 
-    def get_all_attendance_records_dict(self) -> list[dict[str, Any]]:
-        """Get all data from the attendance table."""
+    def get_all_checkins_records_dict(self) -> list[dict[str, Any]]:
+        """Get all data from the checkin table."""
         query = """
-                SELECT attendance_id, student_id, event_date, event_type, timestamp
-                  FROM attendance
+                SELECT checkin_id, student_id, event_date, event_type, timestamp
+                  FROM checkins
               ORDER BY timestamp;
         """
         conn = self.get_db_connection(as_dict=True)
@@ -375,15 +375,15 @@ class DBase:
                     )
         main_conn.close()
         incoming_conn = incoming.get_db_connection(as_dict=True)
-        incoming_attendance = incoming_conn.execute("SELECT * FROM attendance;")
+        incoming_checkins = incoming_conn.execute("SELECT * FROM checkins;")
         incoming_conn.close()
         db_conn: sqlite3.Connection | None = None
-        for appearance in incoming_attendance:
+        for appearance in incoming_checkins:
             try:
                 with self.get_db_connection() as db_conn:
                     db_conn.execute(
                         """
-                            INSERT INTO attendance
+                            INSERT INTO checkins
                                         (student_id, event_type, timestamp)
                                 VALUES (:student_id, :event_type, :timestamp);
                     """,
@@ -410,9 +410,9 @@ class DBase:
             {col: val for col, val in row.items() if col not in excluded_columns}
             for row in events
         ]
-        attends = self.get_all_attendance_records_dict()
-        excluded_columns = ["attendance_id", "event_date", "day_of_week"]
-        db_data["attendance"] = [
+        attends = self.get_all_checkins_records_dict()
+        excluded_columns = ["checkin_id", "event_date", "day_of_week"]
+        db_data["checkins"] = [
             {col: val for col, val in row.items() if col not in excluded_columns}
             for row in attends
         ]
@@ -427,8 +427,8 @@ class DBase:
                         (student_id, first_name, last_name, email, grad_year)
                  VALUES (:student_id, :first_name, :last_name, :email, :grad_year);
         """
-        attendance_query = """
-            INSERT INTO attendance
+        checkins_query = """
+            INSERT INTO checkins
                         (student_id, event_type, timestamp)
                  VALUES (:student_id, :event_type, :timestamp);
         """
@@ -439,7 +439,7 @@ class DBase:
         """
         with self.get_db_connection() as conn:
             conn.executemany(student_query, db_data_dict["students"])
-            conn.executemany(attendance_query, db_data_dict["attendance"])
+            conn.executemany(checkins_query, db_data_dict["checkins"])
             conn.executemany(event_query, db_data_dict["events"])
         conn.close()
 
@@ -480,7 +480,7 @@ class DBase:
     def scan_for_new_events(
         self, event_type: db_tables.EventType = db_tables.EventType.MEETING
     ) -> int:
-        """Scan attendance table for missing events, add them to events table.
+        """Scan checkins table for missing events, add them to events table.
 
         Returns:
             The number of rows added to the events table.
@@ -490,7 +490,7 @@ class DBase:
         )
         possible_new_event_query = """
             SELECT event_date, event_type
-              FROM attendance
+              FROM checkins
           GROUP BY event_date, event_type
           ORDER BY event_date;
         """
@@ -518,13 +518,13 @@ class DBase:
         conn.close()
         return rows_added
 
-    def get_event_attendance(self) -> list[dict[str, Any]]:
-        """Get attendance totals by event."""
+    def get_event_checkins(self) -> list[dict[str, Any]]:
+        """Get checkin totals by event."""
         query = """
                 WITH event_attendance AS (
                         SELECT event_date, day_of_week, event_type,
                                count(student_id) AS total
-                          FROM attendance
+                          FROM checkins
                       GROUP BY event_date, day_of_week, event_type
                 )
                 SELECT a.event_date, a.day_of_week,

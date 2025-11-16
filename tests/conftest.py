@@ -49,7 +49,7 @@ def noevents_dbase(empty_database: database.DBase) -> database.DBase:
     with open(DATA_FOLDER / "testdata-full.json") as jfile:
         attendance_data = json.load(jfile)
     attendance_data["events"] = []
-    attendance_data["attendance"] = []
+    attendance_data["checkins"] = []
     empty_database.load_from_dict(attendance_data)
     return empty_database
 

@@ -115,7 +115,7 @@ class ScanScreen(screen.Screen):
         if self.dbase.has_attended_today(student_id):
             self.log_widget.write(f"[orange3]Already attended: {student_name}[/]")
         else:
-            timestamp = self.dbase.add_attendance_record(
+            timestamp = self.dbase.add_checkin_record(
                 student_id, event_type=self.event_type
             )
             if timestamp is not None:

@@ -40,9 +40,9 @@ CREATE TABLE IF NOT EXISTS students (
 # TODO: Add field(s) for year joined and status (e.g., active, inactive, alumni)
 
 
-ATTENDANCE_TABLE_SCHEMA = """
-CREATE TABLE IF NOT EXISTS attendance (
-    attendance_id INTEGER PRIMARY KEY AUTOINCREMENT,
+CHECKINS_TABLE_SCHEMA = """
+CREATE TABLE IF NOT EXISTS checkins (
+       checkin_id INTEGER PRIMARY KEY AUTOINCREMENT,
        student_id TEXT NOT NULL,
        event_date TEXT GENERATED ALWAYS AS (date(timestamp)) VIRTUAL,
       day_of_week INT GENERATED ALWAYS AS (strftime('%u', event_date)) VIRTUAL,

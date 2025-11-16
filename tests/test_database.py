@@ -40,7 +40,7 @@ def test_empty_database(empty_database: database.DBase) -> None:
     conn.close()
     assert len(tables) == 4
     assert "students" in tables
-    assert "attendance" in tables
+    assert "checkins" in tables
     # Must close connection or fixtures won't be able to delete Sqlite3 file when
     #   setting up for other tests.
 
@@ -62,7 +62,7 @@ def test_existing_database_raises_error_on_create_new(empty_database) -> None:
 def test_attendance_table(full_dbase: database.DBase) -> None:
     """Attendance table has many rows and 5 columns of data."""
     # Act
-    rapdf = full_dbase.get_attendance_dataframe()
+    rapdf = full_dbase.get_checkins_dataframe()
     # Assert
     assert rapdf.shape[0] > 4000
     assert rapdf.shape[1] == 6
@@ -71,8 +71,8 @@ def test_attendance_table(full_dbase: database.DBase) -> None:
 def test_attendance_counts(full_dbase: database.DBase) -> None:
     """Get count of student appearances."""
     # Act
-    season_counts = full_dbase.get_attendance_counts(datetime.date(2025, 9, 1))
-    build_counts = full_dbase.get_attendance_counts(datetime.date(2026, 1, 1))
+    season_counts = full_dbase.get_checkin_counts(datetime.date(2025, 9, 1))
+    build_counts = full_dbase.get_checkin_counts(datetime.date(2026, 1, 1))
     # Assert
     assert len(season_counts) == len(build_counts)
     for student_id in season_counts:
@@ -98,7 +98,7 @@ def test_to_dict(full_dbase: database.DBase) -> None:
     # Act
     data = full_dbase.to_dict()
     # Assert
-    tables = ["students", "attendance", "events"]
+    tables = ["students", "checkins", "events"]
     assert len(data) == len(tables)
     assert all(col in data for col in tables)
     for table in tables:
@@ -118,8 +118,8 @@ def test_from_dict(full_dbase: database.DBase, empty_database2: database.DBase) 
     # Assert
     students = empty_database2.get_all_students_dict()
     assert len(students) == len(full_dbase.get_all_students_dict())
-    attendance = empty_database2.get_all_attendance_records_dict()
-    assert len(attendance) == len(full_dbase.get_all_attendance_records_dict())
+    attendance = empty_database2.get_all_checkins_records_dict()
+    assert len(attendance) == len(full_dbase.get_all_checkins_records_dict())
 
 
 def test_scan_event(noevents_dbase: database.DBase) -> None:
@@ -131,7 +131,7 @@ def test_scan_event(noevents_dbase: database.DBase) -> None:
 def test_event_attendance(full_dbase: database.DBase) -> None:
     """Get event attendance data."""
     # Act
-    attend_data = full_dbase.get_event_attendance()
+    attend_data = full_dbase.get_event_checkins()
     # Assert
     assert len(attend_data) > 20
     field_names = ["event_date", "day_of_week", "event_type", "total", "description"]
@@ -185,13 +185,13 @@ def test_add_checkin(
     # Arrange
     students = attendance_test_data["students"]
     # Act
-    noevents_dbase.add_attendance_record(
+    noevents_dbase.add_checkin_record(
         students[0]["student_id"],
         timestamp=datetime.datetime(2025, 11, 15),
         event_type=db_tables.EventType.COMPETITION,
     )
     # Assert
-    checkins = noevents_dbase.get_all_attendance_records_dict()
+    checkins = noevents_dbase.get_all_checkins_records_dict()
     assert len(checkins) == 1
     assert checkins[0]["student_id"] == students[0]["student_id"]
     assert checkins[0]["event_type"] == db_tables.EventType.COMPETITION.value

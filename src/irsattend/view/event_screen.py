@@ -55,7 +55,7 @@ class EventScreen(screen.Screen):
             ("Attended", "total"),
         ]:
             table.add_column(col[0], key=col[1])
-        attend_data = self.dbase.get_event_attendance()
+        attend_data = self.dbase.get_event_checkins()
         for row in attend_data:
             table.add_row(
                 row["event_date"],

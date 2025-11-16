@@ -218,7 +218,7 @@ class StudentScreen(screen.Screen):
             return
         else:
             student_dict = dict(student)
-        attendance = self.dbase.get_attendance_count_by_id(self._selected_student_id)
+        attendance = self.dbase.get_checkin_count_by_id(self._selected_student_id)
         student_dict["attendance"] = attendance
 
         def on_dialog_closed(data: dict | None):
@@ -231,17 +231,17 @@ class StudentScreen(screen.Screen):
             if attendance_count is not None:
                 current_attendance = attendance
                 if attendance_count == 0:
-                    self.dbase.remove_all_attendance_records(self._selected_student_id)
+                    self.dbase.remove_all_checkin_records(self._selected_student_id)
                 elif attendance_count > 0:
                     difference = attendance_count - current_attendance
                     if difference > 0:
                         # This means we need to add more records
                         for _ in range(difference):
-                            self.dbase.add_attendance_record(self._selected_student_id)
+                            self.dbase.add_checkin_record(self._selected_student_id)
                     elif difference < 0:
                         # This means we need to remove records
                         for _ in range(abs(difference)):
-                            self.dbase.remove_last_attendance_record(
+                            self.dbase.remove_last_checkin_record(
                                 self._selected_student_id
                             )
                     self.update_status("[green]Student updated successfully.[/]")
