@@ -3,7 +3,7 @@
 ## Students
 Student names, email addresses, and graduation year.
 
-## Attendence
+## Checkins
 Student IDs and datetimes that students check into the attendance system.
 
 ## Events

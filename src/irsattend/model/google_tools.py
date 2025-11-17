@@ -15,7 +15,6 @@ from irsattend.model import database
 
 
 # TODO: Check attendance name from roster.
-# TODO: Strip whitespace from names downloaded from roster.
 # TODO: Provide command-line feedback to user.
 
 
