@@ -1,0 +1,14 @@
+"""Test Excel file functionality."""
+
+import pathlib
+
+from irsattend.model import database, excel
+
+
+OUTPUT_PATH = pathlib.Path(__file__).parent / "output"
+
+
+def test_write_excel(full_dbase: database.DBase) -> None:
+    """Write contents of database to an Excel file."""
+    # Act
+    excel.write(full_dbase, OUTPUT_PATH / "excel-export.xlsx")

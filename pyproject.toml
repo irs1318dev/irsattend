@@ -1,6 +1,6 @@
 [project]
 name = "irsattend"
-version = "0.4.1"
+version = "0.5.0"
 description = "The Issaquah Robotics Society's Python program for managing attendance"
 readme = "README.md"
 authors = [
@@ -34,7 +34,6 @@ dev = [
     "pyright>=1.1.407",
     "pytest>=8.4.1",
     "ruff>=0.12.8",
-    "seaborn>=0.13.2",
     "textual-dev>=1.7.0",
 ]
 

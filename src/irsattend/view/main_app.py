@@ -6,7 +6,7 @@ import pathlib
 import textual
 from textual import app, containers, reactive, widgets
 
-from irsattend.model import config, database
+from irsattend.model import config, database, excel
 from irsattend.view import (
     attendance_screen,
     event_screen,
@@ -204,6 +204,9 @@ class IRSAttend(app.App):
                 with open(export_path.with_suffix(".json"), "wt") as jfile:
                     json.dump(dbase.to_dict(), jfile, indent=2)
                 self.message = "Exporting JSON file."
+            case ".xlsx":
+                dbase = database.DBase(config.settings.db_path)
+                excel.write(dbase, export_path.with_suffix(".xlsx"))
             case _:
                 self.message = "Incorrect file type"
 

@@ -1,0 +1,32 @@
+"""Export attendance data to an Excel file."""
+
+import pathlib
+from typing import Any
+
+import xlsxwriter
+
+from irsattend.model import database
+
+
+def write(dbase: database.DBase, excel_path: pathlib.Path) -> None:
+    """Write all data to a Microsoft Excel file."""
+    workbook = xlsxwriter.Workbook(excel_path)
+    attendance_data = dbase.to_dict()
+    _write_sheet(workbook, "Students", attendance_data["students"])
+    _write_sheet(workbook, "Events", attendance_data["events"])
+    student_totals = [dict(row) for row in dbase.get_student_attendance_data()]
+    _write_sheet(workbook, "Attendance by Student", student_totals)
+    event_totals = dbase.get_event_checkins()
+    _write_sheet(workbook, "Attendance by Event", event_totals)
+    _write_sheet(workbook, "Check-ins", attendance_data["checkins"])
+    workbook.close()
+
+
+def _write_sheet(
+    workbook: xlsxwriter.Workbook, sheet_name: str, data: list[dict[str, Any]]
+) -> None:
+    """Write a table of data to a worksheet."""
+    sheet = workbook.add_worksheet(sheet_name)
+    sheet.write_row(row=0, col=0, data=list(data[0].keys()))
+    for row_number, row_values in enumerate(data):
+        sheet.write_row(row=row_number + 1, col=0, data=list(row_values.values()))

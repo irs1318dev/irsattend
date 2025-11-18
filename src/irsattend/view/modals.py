@@ -130,7 +130,9 @@ class CSVImportDialog(screen.ModalScreen):
             yield widgets.Label("[bold]Import Students from CSV[/bold]")
             yield widgets.Static()
             yield widgets.Label("CSV Format Requirements:")
-            yield widgets.Static("The CSV file must have these column headers (first row):")
+            yield widgets.Static(
+                "The CSV file must have these column headers (first row):"
+            )
             yield widgets.Static(
                 '[yellow]"Last Name", "First Name", "Email", "Grad Year"[/yellow]'
             )
@@ -139,7 +141,9 @@ class CSVImportDialog(screen.ModalScreen):
             )
             yield widgets.Static()
             yield widgets.Label("Select CSV File:")
-            yield widgets.Input(placeholder="Enter full path to CSV file", id="csv-path")
+            yield widgets.Input(
+                placeholder="Enter full path to CSV file", id="csv-path"
+            )
             yield widgets.Static("", id="csv-import-status")
             with containers.Horizontal():
                 yield widgets.Button("Import", variant="primary", id="start-import")
