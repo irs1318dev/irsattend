@@ -76,3 +76,11 @@ Button {
     margin-top: 1;
     color: $warning;
 }
+
+Vertical.data-table {
+    width: 70%
+}
+
+Vertical.edit-pane {
+    width: 30%
+}

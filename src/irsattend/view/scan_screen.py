@@ -9,7 +9,7 @@ import textual
 from textual import app, containers, message, screen, widgets
 from textual.widgets import option_list
 
-from irsattend.model import config, database, db_tables
+from irsattend.model import config, database, schema
 from irsattend.view import pw_dialog
 
 
@@ -21,7 +21,7 @@ class ScanScreen(screen.Screen):
     log_widget: widgets.RichLog
     _scanned: set[str]
     """Recently scanned student IDs."""
-    event_type: db_tables.EventType
+    event_type: schema.EventType
     """Type of event at which we're taking attendance."""
 
     CSS_PATH = "../styles/main.tcss"
@@ -62,7 +62,7 @@ class ScanScreen(screen.Screen):
         )
 
     def set_event_type_and_start_scanning(
-        self, event_type: Optional[db_tables.EventType]
+        self, event_type: Optional[schema.EventType]
     ) -> None:
         """Set the event type"""
         if event_type is None:
@@ -140,7 +140,7 @@ class ScanScreen(screen.Screen):
         )
 
 
-class EventTypeDialog(screen.ModalScreen[Optional[db_tables.EventType]]):
+class EventTypeDialog(screen.ModalScreen[Optional[schema.EventType]]):
     """Select the event type when opening scan attendance screen."""
 
     CSS_PATH = "../styles/modal.tcss"
@@ -156,7 +156,7 @@ class EventTypeDialog(screen.ModalScreen[Optional[db_tables.EventType]]):
             event_options = widgets.OptionList(
                 *[
                     option_list.Option(t.value.title(), id=t)
-                    for t in db_tables.EventType
+                    for t in schema.EventType
                 ],
                 id="event-type-option",
             )
@@ -165,7 +165,7 @@ class EventTypeDialog(screen.ModalScreen[Optional[db_tables.EventType]]):
                 yield widgets.Button("Ok", id="event-type-select-ok-button")
                 yield widgets.Button("Cancel", id="event-type-select-cancel-button")
         type_map = {opt.id: idx for idx, opt in enumerate(event_options.options)}
-        event_options.highlighted = type_map[db_tables.EventType.MEETING]
+        event_options.highlighted = type_map[schema.EventType.MEETING]
 
     @textual.on(widgets.Button.Pressed, "#event-type-select-ok-button")
     def on_ok_button_pressed(self) -> None:
@@ -174,7 +174,7 @@ class EventTypeDialog(screen.ModalScreen[Optional[db_tables.EventType]]):
         selected_index = event_type_list.highlighted
         if selected_index is not None:
             selected_event = cast(
-                db_tables.EventType, event_type_list.options[selected_index].id
+                schema.EventType, event_type_list.options[selected_index].id
             )
             self.dismiss(selected_event)
         else:

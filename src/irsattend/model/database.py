@@ -10,7 +10,7 @@ from typing import Any, cast, Optional
 
 import polars as pl
 
-from irsattend.model import config, db_tables
+from irsattend.model import config, schema
 
 
 class DBaseError(Exception):
@@ -82,9 +82,9 @@ class DBase:
     def create_tables(self):
         """Creates the database tables if they don't already exist."""
         with self.get_db_connection() as conn:
-            conn.execute(db_tables.STUDENT_TABLE_SCHEMA)
-            conn.execute(db_tables.CHECKINS_TABLE_SCHEMA)
-            conn.execute(db_tables.EVENT_TABLE_SCHEMA)
+            conn.execute(schema.STUDENT_TABLE_SCHEMA)
+            conn.execute(schema.CHECKINS_TABLE_SCHEMA)
+            conn.execute(schema.EVENT_TABLE_SCHEMA)
         conn.close()
 
     @classmethod
@@ -299,7 +299,7 @@ class DBase:
         self,
         student_id: str,
         timestamp: Optional[datetime.datetime] = None,
-        event_type: db_tables.EventType = db_tables.EventType.MEETING,
+        event_type: schema.EventType = schema.EventType.MEETING,
     ) -> Optional[datetime.datetime]:
         """Add an checkin record for a student.
 
@@ -445,7 +445,7 @@ class DBase:
 
     def add_event(
         self,
-        event_type: db_tables.EventType,
+        event_type: schema.EventType,
         event_date: Optional[datetime.date] = None,
         description: Optional[str] = None,
     ) -> None:
@@ -478,7 +478,7 @@ class DBase:
         return events
 
     def scan_for_new_events(
-        self, event_type: db_tables.EventType = db_tables.EventType.MEETING
+        self, event_type: schema.EventType = schema.EventType.MEETING
     ) -> int:
         """Scan checkins table for missing events, add them to events table.
 
