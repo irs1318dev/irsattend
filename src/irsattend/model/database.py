@@ -527,7 +527,7 @@ class DBase:
                           FROM checkins
                       GROUP BY event_date, day_of_week, event_type
                 )
-                SELECT a.event_date, a.day_of_week,
+                SELECT e.event_id, a.event_date, a.day_of_week,
                        COALESCE(e.event_type, a.event_type) AS event_type,
                        a.total, e.description
                   FROM event_attendance AS a

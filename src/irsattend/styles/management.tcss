@@ -78,9 +78,12 @@ Button {
 }
 
 Vertical.data-table {
-    width: 70%
+    width: 60%;
 }
 
 Vertical.edit-pane {
-    width: 30%
+    width: 40%;
+}
+Horizontal.menu {
+    height: 5;
 }
