@@ -135,7 +135,7 @@ def test_event_attendance(full_dbase: database.DBase) -> None:
     # Assert
     assert len(attend_data) > 20
     field_names = [
-        "event_id", "event_date", "day_of_week", "event_type", "total", "description"]
+        "event_date", "day_of_week", "event_type", "total", "description"]
     for field in field_names:
         assert field in attend_data[0]
     assert len(attend_data[0]) == len(field_names)
@@ -185,10 +185,12 @@ def test_add_checkin(
     """Add a student checkin."""
     # Arrange
     students = attendance_test_data["students"]
+    event_date = datetime.datetime(2025, 11, 15)
+    noevents_dbase.add_event(schema.EventType.COMPETITION, event_date, "test")
     # Act
     noevents_dbase.add_checkin_record(
         students[0]["student_id"],
-        timestamp=datetime.datetime(2025, 11, 15),
+        event_date,
         event_type=schema.EventType.COMPETITION,
     )
     # Assert
@@ -197,3 +199,4 @@ def test_add_checkin(
     assert checkins[0]["student_id"] == students[0]["student_id"]
     assert checkins[0]["event_type"] == schema.EventType.COMPETITION.value
     assert checkins[0]["event_date"] == "2025-11-15"
+

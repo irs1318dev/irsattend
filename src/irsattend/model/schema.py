@@ -49,17 +49,17 @@ CREATE TABLE IF NOT EXISTS checkins (
        event_type TEXT,
         timestamp TEXT NOT NULL,
       FOREIGN KEY (student_id) REFERENCES students (student_id),
+      FOREIGN KEY (event_date, event_type) REFERENCES events (event_date, event_type),
        CONSTRAINT single_event_constraint UNIQUE(student_id, event_date, event_type)
 );
 """
 
 EVENT_TABLE_SCHEMA = """
 CREATE TABLE IF NOT EXISTS events (
-        event_id INTEGER PRIMARY KEY AUTOINCREMENT,
       event_date TEXT NOT NULL,
      day_of_week INT GENERATED ALWAYS AS (strftime('%u', event_date)) VIRTUAL,
       event_type TEXT NOT NULL,
      description TEXT,
-      CONSTRAINT event_date_type_constraint UNIQUE(event_date, event_type)
+     PRIMARY KEY (event_date, event_type) ON CONFLICT IGNORE
 );
 """

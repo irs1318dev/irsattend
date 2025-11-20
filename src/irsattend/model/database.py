@@ -439,8 +439,9 @@ class DBase:
         """
         with self.get_db_connection() as conn:
             conn.executemany(student_query, db_data_dict["students"])
-            conn.executemany(checkins_query, db_data_dict["checkins"])
             conn.executemany(event_query, db_data_dict["events"])
+        with conn:
+            conn.executemany(checkins_query, db_data_dict["checkins"])
         conn.close()
 
     def add_event(
@@ -462,13 +463,15 @@ class DBase:
                 ON CONFLICT DO NOTHING;
         """
         with self.get_db_connection() as conn:
-            conn.execute(query, (event_date.isoformat(), event_type.value, description))
+            conn.execute(
+                query,
+                (event_date.strftime("%Y-%m-%d"), event_type.value, description))
         conn.close()
 
     def get_events_dict(self) -> list[dict[str, Any]]:
         """Get all records from the events table."""
         query = """
-                SELECT event_id, event_date, event_type, description
+                SELECT event_date, event_type, description
                   FROM events
               ORDER BY event_date, event_type;
         """
@@ -527,7 +530,7 @@ class DBase:
                           FROM checkins
                       GROUP BY event_date, day_of_week, event_type
                 )
-                SELECT e.event_id, a.event_date, a.day_of_week,
+                SELECT a.event_date, a.day_of_week,
                        COALESCE(e.event_type, a.event_type) AS event_type,
                        a.total, e.description
                   FROM event_attendance AS a
