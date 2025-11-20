@@ -134,7 +134,8 @@ def test_event_attendance(full_dbase: database.DBase) -> None:
     attend_data = full_dbase.get_event_checkins()
     # Assert
     assert len(attend_data) > 20
-    field_names = ["event_date", "day_of_week", "event_type", "total", "description"]
+    field_names = [
+        "event_id", "event_date", "day_of_week", "event_type", "total", "description"]
     for field in field_names:
         assert field in attend_data[0]
     assert len(attend_data[0]) == len(field_names)
