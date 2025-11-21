@@ -480,47 +480,6 @@ class DBase:
         conn.close()
         return events
 
-    def scan_for_new_events(
-        self, event_type: schema.EventType = schema.EventType.MEETING
-    ) -> int:
-        """Scan checkins table for missing events, add them to events table.
-
-        Returns:
-            The number of rows added to the events table.
-        """
-        events = set(
-            (row["event_date"], row["event_type"]) for row in self.get_events_dict()
-        )
-        possible_new_event_query = """
-            SELECT event_date, event_type
-              FROM checkins
-          GROUP BY event_date, event_type
-          ORDER BY event_date;
-        """
-        conn = self.get_db_connection(as_dict=True)
-        possible_events = conn.execute(possible_new_event_query).fetchall()
-        conn.close()
-        events_to_add: list[dict[str, str]] = []
-        for poss_event in possible_events:
-            if (poss_event["event_date"], poss_event["event_type"]) not in events:
-                events_to_add.append(
-                    {
-                        "event_date": poss_event["event_date"],
-                        "event_type": str(event_type),
-                    }
-                )
-        insert_event_query = """
-            INSERT INTO events
-                        (event_date, event_type)
-                 VALUES (:event_date, :event_type);
-        """
-        with self.get_db_connection() as conn:
-            cursor = conn.cursor()
-            cursor.executemany(insert_event_query, events_to_add)
-            rows_added = cursor.rowcount
-        conn.close()
-        return rows_added
-
     def get_event_checkins(self) -> list[dict[str, Any]]:
         """Get checkin totals by event."""
         query = """

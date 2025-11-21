@@ -52,7 +52,7 @@ class EventScreen(screen.Screen):
         """Add the datatable and other controls to the screen."""
         yield widgets.Header()
         with containers.Horizontal(classes="menu"):
-            yield widgets.Button("Scan for Meetings", id="events-scan")
+            yield widgets.Static("Future Button Bar")
         with containers.Horizontal():
             yield widgets.DataTable(id="events-table", classes="data-table")
             with containers.Vertical(classes="edit-pane"):
@@ -74,10 +74,6 @@ class EventScreen(screen.Screen):
     def on_mount(self) -> None:
         """Load data into the table."""
         self.load_table()
-
-    @textual.on(widgets.Button.Pressed, "#events-scan")
-    def action_scan_for_events(self) -> None:
-        self.dbase.scan_for_new_events()
 
     def update_event_data(self) -> None:
         """Retrieve event data from the database."""
