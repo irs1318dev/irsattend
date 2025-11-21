@@ -6,7 +6,7 @@ import pathlib
 import random
 import re
 import sqlite3
-from typing import Any, cast, Optional
+from typing import Any, Callable, cast, Optional
 
 import polars as pl
 
@@ -18,7 +18,7 @@ class DBaseError(Exception):
 
 
 def dict_factory(cursor: sqlite3.Cursor, row: Sequence) -> dict[str, Any]:
-    """Create a dictionary row factory."""
+    """Return Sqlite data as a dictionary."""
     fields = [column[0] for column in cursor.description]
     return {key: value for key, value in zip(fields, row)}
 
@@ -78,7 +78,7 @@ class DBase:
             conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA foreign_keys = ON;")
         return conn
-
+    
     def create_tables(self):
         """Creates the database tables if they don't already exist."""
         with self.get_db_connection() as conn:
@@ -479,6 +479,10 @@ class DBase:
         events = conn.execute(query).fetchall()
         conn.close()
         return events
+    
+    def get_events(self) -> list[schema.Event]:
+        """Get all records as a list of Event objects."""
+        return schema.Event.from_list(self.get_events_dict())
 
     def get_event_checkins(self) -> list[dict[str, Any]]:
         """Get checkin totals by event."""

@@ -12,7 +12,12 @@ Event dates and types.
 The day_of_week field is an integer ranging from 1 (Monday) to 7 (Sunday).
 """
 
+import dataclasses
+import datetime
 import enum
+from typing import Any, Optional, Sequence
+
+import sqlite3
 
 
 class EventType(enum.StrEnum):
@@ -63,3 +68,61 @@ CREATE TABLE IF NOT EXISTS events (
      PRIMARY KEY (event_date, event_type) ON CONFLICT IGNORE
 );
 """
+
+@dataclasses.dataclass
+class Event:
+    event_date: datetime.date
+    event_type: EventType
+    description: Optional[str]
+
+    def __init__(
+            self,
+            event_date: datetime.date | str,
+            event_type: EventType,
+            description: Optional[str] = None
+    ) -> None:
+        """ensure event_date is converted to datetime.date."""
+        if isinstance(event_date, str):
+            event_date = datetime.date.fromisoformat(event_date)
+        self.event_date = event_date
+        self.event_type = event_type
+        self.description = description
+
+    @property
+    def iso_date(self) -> str:
+        """Event date as an iso-formatted string."""
+        return self.event_date.strftime("%Y-%m-%d")
+    
+    @property
+    def day_of_week(self) -> int:
+        """Day of week as an integer with Monday = 1."""
+        return self.event_date.weekday() + 1
+    
+    @property
+    def weekday_name(self) -> str:
+        """Day of week as a string: 'Monday', 'Tuesday', etc."""
+        return self.event_date.strftime("%A")
+    
+    @property
+    def key(self) -> str:
+        """String that uniquely identifies the event."""
+        return f"{self.iso_date}::{self.event_type.value}"
+    
+    @staticmethod
+    def from_dict(event: dict[str, Any]) -> "Event":
+        """Convert a dictionary to an Event."""
+        if isinstance(event["event_date"], str):
+            event_date = datetime.date.fromisoformat(event["event_date"])
+        else:
+            event_date = event["event_date"]
+        return Event(event_date, event["event_type"], event["description"])
+    
+    @staticmethod
+    def from_list(events: Sequence[dict[str, Any] | sqlite3.Row]) -> list["Event"]:
+        """Convert a list of dictionaries or Row objects to a list of Events."""
+        return [
+            Event(event["event_date"], event["event_type"], event["description"])
+            for event in events
+        ]
+
+ 

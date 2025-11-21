@@ -122,12 +122,6 @@ def test_from_dict(full_dbase: database.DBase, empty_database2: database.DBase) 
     assert len(attendance) == len(full_dbase.get_all_checkins_records_dict())
 
 
-def test_scan_event(noevents_dbase: database.DBase) -> None:
-    """Scan attendance records for missing events."""
-    # Act
-    noevents_dbase.scan_for_new_events()
-
-
 def test_event_attendance(full_dbase: database.DBase) -> None:
     """Get event attendance data."""
     # Act

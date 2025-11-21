@@ -124,3 +124,14 @@ class EventScreen(screen.Screen):
 
             date_input.value = short_date
 
+
+class EventDialog(screen.ModalScreen):
+    """Edit or add events."""
+
+    CSS_PATH = "../styles/modal.tcss"
+
+    def __init__(self, student_data: dict[str, Any] | None = None) -> None:
+        self.student_data = student_data
+        super().__init__()
+        if not student_data:
+            self.add_class("add-mode")
