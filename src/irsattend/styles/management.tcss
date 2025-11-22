@@ -87,3 +87,8 @@ Vertical.edit-pane {
 Horizontal.menu {
     height: 5;
 }
+
+Static.separator {
+    height: 3;
+    background: indigo;
+}

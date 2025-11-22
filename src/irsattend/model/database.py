@@ -6,7 +6,7 @@ import pathlib
 import random
 import re
 import sqlite3
-from typing import Any, Callable, cast, Optional
+from typing import Any, cast, Optional
 
 import polars as pl
 
@@ -28,9 +28,24 @@ def adapt_date_iso(val: datetime.date) -> str:
     return val.isoformat()
 
 
+def convert_event_date(val: bytes) -> datetime.date:
+    """Convert Sqlite event_date values to Date objects."""
+    return datetime.date.fromisoformat(str(val))
+
+
 def adapt_datetime_iso(val: datetime.datetime) -> str:
     """Adapt datetime.datetime to timezone-naive ISO 8601 date."""
     return val.replace(tzinfo=None).isoformat()
+
+
+def adapt_event_type(val: schema.EventType) -> str:
+    """Adapt schema.Eventtype objects to strings."""
+    return val.value
+
+
+def convert_event_type(val: bytes) -> schema.EventType:
+    """Convert values from event_type columns to an EventType enum object."""
+    return schema.EventType(str(val))
 
 
 # Sqlite converts Python datetime.date and datetime.datetime objects to
@@ -40,9 +55,12 @@ def adapt_datetime_iso(val: datetime.datetime) -> str:
 # The register_adapter function calls explicity tell Sqlite how to convert date
 #   and datetime objects to text values that can be stored in Sqlite.
 #   Omitting these two lines results in deprecation warnings when we run the
-#   applicatin or tests.
+#   application or tests.
 sqlite3.register_adapter(datetime.date, adapt_date_iso)
 sqlite3.register_adapter(datetime.datetime, adapt_datetime_iso)
+# sqlite3.register_adapter(schema.EventType, adapt_event_type)
+# sqlite3.register_converter("event_date", convert_event_date)
+# sqlite3.register_converter("event_type", convert_event_type)
 
 
 class DBase:
@@ -479,30 +497,3 @@ class DBase:
         events = conn.execute(query).fetchall()
         conn.close()
         return events
-    
-    def get_events(self) -> list[schema.Event]:
-        """Get all records as a list of Event objects."""
-        return schema.Event.from_list(self.get_events_dict())
-
-    def get_event_checkins(self) -> list[dict[str, Any]]:
-        """Get checkin totals by event."""
-        query = """
-                WITH event_attendance AS (
-                        SELECT event_date, day_of_week, event_type,
-                               count(student_id) AS total
-                          FROM checkins
-                      GROUP BY event_date, day_of_week, event_type
-                )
-                SELECT a.event_date, a.day_of_week,
-                       COALESCE(e.event_type, a.event_type) AS event_type,
-                       a.total, e.description
-                  FROM event_attendance AS a
-             LEFT JOIN events AS e
-                    ON a.event_date = e.event_date AND
-                       a.event_type = e.event_type
-              ORDER BY a.event_date;
-        """
-        conn = self.get_db_connection(as_dict=True)
-        event_attendance = conn.execute(query).fetchall()
-        conn.close()
-        return event_attendance

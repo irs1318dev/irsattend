@@ -122,27 +122,6 @@ def test_from_dict(full_dbase: database.DBase, empty_database2: database.DBase) 
     assert len(attendance) == len(full_dbase.get_all_checkins_records_dict())
 
 
-def test_event_attendance(full_dbase: database.DBase) -> None:
-    """Get event attendance data."""
-    # Act
-    attend_data = full_dbase.get_event_checkins()
-    # Assert
-    assert len(attend_data) > 20
-    field_names = [
-        "event_date", "day_of_week", "event_type", "total", "description"]
-    for field in field_names:
-        assert field in attend_data[0]
-    assert len(attend_data[0]) == len(field_names)
-    prior_event_date = datetime.date.fromisoformat(attend_data[0]["event_date"])
-    # Event dates are in chronological order.
-    for event in attend_data[1:]:
-        current_date = datetime.date.fromisoformat(event["event_date"])
-        assert current_date >= prior_event_date
-        prior_event_date = current_date
-        assert 1 <= event["day_of_week"] <= 7
-        assert event["total"] >= 0
-    rich.print(attend_data)
-
 
 def test_add_event(noevents_dbase: database.DBase) -> None:
     """Add an event to the events table."""

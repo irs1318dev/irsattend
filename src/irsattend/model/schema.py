@@ -15,22 +15,11 @@ The day_of_week field is an integer ranging from 1 (Monday) to 7 (Sunday).
 import dataclasses
 import datetime
 import enum
-from typing import Any, Optional, Sequence
-
-import sqlite3
+from typing import Optional, TYPE_CHECKING
 
 
-class EventType(enum.StrEnum):
-    """Types of events at which we take attendance."""
-
-    COMPETITION = "competition"
-    KICKOFF = "kickoff"
-    MEETING = "meeting"
-    NONE = "none"
-    OPPORTUNITY = "opportunity"
-    OUTREACH = "outreach"
-    VIRTUAL = "virtual"
-    VOLUNTEERING = "volunteering"
+if TYPE_CHECKING:
+    from irsattend.model import database
 
 
 STUDENT_TABLE_SCHEMA = """
@@ -42,7 +31,32 @@ CREATE TABLE IF NOT EXISTS students (
     grad_year INTEGER NOT NULL
 );
 """
-# TODO: Add field(s) for year joined and status (e.g., active, inactive, alumni)
+
+
+@dataclasses.dataclass
+class Student:
+    """An FRC student."""
+    student_id: str
+    first_name: str
+    last_name: str
+    grad_year: int
+    email: str
+
+    @staticmethod
+    def get_students(dbase: "database.DBase") -> list["Student"]:
+        """Retrieve a list of Student objects from the database."""
+        query = """
+            SELECT student_id, last_name, first_name, grad_year, email
+             FROM students
+         ORDER BY student_id;
+        """
+        conn = dbase.get_db_connection(as_dict=True)
+        students = [
+            Student(**student) for student in conn.execute(query)
+        ]
+        conn.close()
+        return students
+
 
 
 CHECKINS_TABLE_SCHEMA = """
@@ -59,18 +73,33 @@ CREATE TABLE IF NOT EXISTS checkins (
 );
 """
 
+
+class EventType(enum.StrEnum):
+    """Types of events at which we take attendance."""
+
+    COMPETITION = "competition"
+    KICKOFF = "kickoff"
+    MEETING = "meeting"
+    NONE = "none"
+    OPPORTUNITY = "opportunity"
+    OUTREACH = "outreach"
+    VIRTUAL = "virtual"
+    VOLUNTEERING = "volunteering"
+
+
 EVENT_TABLE_SCHEMA = """
 CREATE TABLE IF NOT EXISTS events (
-      event_date TEXT NOT NULL,
-     day_of_week INT GENERATED ALWAYS AS (strftime('%u', event_date)) VIRTUAL,
-      event_type TEXT NOT NULL,
-     description TEXT,
-     PRIMARY KEY (event_date, event_type) ON CONFLICT IGNORE
+     event_date TEXT NOT NULL,
+    day_of_week INT GENERATED ALWAYS AS (strftime('%u', event_date)) VIRTUAL,
+     event_type TEXT NOT NULL,
+    description TEXT,
+    PRIMARY KEY (event_date, event_type) ON CONFLICT IGNORE
 );
 """
 
 @dataclasses.dataclass
 class Event:
+    """An event at which we record attendance."""
     event_date: datetime.date
     event_type: EventType
     description: Optional[str]
@@ -78,12 +107,14 @@ class Event:
     def __init__(
             self,
             event_date: datetime.date | str,
-            event_type: EventType,
-            description: Optional[str] = None
+            event_type: str | EventType,
+            description: Optional[str] = None,
     ) -> None:
-        """ensure event_date is converted to datetime.date."""
+        """Ensure event_date is converted to datetime.date."""
         if isinstance(event_date, str):
             event_date = datetime.date.fromisoformat(event_date)
+        if isinstance(event_type, str):
+            event_type = EventType(event_type)
         self.event_date = event_date
         self.event_type = event_type
         self.description = description
@@ -109,20 +140,18 @@ class Event:
         return f"{self.iso_date}::{self.event_type.value}"
     
     @staticmethod
-    def from_dict(event: dict[str, Any]) -> "Event":
-        """Convert a dictionary to an Event."""
-        if isinstance(event["event_date"], str):
-            event_date = datetime.date.fromisoformat(event["event_date"])
-        else:
-            event_date = event["event_date"]
-        return Event(event_date, event["event_type"], event["description"])
-    
-    @staticmethod
-    def from_list(events: Sequence[dict[str, Any] | sqlite3.Row]) -> list["Event"]:
-        """Convert a list of dictionaries or Row objects to a list of Events."""
-        return [
-            Event(event["event_date"], event["event_type"], event["description"])
-            for event in events
+    def get_events(dbase: "database.DBase") -> list["Event"]:
+        """Retrieve a list of Student objects from the database."""
+        query = """
+                SELECT event_date, event_type, description
+                  FROM events
+              ORDER BY event_date, event_type;
+        """
+        conn = dbase.get_db_connection(as_dict=True)
+        events = [
+            Event(**event) for event in conn.execute(query)
         ]
+        conn.close()
+        return events
 
  

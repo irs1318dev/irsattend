@@ -1,11 +1,13 @@
 """Export attendance data to an Excel file."""
 
+import dataclasses
 import pathlib
 from typing import Any
 
 import xlsxwriter
 
 from irsattend.model import database
+from irsattend.binders import events
 
 
 def write(dbase: database.DBase, excel_path: pathlib.Path) -> None:
@@ -16,8 +18,12 @@ def write(dbase: database.DBase, excel_path: pathlib.Path) -> None:
     _write_sheet(workbook, "Events", attendance_data["events"])
     student_totals = [dict(row) for row in dbase.get_student_attendance_data()]
     _write_sheet(workbook, "Attendance by Student", student_totals)
-    event_totals = dbase.get_event_checkins()
-    _write_sheet(workbook, "Attendance by Event", event_totals)
+    event_totals = events.CheckinEvent.get_checkin_events(dbase)
+    _write_sheet(
+        workbook,
+        "Attendance by Event",
+        [dataclasses.asdict(event) for event in event_totals]
+    )
     _write_sheet(workbook, "Check-ins", attendance_data["checkins"])
     workbook.close()
 

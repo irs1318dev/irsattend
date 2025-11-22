@@ -909,7 +909,7 @@
     },
     {
       "event_date": "2026-01-05",
-      "event_type": "online",
+      "event_type": "virtual",
       "description": null
     },
     {
@@ -929,7 +929,7 @@
     },
     {
       "event_date": "2026-01-12",
-      "event_type": "online",
+      "event_type": "virtual",
       "description": null
     },
     {
@@ -949,7 +949,7 @@
     },
     {
       "event_date": "2026-01-19",
-      "event_type": "online",
+      "event_type": "virtual",
       "description": null
     },
     {
@@ -969,7 +969,7 @@
     },
     {
       "event_date": "2026-01-26",
-      "event_type": "online",
+      "event_type": "virtual",
       "description": null
     },
     {
@@ -994,7 +994,7 @@
     },
     {
       "event_date": "2026-02-02",
-      "event_type": "online",
+      "event_type": "virtual",
       "description": null
     },
     {
@@ -1019,7 +1019,7 @@
     },
     {
       "event_date": "2026-02-09",
-      "event_type": "online",
+      "event_type": "virtual",
       "description": null
     },
     {
@@ -1044,7 +1044,7 @@
     },
     {
       "event_date": "2026-02-16",
-      "event_type": "online",
+      "event_type": "virtual",
       "description": null
     },
     {
@@ -1069,7 +1069,7 @@
     },
     {
       "event_date": "2026-02-23",
-      "event_type": "online",
+      "event_type": "virtual",
       "description": null
     },
     {
@@ -1094,7 +1094,7 @@
     },
     {
       "event_date": "2026-03-02",
-      "event_type": "online",
+      "event_type": "virtual",
       "description": null
     },
     {
@@ -7696,367 +7696,367 @@
     },
     {
       "student_id": "al_mansour-fatima-2028-744",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:09:16.312462"
     },
     {
       "student_id": "rana-simran-2027-150",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:10:24.582946"
     },
     {
       "student_id": "pham-tu-2027-853",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:19:08.569687"
     },
     {
       "student_id": "davis-isabella-2029-060",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:20:17.803195"
     },
     {
       "student_id": "smith-emily-2029-676",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:21:31.280221"
     },
     {
       "student_id": "hall-david-2027-417",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:21:55.853502"
     },
     {
       "student_id": "iyer-aria-2027-558",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:23:33.650686"
     },
     {
       "student_id": "das-shreya-2027-285",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:23:41.943202"
     },
     {
       "student_id": "evans-lucas-2029-453",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:23:59.278698"
     },
     {
       "student_id": "white-henry-2028-671",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:24:12.970884"
     },
     {
       "student_id": "jabari-leila-2028-495",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:24:14.701616"
     },
     {
       "student_id": "suleiman-yasmin-2029-962",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:25:30.130706"
     },
     {
       "student_id": "bose-arnav-2028-221",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:26:16.882960"
     },
     {
       "student_id": "nasser-maya-2029-732",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:27:27.423295"
     },
     {
       "student_id": "cheng-hui-2028-840",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:27:46.416102"
     },
     {
       "student_id": "farooq-samir-2029-619",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:27:57.129990"
     },
     {
       "student_id": "verma-pranav-2029-514",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:28:10.540006"
     },
     {
       "student_id": "tran-anh-2029-878",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:28:21.403299"
     },
     {
       "student_id": "yilmaz-deniz-2029-877",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:28:42.174036"
     },
     {
       "student_id": "hoang-minh-2029-592",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:29:32.900240"
     },
     {
       "student_id": "hashimoto-akira-2029-750",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:29:38.604113"
     },
     {
       "student_id": "mehta-krishna-2029-672",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:30:13.284252"
     },
     {
       "student_id": "murphy-jack-2029-737",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:31:22.184158"
     },
     {
       "student_id": "turner-natalie-2027-825",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:31:59.631234"
     },
     {
       "student_id": "kobayashi-shota-2028-005",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:32:29.717689"
     },
     {
       "student_id": "rizvi-saad-2028-174",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:33:21.121343"
     },
     {
       "student_id": "patel-aarav-2029-565",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:33:32.792861"
     },
     {
       "student_id": "lewis-matthew-2027-203",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:34:07.870273"
     },
     {
       "student_id": "garcia-sofia-2029-953",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:34:22.759837"
     },
     {
       "student_id": "king-chloe-2028-029",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:34:28.965798"
     },
     {
       "student_id": "nguyen-thanh-2029-280",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:34:37.878224"
     },
     {
       "student_id": "yamada-haruki-2028-267",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:34:42.404897"
     },
     {
       "student_id": "zhou-meilin-2027-200",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:34:43.294193"
     },
     {
       "student_id": "young-benjamin-2028-301",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:34:53.849446"
     },
     {
       "student_id": "sengupta-arjun-2026-794",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:35:15.763233"
     },
     {
       "student_id": "chatterjee-anvi-2027-491",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:37:05.908965"
     },
     {
       "student_id": "park-seo_yeon-2029-004",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:37:07.336864"
     },
     {
       "student_id": "anderson-mason-2028-608",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:37:40.001336"
     },
     {
       "student_id": "banerjee-vihaan-2027-180",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:39:15.922028"
     },
     {
       "student_id": "rahim-imran-2028-010",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:39:58.914112"
     },
     {
       "student_id": "scott-alexander-2027-644",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:40:11.009475"
     },
     {
       "student_id": "chaudhry-rehan-2029-286",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:40:20.104034"
     },
     {
       "student_id": "pandey-riya-2028-213",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:43:55.668435"
     },
     {
       "student_id": "mishra-pari-2028-783",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:47:24.547371"
     },
     {
       "student_id": "sun-lei-2029-787",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:47:54.862695"
     },
     {
       "student_id": "kim-min_jun-2029-466",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:50:24.123927"
     },
     {
       "student_id": "ng-mei-2029-774",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:50:38.361115"
     },
     {
       "student_id": "lin-xin-2028-241",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:51:42.284427"
     },
     {
       "student_id": "qureshi-rayyan-2027-454",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:52:21.286777"
     },
     {
       "student_id": "ito-sakura-2029-833",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:53:03.656554"
     },
     {
       "student_id": "jain-diya-2029-516",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:54:23.303753"
     },
     {
       "student_id": "al_sharif-samira-2028-135",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:56:32.134043"
     },
     {
       "student_id": "st_clare-denise-2027-191",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:57:16.712245"
     },
     {
       "student_id": "haddad-layla-2029-728",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:57:48.162586"
     },
     {
       "student_id": "joshi-neha-2028-211",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:58:19.933102"
     },
     {
       "student_id": "reddy-sanvi-2029-139",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:58:38.837323"
     },
     {
       "student_id": "oconnor-sean-2028-842",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:58:44.552412"
     },
     {
       "student_id": "salem-amal-2026-624",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 17:59:20.854846"
     },
     {
       "student_id": "saleh-nour-2028-496",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 18:00:50.587306"
     },
     {
       "student_id": "rahman-noor-2029-758",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 18:01:36.030586"
     },
     {
       "student_id": "mansoor-karim-2028-638",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 18:03:27.131458"
     },
     {
       "student_id": "miller-william-2029-562",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 18:04:19.998843"
     },
     {
       "student_id": "rizwan-ayaan-2026-249",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 18:05:31.898485"
     },
     {
       "student_id": "tanaka-ren-2029-091",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 18:08:06.077034"
     },
     {
       "student_id": "nguyen-dao-2026-594",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 18:08:13.623763"
     },
     {
       "student_id": "suzuki-hana-2028-563",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 18:09:56.074382"
     },
     {
       "student_id": "perez-lucas-2026-363",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 18:14:03.431154"
     },
     {
       "student_id": "kapoor-dev-2028-854",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 18:17:46.906744"
     },
     {
       "student_id": "walker-logan-2028-771",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 18:19:01.042853"
     },
     {
       "student_id": "martin-ethan-2028-811",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 18:20:37.125536"
     },
     {
       "student_id": "chen-li-2029-204",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 18:23:37.000672"
     },
     {
       "student_id": "nguyen-phuc-2028-780",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 18:46:44.925539"
     },
     {
       "student_id": "clark-amelia-2029-705",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-05 18:56:34.736075"
     },
     {
@@ -9061,362 +9061,362 @@
     },
     {
       "student_id": "jain-diya-2029-516",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:11:26.476411"
     },
     {
       "student_id": "martin-ethan-2028-811",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:16:29.663358"
     },
     {
       "student_id": "perez-lucas-2026-363",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:20:16.366615"
     },
     {
       "student_id": "salem-amal-2026-624",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:21:33.398394"
     },
     {
       "student_id": "saleh-nour-2028-496",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:22:01.111153"
     },
     {
       "student_id": "pandey-riya-2028-213",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:22:51.609967"
     },
     {
       "student_id": "clark-amelia-2029-705",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:23:52.562695"
     },
     {
       "student_id": "nguyen-thanh-2029-280",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:24:39.158634"
     },
     {
       "student_id": "davis-isabella-2029-060",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:25:42.784945"
     },
     {
       "student_id": "miller-william-2029-562",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:25:59.758290"
     },
     {
       "student_id": "white-henry-2028-671",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:27:39.020246"
     },
     {
       "student_id": "kobayashi-shota-2028-005",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:27:40.567607"
     },
     {
       "student_id": "chaudhry-rehan-2029-286",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:27:42.305498"
     },
     {
       "student_id": "rizwan-ayaan-2026-249",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:29:08.166929"
     },
     {
       "student_id": "turner-natalie-2027-825",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:29:10.482723"
     },
     {
       "student_id": "scott-alexander-2027-644",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:29:55.473574"
     },
     {
       "student_id": "al_mansour-fatima-2028-744",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:30:18.752573"
     },
     {
       "student_id": "garcia-sofia-2029-953",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:30:33.686706"
     },
     {
       "student_id": "lee-ji_woo-2029-657",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:30:42.186380"
     },
     {
       "student_id": "zhang-yu-2029-424",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:32:45.903263"
     },
     {
       "student_id": "suleiman-yasmin-2029-962",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:33:05.016792"
     },
     {
       "student_id": "yamamoto-haruto-2029-867",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:34:07.231858"
     },
     {
       "student_id": "haddad-layla-2029-728",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:34:07.696913"
     },
     {
       "student_id": "lewis-matthew-2027-203",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:36:17.456881"
     },
     {
       "student_id": "williams-james-2029-462",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:38:17.415951"
     },
     {
       "student_id": "ito-sakura-2029-833",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:38:23.888995"
     },
     {
       "student_id": "rahim-imran-2028-010",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:39:28.523247"
     },
     {
       "student_id": "lin-xin-2028-241",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:41:09.011446"
     },
     {
       "student_id": "yamada-haruki-2028-267",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:41:28.813138"
     },
     {
       "student_id": "hashimoto-akira-2029-750",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:42:35.161620"
     },
     {
       "student_id": "evans-lucas-2029-453",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:44:03.084906"
     },
     {
       "student_id": "young-benjamin-2028-301",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:44:11.168317"
     },
     {
       "student_id": "al_sharif-samira-2028-135",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:45:04.890619"
     },
     {
       "student_id": "zhou-meilin-2027-200",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:45:46.794483"
     },
     {
       "student_id": "king-chloe-2028-029",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:46:04.384520"
     },
     {
       "student_id": "mori-keiko-2027-853",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:46:09.975097"
     },
     {
       "student_id": "al_farsi-omar-2029-343",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:46:37.985024"
     },
     {
       "student_id": "tanaka-ren-2029-091",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:46:46.260065"
     },
     {
       "student_id": "chatterjee-anvi-2027-491",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:47:02.512530"
     },
     {
       "student_id": "rizvi-saad-2028-174",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:48:08.080518"
     },
     {
       "student_id": "kapoor-dev-2028-854",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:48:26.419398"
     },
     {
       "student_id": "tran-anh-2029-878",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:50:15.445665"
     },
     {
       "student_id": "bakr-salma-2029-946",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:52:03.989889"
     },
     {
       "student_id": "sun-lei-2029-787",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:52:18.699622"
     },
     {
       "student_id": "desai-isha-2029-550",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:52:33.874812"
     },
     {
       "student_id": "nguyen-dao-2026-594",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:53:08.115158"
     },
     {
       "student_id": "qureshi-rayyan-2027-454",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:54:11.689537"
     },
     {
       "student_id": "chen-li-2029-204",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:54:24.124931"
     },
     {
       "student_id": "anderson-mason-2028-608",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:56:19.067321"
     },
     {
       "student_id": "bose-arnav-2028-221",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:56:41.419924"
     },
     {
       "student_id": "farooq-samir-2029-619",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:56:58.082809"
     },
     {
       "student_id": "oconnor-sean-2028-842",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 17:59:17.082623"
     },
     {
       "student_id": "park-seo_yeon-2029-004",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 18:00:07.892528"
     },
     {
       "student_id": "gupta-aditya-2029-329",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 18:02:06.418715"
     },
     {
       "student_id": "mansoor-karim-2028-638",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 18:03:55.910457"
     },
     {
       "student_id": "moore-elijah-2029-063",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 18:06:24.275494"
     },
     {
       "student_id": "ng-mei-2029-774",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 18:06:30.005217"
     },
     {
       "student_id": "kumar-arjun-2029-548",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 18:09:36.474245"
     },
     {
       "student_id": "verma-pranav-2029-514",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 18:12:09.959225"
     },
     {
       "student_id": "baker-daniel-2027-604",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 18:12:21.701541"
     },
     {
       "student_id": "murphy-jack-2029-737",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 18:18:27.704876"
     },
     {
       "student_id": "sengupta-arjun-2026-794",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 18:18:32.847358"
     },
     {
       "student_id": "haddad-yousef-2026-200",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 18:20:34.434486"
     },
     {
       "student_id": "pham-tu-2027-853",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 18:21:42.123182"
     },
     {
       "student_id": "khan-zara-2029-790",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 18:22:32.793143"
     },
     {
       "student_id": "srinivasan-meera-2028-252",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 18:22:55.444743"
     },
     {
       "student_id": "wong-chun-2026-257",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 18:25:54.328420"
     },
     {
       "student_id": "fujita-daiki-2028-499",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 18:27:15.763047"
     },
     {
       "student_id": "mukherjee-diya-2026-701",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 18:27:42.728414"
     },
     {
       "student_id": "kim-min_jun-2029-466",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 18:29:43.434964"
     },
     {
       "student_id": "reddy-sanvi-2029-139",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 18:37:20.133381"
     },
     {
       "student_id": "mehta-krishna-2029-672",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-12 18:40:36.371971"
     },
     {
@@ -10391,297 +10391,297 @@
     },
     {
       "student_id": "white-henry-2028-671",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:03:33.265475"
     },
     {
       "student_id": "yamada-haruki-2028-267",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:05:10.668820"
     },
     {
       "student_id": "ali-ahmed-2029-874",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:08:53.600749"
     },
     {
       "student_id": "murphy-jack-2029-737",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:09:46.559446"
     },
     {
       "student_id": "scott-alexander-2027-644",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:12:04.290327"
     },
     {
       "student_id": "desai-isha-2029-550",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:14:13.167845"
     },
     {
       "student_id": "robinson-grace-2028-298",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:16:57.675367"
     },
     {
       "student_id": "mukherjee-diya-2026-701",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:17:50.664997"
     },
     {
       "student_id": "king-chloe-2028-029",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:18:27.261100"
     },
     {
       "student_id": "mehta-krishna-2029-672",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:20:05.933811"
     },
     {
       "student_id": "hoang-minh-2029-592",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:21:28.495395"
     },
     {
       "student_id": "reddy-sanvi-2029-139",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:22:33.236957"
     },
     {
       "student_id": "lin-xin-2028-241",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:24:15.185011"
     },
     {
       "student_id": "lim-su_bin-2029-223",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:25:16.142012"
     },
     {
       "student_id": "kim-min_jun-2029-466",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:25:49.512539"
     },
     {
       "student_id": "hossain-farhan-2027-161",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:26:15.439153"
     },
     {
       "student_id": "park-seo_yeon-2029-004",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:26:15.448850"
     },
     {
       "student_id": "tanaka-ren-2029-091",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:26:19.923798"
     },
     {
       "student_id": "chen-li-2029-204",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:27:26.483321"
     },
     {
       "student_id": "banerjee-vihaan-2027-180",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:29:55.351585"
     },
     {
       "student_id": "saleh-nour-2028-496",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:32:05.584605"
     },
     {
       "student_id": "jabari-leila-2028-495",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:32:26.061187"
     },
     {
       "student_id": "nguyen-dao-2026-594",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:33:54.761741"
     },
     {
       "student_id": "walker-logan-2028-771",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:35:05.364166"
     },
     {
       "student_id": "tran-anh-2029-878",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:36:12.596197"
     },
     {
       "student_id": "das-shreya-2027-285",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:38:03.155521"
     },
     {
       "student_id": "zhou-meilin-2027-200",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:41:05.235893"
     },
     {
       "student_id": "verma-pranav-2029-514",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:41:14.883245"
     },
     {
       "student_id": "khan-zara-2029-790",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:43:51.842959"
     },
     {
       "student_id": "lee-ji_woo-2029-657",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:45:10.191902"
     },
     {
       "student_id": "martin-ethan-2028-811",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:45:12.160163"
     },
     {
       "student_id": "sun-lei-2029-787",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:48:35.768370"
     },
     {
       "student_id": "gupta-aditya-2029-329",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:48:46.190540"
     },
     {
       "student_id": "qureshi-rayyan-2027-454",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:48:58.417521"
     },
     {
       "student_id": "rana-simran-2027-150",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:51:16.094757"
     },
     {
       "student_id": "rahim-imran-2028-010",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:52:08.239915"
     },
     {
       "student_id": "mansoor-karim-2028-638",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:52:22.261658"
     },
     {
       "student_id": "srinivasan-meera-2028-252",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:53:24.623478"
     },
     {
       "student_id": "clark-amelia-2029-705",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:53:32.387190"
     },
     {
       "student_id": "jain-diya-2029-516",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:54:10.940806"
     },
     {
       "student_id": "cheng-hui-2028-840",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 17:59:59.473841"
     },
     {
       "student_id": "mori-keiko-2027-853",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 18:00:14.001259"
     },
     {
       "student_id": "haddad-layla-2029-728",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 18:01:19.298240"
     },
     {
       "student_id": "kobayashi-shota-2028-005",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 18:03:24.327582"
     },
     {
       "student_id": "ito-sakura-2029-833",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 18:03:50.546665"
     },
     {
       "student_id": "anderson-mason-2028-608",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 18:06:53.862557"
     },
     {
       "student_id": "moore-elijah-2029-063",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 18:08:52.596181"
     },
     {
       "student_id": "turner-natalie-2027-825",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 18:10:03.712748"
     },
     {
       "student_id": "young-benjamin-2028-301",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 18:10:30.366568"
     },
     {
       "student_id": "rizwan-ayaan-2026-249",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 18:11:20.678630"
     },
     {
       "student_id": "salem-amal-2026-624",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 18:24:14.242040"
     },
     {
       "student_id": "nguyen-phuc-2028-780",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 18:24:48.307358"
     },
     {
       "student_id": "oconnor-sean-2028-842",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 18:26:05.171016"
     },
     {
       "student_id": "suleiman-yasmin-2029-962",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 18:29:49.265486"
     },
     {
       "student_id": "williams-james-2029-462",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 18:33:14.039338"
     },
     {
       "student_id": "nasser-maya-2029-732",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 18:37:44.127938"
     },
     {
       "student_id": "rahman-noor-2029-758",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 18:41:56.177509"
     },
     {
       "student_id": "evans-lucas-2029-453",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 18:44:03.687987"
     },
     {
       "student_id": "pham-quang-2028-969",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-19 18:44:47.528801"
     },
     {
@@ -11631,317 +11631,317 @@
     },
     {
       "student_id": "mori-keiko-2027-853",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:09:55.006324"
     },
     {
       "student_id": "young-benjamin-2028-301",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:11:15.462113"
     },
     {
       "student_id": "qureshi-rayyan-2027-454",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:11:41.324333"
     },
     {
       "student_id": "iyer-aria-2027-558",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:18:16.837072"
     },
     {
       "student_id": "salem-amal-2026-624",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:19:54.001291"
     },
     {
       "student_id": "verma-pranav-2029-514",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:23:16.414997"
     },
     {
       "student_id": "suleiman-yasmin-2029-962",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:24:05.244458"
     },
     {
       "student_id": "smith-emily-2029-676",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:24:09.457883"
     },
     {
       "student_id": "williams-james-2029-462",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:25:08.900979"
     },
     {
       "student_id": "haddad-layla-2029-728",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:25:31.978518"
     },
     {
       "student_id": "al_mansour-fatima-2028-744",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:26:15.691895"
     },
     {
       "student_id": "al_sharif-samira-2028-135",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:27:50.501399"
     },
     {
       "student_id": "jain-diya-2029-516",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:28:53.216531"
     },
     {
       "student_id": "mishra-pari-2028-783",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:30:49.282844"
     },
     {
       "student_id": "pham-quang-2028-969",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:31:41.045669"
     },
     {
       "student_id": "al_hashimi-noor-2027-778",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:31:41.689855"
     },
     {
       "student_id": "ng-mei-2029-774",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:32:26.668880"
     },
     {
       "student_id": "hassan-amira-2029-592",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:32:40.746551"
     },
     {
       "student_id": "tanaka-ren-2029-091",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:33:55.289595"
     },
     {
       "student_id": "wong-chun-2026-257",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:35:16.454991"
     },
     {
       "student_id": "perez-lucas-2026-363",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:36:16.052570"
     },
     {
       "student_id": "chatterjee-anvi-2027-491",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:36:18.733953"
     },
     {
       "student_id": "lee-ji_woo-2029-657",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:36:24.691430"
     },
     {
       "student_id": "hall-david-2027-417",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:36:44.643546"
     },
     {
       "student_id": "farooq-samir-2029-619",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:39:15.709634"
     },
     {
       "student_id": "scott-alexander-2027-644",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:39:54.161118"
     },
     {
       "student_id": "yilmaz-deniz-2029-877",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:40:06.147185"
     },
     {
       "student_id": "yamamoto-haruto-2029-867",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:41:55.348539"
     },
     {
       "student_id": "miller-william-2029-562",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:41:58.967720"
     },
     {
       "student_id": "cheng-hui-2028-840",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:42:19.630631"
     },
     {
       "student_id": "tran-anh-2029-878",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:44:10.857842"
     },
     {
       "student_id": "bose-arnav-2028-221",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:44:40.855462"
     },
     {
       "student_id": "khan-zara-2029-790",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:45:38.576877"
     },
     {
       "student_id": "zhou-meilin-2027-200",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:46:37.710214"
     },
     {
       "student_id": "suzuki-hana-2028-563",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:48:44.362056"
     },
     {
       "student_id": "oconnor-sean-2028-842",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:51:45.050891"
     },
     {
       "student_id": "pandey-riya-2028-213",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:51:54.220869"
     },
     {
       "student_id": "martin-ethan-2028-811",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:53:02.730522"
     },
     {
       "student_id": "ito-sakura-2029-833",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:55:50.348086"
     },
     {
       "student_id": "patel-aarav-2029-565",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:57:20.604027"
     },
     {
       "student_id": "reddy-sanvi-2029-139",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:58:18.648388"
     },
     {
       "student_id": "joshi-neha-2028-211",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 17:59:33.475365"
     },
     {
       "student_id": "fujita-daiki-2028-499",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:01:58.972511"
     },
     {
       "student_id": "singh-ananya-2029-225",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:02:17.702793"
     },
     {
       "student_id": "turner-natalie-2027-825",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:04:03.201141"
     },
     {
       "student_id": "anderson-mason-2028-608",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:11:24.994366"
     },
     {
       "student_id": "rahim-imran-2028-010",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:12:28.487217"
     },
     {
       "student_id": "rizwan-ayaan-2026-249",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:13:58.654612"
     },
     {
       "student_id": "rahman-noor-2029-758",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:15:48.196246"
     },
     {
       "student_id": "kobayashi-shota-2028-005",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:17:53.400951"
     },
     {
       "student_id": "al_farsi-omar-2029-343",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:17:54.927112"
     },
     {
       "student_id": "robinson-grace-2028-298",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:18:18.559804"
     },
     {
       "student_id": "nguyen-dao-2026-594",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:18:21.379346"
     },
     {
       "student_id": "clark-amelia-2029-705",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:21:27.343816"
     },
     {
       "student_id": "sun-lei-2029-787",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:22:14.002988"
     },
     {
       "student_id": "kim-min_jun-2029-466",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:27:59.586716"
     },
     {
       "student_id": "park-seo_yeon-2029-004",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:33:40.117109"
     },
     {
       "student_id": "rizvi-saad-2028-174",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:34:24.634036"
     },
     {
       "student_id": "banerjee-vihaan-2027-180",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:38:42.895863"
     },
     {
       "student_id": "haddad-yousef-2026-200",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:47:26.249580"
     },
     {
       "student_id": "saleh-nour-2028-496",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:47:37.248295"
     },
     {
       "student_id": "brown-olivia-2029-956",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:54:35.768775"
     },
     {
       "student_id": "jabari-leila-2028-495",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-01-26 18:55:33.359121"
     },
     {
@@ -13276,337 +13276,337 @@
     },
     {
       "student_id": "thomas-charlotte-2029-276",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:04:31.031522"
     },
     {
       "student_id": "mansoor-karim-2028-638",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:07:28.797171"
     },
     {
       "student_id": "martin-ethan-2028-811",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:10:30.371535"
     },
     {
       "student_id": "nguyen-dao-2026-594",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:10:32.484360"
     },
     {
       "student_id": "ali-ahmed-2029-874",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:11:42.629031"
     },
     {
       "student_id": "hashimoto-akira-2029-750",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:16:45.838350"
     },
     {
       "student_id": "king-chloe-2028-029",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:17:00.334523"
     },
     {
       "student_id": "chaudhry-rehan-2029-286",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:19:46.444485"
     },
     {
       "student_id": "khan-zara-2029-790",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:20:08.328886"
     },
     {
       "student_id": "rana-simran-2027-150",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:20:59.909387"
     },
     {
       "student_id": "al_mansour-fatima-2028-744",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:22:07.465122"
     },
     {
       "student_id": "pandey-riya-2028-213",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:22:29.182165"
     },
     {
       "student_id": "rizwan-ayaan-2026-249",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:22:42.883348"
     },
     {
       "student_id": "kapoor-dev-2028-854",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:24:40.766022"
     },
     {
       "student_id": "rizvi-saad-2028-174",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:25:57.550221"
     },
     {
       "student_id": "al_farsi-omar-2029-343",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:26:22.795150"
     },
     {
       "student_id": "tanaka-ren-2029-091",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:26:47.441722"
     },
     {
       "student_id": "clark-amelia-2029-705",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:26:58.843154"
     },
     {
       "student_id": "joshi-neha-2028-211",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:27:04.698897"
     },
     {
       "student_id": "farooq-samir-2029-619",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:29:18.643125"
     },
     {
       "student_id": "mehta-krishna-2029-672",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:30:15.123366"
     },
     {
       "student_id": "ito-sakura-2029-833",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:30:33.563968"
     },
     {
       "student_id": "banerjee-vihaan-2027-180",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:32:52.768587"
     },
     {
       "student_id": "cheng-hui-2028-840",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:33:14.892173"
     },
     {
       "student_id": "verma-pranav-2029-514",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:33:17.561883"
     },
     {
       "student_id": "pham-tu-2027-853",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:33:38.665904"
     },
     {
       "student_id": "hassan-amira-2029-592",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:34:51.773076"
     },
     {
       "student_id": "hoang-minh-2029-592",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:37:27.599023"
     },
     {
       "student_id": "moore-elijah-2029-063",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:38:33.174468"
     },
     {
       "student_id": "turner-natalie-2027-825",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:39:33.301892"
     },
     {
       "student_id": "robinson-grace-2028-298",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:39:44.561120"
     },
     {
       "student_id": "chakraborty-anika-2028-937",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:41:17.428391"
     },
     {
       "student_id": "suleiman-yasmin-2029-962",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:41:20.305766"
     },
     {
       "student_id": "reddy-sanvi-2029-139",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:42:06.956123"
     },
     {
       "student_id": "anderson-mason-2028-608",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:44:22.068612"
     },
     {
       "student_id": "chatterjee-anvi-2027-491",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:45:26.633479"
     },
     {
       "student_id": "clark-emma-2026-699",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:45:27.126562"
     },
     {
       "student_id": "jabari-leila-2028-495",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:45:46.136528"
     },
     {
       "student_id": "lin-xin-2028-241",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:46:35.765752"
     },
     {
       "student_id": "zhou-meilin-2027-200",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:47:12.828502"
     },
     {
       "student_id": "baker-daniel-2027-604",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:47:18.797240"
     },
     {
       "student_id": "lim-su_bin-2029-223",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:48:31.904386"
     },
     {
       "student_id": "wang-wei-2029-685",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:49:51.587266"
     },
     {
       "student_id": "salem-amal-2026-624",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:53:51.128554"
     },
     {
       "student_id": "sato-yuki-2029-042",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:55:35.509231"
     },
     {
       "student_id": "kato-shin-2026-589",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:56:44.503477"
     },
     {
       "student_id": "al_sharif-samira-2028-135",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 17:59:49.717796"
     },
     {
       "student_id": "chen-li-2029-204",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 18:01:47.386737"
     },
     {
       "student_id": "evans-lucas-2029-453",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 18:06:20.223212"
     },
     {
       "student_id": "sun-lei-2029-787",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 18:06:22.747573"
     },
     {
       "student_id": "scott-alexander-2027-644",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 18:08:08.033195"
     },
     {
       "student_id": "miller-william-2029-562",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 18:08:25.650685"
     },
     {
       "student_id": "jain-diya-2029-516",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 18:11:25.806003"
     },
     {
       "student_id": "hall-david-2027-417",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 18:12:02.736664"
     },
     {
       "student_id": "srinivasan-meera-2028-252",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 18:12:16.268464"
     },
     {
       "student_id": "haddad-layla-2029-728",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 18:12:46.382138"
     },
     {
       "student_id": "st_clare-denise-2027-191",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 18:15:37.926789"
     },
     {
       "student_id": "desai-isha-2029-550",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 18:16:23.814610"
     },
     {
       "student_id": "williams-james-2029-462",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 18:19:23.134052"
     },
     {
       "student_id": "al_mutairi-lina-2026-117",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 18:21:08.462240"
     },
     {
       "student_id": "oconnor-sean-2028-842",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 18:23:49.359839"
     },
     {
       "student_id": "pham-quang-2028-969",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 18:26:43.471975"
     },
     {
       "student_id": "young-benjamin-2028-301",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 18:27:11.071023"
     },
     {
       "student_id": "ng-mei-2029-774",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 18:31:45.239978"
     },
     {
       "student_id": "nguyen-thanh-2029-280",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 18:41:37.923685"
     },
     {
       "student_id": "garcia-sofia-2029-953",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 18:41:42.600677"
     },
     {
       "student_id": "murphy-jack-2029-737",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-02 18:47:26.832869"
     },
     {
@@ -14966,327 +14966,327 @@
     },
     {
       "student_id": "bakr-salma-2029-946",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:03:49.895026"
     },
     {
       "student_id": "oconnor-sean-2028-842",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:12:07.269214"
     },
     {
       "student_id": "farooq-samir-2029-619",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:12:54.103340"
     },
     {
       "student_id": "zhou-meilin-2027-200",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:13:02.905431"
     },
     {
       "student_id": "moore-elijah-2029-063",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:14:50.608444"
     },
     {
       "student_id": "pham-tu-2027-853",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:18:24.016241"
     },
     {
       "student_id": "mehta-krishna-2029-672",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:21:19.773372"
     },
     {
       "student_id": "rizvi-saad-2028-174",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:26:19.019120"
     },
     {
       "student_id": "ito-sakura-2029-833",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:26:22.168206"
     },
     {
       "student_id": "pandey-riya-2028-213",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:26:39.174440"
     },
     {
       "student_id": "jain-diya-2029-516",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:27:16.942475"
     },
     {
       "student_id": "mori-keiko-2027-853",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:28:33.987568"
     },
     {
       "student_id": "hoang-minh-2029-592",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:28:45.757451"
     },
     {
       "student_id": "bose-arnav-2028-221",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:29:49.804766"
     },
     {
       "student_id": "mukherjee-diya-2026-701",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:30:49.110689"
     },
     {
       "student_id": "yilmaz-deniz-2029-877",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:31:54.890475"
     },
     {
       "student_id": "joshi-neha-2028-211",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:32:34.480000"
     },
     {
       "student_id": "turner-natalie-2027-825",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:33:50.897281"
     },
     {
       "student_id": "kim-min_jun-2029-466",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:34:24.045644"
     },
     {
       "student_id": "tran-anh-2029-878",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:35:16.314082"
     },
     {
       "student_id": "robinson-grace-2028-298",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:35:50.006656"
     },
     {
       "student_id": "rahim-imran-2028-010",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:35:56.132741"
     },
     {
       "student_id": "cheng-hui-2028-840",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:36:45.797392"
     },
     {
       "student_id": "mansoor-karim-2028-638",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:37:41.552798"
     },
     {
       "student_id": "mansour-samir-2027-636",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:37:48.752773"
     },
     {
       "student_id": "kato-shin-2026-589",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:39:32.732394"
     },
     {
       "student_id": "haddad-layla-2029-728",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:45:01.945462"
     },
     {
       "student_id": "wang-wei-2029-685",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:45:54.769342"
     },
     {
       "student_id": "nguyen-dao-2026-594",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:48:39.879002"
     },
     {
       "student_id": "park-seo_yeon-2029-004",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:49:21.429802"
     },
     {
       "student_id": "desai-isha-2029-550",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:49:32.849910"
     },
     {
       "student_id": "nasser-maya-2029-732",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:49:55.030994"
     },
     {
       "student_id": "banerjee-vihaan-2027-180",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:50:11.389491"
     },
     {
       "student_id": "clark-emma-2026-699",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:50:44.491160"
     },
     {
       "student_id": "rizwan-ayaan-2026-249",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:51:01.818698"
     },
     {
       "student_id": "sharma-vihaan-2029-204",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:54:15.135359"
     },
     {
       "student_id": "kumar-arjun-2029-548",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:54:31.352006"
     },
     {
       "student_id": "ng-mei-2029-774",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:54:44.292674"
     },
     {
       "student_id": "chatterjee-anvi-2027-491",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:56:35.796162"
     },
     {
       "student_id": "yamada-haruki-2028-267",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:56:38.879034"
     },
     {
       "student_id": "evans-lucas-2029-453",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:57:10.165689"
     },
     {
       "student_id": "clark-amelia-2029-705",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:57:24.944690"
     },
     {
       "student_id": "hossain-farhan-2027-161",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 17:59:49.872733"
     },
     {
       "student_id": "khan-zara-2029-790",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:00:59.398060"
     },
     {
       "student_id": "kapoor-dev-2028-854",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:01:21.806854"
     },
     {
       "student_id": "huynh-trang-2027-384",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:01:50.190037"
     },
     {
       "student_id": "chakraborty-anika-2028-937",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:05:11.922806"
     },
     {
       "student_id": "anderson-mason-2028-608",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:09:30.838414"
     },
     {
       "student_id": "pham-quang-2028-969",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:10:13.917916"
     },
     {
       "student_id": "suleiman-yasmin-2029-962",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:12:17.218780"
     },
     {
       "student_id": "hall-david-2027-417",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:13:46.874424"
     },
     {
       "student_id": "qureshi-rayyan-2027-454",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:15:30.069320"
     },
     {
       "student_id": "young-benjamin-2028-301",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:18:07.306658"
     },
     {
       "student_id": "verma-pranav-2029-514",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:18:35.006683"
     },
     {
       "student_id": "scott-alexander-2027-644",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:23:43.925690"
     },
     {
       "student_id": "kobayashi-shota-2028-005",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:24:38.310050"
     },
     {
       "student_id": "barakat-aliyah-2028-637",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:26:22.254431"
     },
     {
       "student_id": "salem-amal-2026-624",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:28:10.527879"
     },
     {
       "student_id": "sun-lei-2029-787",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:29:12.740672"
     },
     {
       "student_id": "al_sharif-samira-2028-135",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:33:22.479794"
     },
     {
       "student_id": "walker-logan-2028-771",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:34:14.224183"
     },
     {
       "student_id": "sengupta-arjun-2026-794",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:35:20.846274"
     },
     {
       "student_id": "al_mansour-fatima-2028-744",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:40:47.607656"
     },
     {
       "student_id": "reddy-sanvi-2029-139",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:43:17.113486"
     },
     {
       "student_id": "tanaka-ren-2029-091",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-09 18:51:46.147735"
     },
     {
@@ -16631,342 +16631,342 @@
     },
     {
       "student_id": "evans-lucas-2029-453",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:04:33.461771"
     },
     {
       "student_id": "suzuki-hana-2028-563",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:09:17.834665"
     },
     {
       "student_id": "park-seo_yeon-2029-004",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:14:51.255688"
     },
     {
       "student_id": "gupta-aditya-2029-329",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:15:31.635351"
     },
     {
       "student_id": "sengupta-arjun-2026-794",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:15:49.874117"
     },
     {
       "student_id": "white-henry-2028-671",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:17:08.275106"
     },
     {
       "student_id": "pandey-riya-2028-213",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:19:47.080321"
     },
     {
       "student_id": "al_mutairi-lina-2026-117",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:20:08.213574"
     },
     {
       "student_id": "verma-pranav-2029-514",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:20:17.625050"
     },
     {
       "student_id": "haddad-layla-2029-728",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:21:07.307198"
     },
     {
       "student_id": "lee-ji_woo-2029-657",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:21:39.708193"
     },
     {
       "student_id": "das-shreya-2027-285",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:23:32.619844"
     },
     {
       "student_id": "walker-logan-2028-771",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:26:13.091107"
     },
     {
       "student_id": "clark-amelia-2029-705",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:27:07.464350"
     },
     {
       "student_id": "hoang-minh-2029-592",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:28:45.752919"
     },
     {
       "student_id": "rana-simran-2027-150",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:30:37.266311"
     },
     {
       "student_id": "zhang-yu-2029-424",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:30:59.740557"
     },
     {
       "student_id": "ng-mei-2029-774",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:34:20.011465"
     },
     {
       "student_id": "wong-chun-2026-257",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:34:28.956715"
     },
     {
       "student_id": "salem-amal-2026-624",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:37:05.671676"
     },
     {
       "student_id": "hall-david-2027-417",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:37:34.162394"
     },
     {
       "student_id": "oconnor-sean-2028-842",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:37:58.686284"
     },
     {
       "student_id": "miller-william-2029-562",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:39:56.934676"
     },
     {
       "student_id": "davis-isabella-2029-060",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:40:36.766640"
     },
     {
       "student_id": "mishra-pari-2028-783",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:40:41.589703"
     },
     {
       "student_id": "jabari-leila-2028-495",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:41:02.933141"
     },
     {
       "student_id": "anderson-mason-2028-608",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:41:38.479098"
     },
     {
       "student_id": "martin-ethan-2028-811",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:43:34.188792"
     },
     {
       "student_id": "tanaka-ren-2029-091",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:44:50.350455"
     },
     {
       "student_id": "al_sharif-samira-2028-135",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:46:01.783729"
     },
     {
       "student_id": "pham-quang-2028-969",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:46:08.967661"
     },
     {
       "student_id": "al_hashimi-noor-2027-778",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:46:14.140208"
     },
     {
       "student_id": "rahman-noor-2029-758",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:46:26.309471"
     },
     {
       "student_id": "cheng-hui-2028-840",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:48:13.159221"
     },
     {
       "student_id": "farooq-samir-2029-619",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:48:22.193773"
     },
     {
       "student_id": "lim-su_bin-2029-223",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:48:43.490072"
     },
     {
       "student_id": "lewis-matthew-2027-203",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:49:42.595884"
     },
     {
       "student_id": "clark-emma-2026-699",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:49:52.318403"
     },
     {
       "student_id": "turner-natalie-2027-825",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:50:42.702086"
     },
     {
       "student_id": "khan-zara-2029-790",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:50:44.065121"
     },
     {
       "student_id": "kumar-arjun-2029-548",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:56:34.361704"
     },
     {
       "student_id": "rizvi-saad-2028-174",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:58:40.411363"
     },
     {
       "student_id": "perez-lucas-2026-363",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 17:58:56.612965"
     },
     {
       "student_id": "al_farsi-omar-2029-343",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:00:17.587173"
     },
     {
       "student_id": "ali-ahmed-2029-874",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:03:36.897629"
     },
     {
       "student_id": "zhou-meilin-2027-200",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:07:39.727766"
     },
     {
       "student_id": "bakr-salma-2029-946",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:07:44.181614"
     },
     {
       "student_id": "young-benjamin-2028-301",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:08:27.939518"
     },
     {
       "student_id": "kim-min_jun-2029-466",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:10:27.832871"
     },
     {
       "student_id": "van_buren-martin-2029-739",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:11:04.136587"
     },
     {
       "student_id": "barakat-aliyah-2028-637",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:12:29.987198"
     },
     {
       "student_id": "jain-diya-2029-516",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:13:32.137800"
     },
     {
       "student_id": "banerjee-vihaan-2027-180",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:14:55.849467"
     },
     {
       "student_id": "mori-keiko-2027-853",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:19:38.367341"
     },
     {
       "student_id": "patel-aarav-2029-565",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:20:44.527387"
     },
     {
       "student_id": "scott-alexander-2027-644",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:21:39.979117"
     },
     {
       "student_id": "baker-daniel-2027-604",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:23:58.706249"
     },
     {
       "student_id": "iyer-aria-2027-558",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:25:35.741600"
     },
     {
       "student_id": "tran-anh-2029-878",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:26:18.186188"
     },
     {
       "student_id": "desai-isha-2029-550",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:28:11.760876"
     },
     {
       "student_id": "mehta-krishna-2029-672",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:30:06.115238"
     },
     {
       "student_id": "chen-li-2029-204",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:30:59.630088"
     },
     {
       "student_id": "fujita-daiki-2028-499",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:34:43.176439"
     },
     {
       "student_id": "mansour-samir-2027-636",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:34:56.456657"
     },
     {
       "student_id": "chaudhry-rehan-2029-286",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:38:40.778264"
     },
     {
       "student_id": "rizwan-ayaan-2026-249",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:44:13.153118"
     },
     {
       "student_id": "kapoor-dev-2028-854",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:44:46.089484"
     },
     {
       "student_id": "yamada-haruki-2028-267",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-16 18:50:40.140298"
     },
     {
@@ -18271,352 +18271,352 @@
     },
     {
       "student_id": "ito-sakura-2029-833",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:10:17.990772"
     },
     {
       "student_id": "salem-amal-2026-624",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:11:54.924058"
     },
     {
       "student_id": "lee-ji_woo-2029-657",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:12:19.175541"
     },
     {
       "student_id": "ng-mei-2029-774",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:16:14.842391"
     },
     {
       "student_id": "suleiman-yasmin-2029-962",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:17:43.776917"
     },
     {
       "student_id": "al_mansour-fatima-2028-744",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:17:47.935449"
     },
     {
       "student_id": "pandey-riya-2028-213",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:17:57.595285"
     },
     {
       "student_id": "white-henry-2028-671",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:19:10.171047"
     },
     {
       "student_id": "saleh-nour-2028-496",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:22:27.696329"
     },
     {
       "student_id": "farooq-samir-2029-619",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:22:53.165536"
     },
     {
       "student_id": "kato-shin-2026-589",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:23:27.452260"
     },
     {
       "student_id": "rizwan-ayaan-2026-249",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:23:52.578345"
     },
     {
       "student_id": "desai-isha-2029-550",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:24:19.618848"
     },
     {
       "student_id": "srinivasan-meera-2028-252",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:24:21.167732"
     },
     {
       "student_id": "turner-natalie-2027-825",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:26:02.961241"
     },
     {
       "student_id": "huynh-trang-2027-384",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:27:17.931257"
     },
     {
       "student_id": "nguyen-phuc-2028-780",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:27:53.488289"
     },
     {
       "student_id": "pham-quang-2028-969",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:29:18.626748"
     },
     {
       "student_id": "yilmaz-deniz-2029-877",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:30:00.562572"
     },
     {
       "student_id": "al_sharif-samira-2028-135",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:30:26.418336"
     },
     {
       "student_id": "tanaka-ren-2029-091",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:30:38.738664"
     },
     {
       "student_id": "mansoor-karim-2028-638",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:31:40.794840"
     },
     {
       "student_id": "kapoor-dev-2028-854",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:33:16.278333"
     },
     {
       "student_id": "sato-yuki-2029-042",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:35:08.994895"
     },
     {
       "student_id": "perez-lucas-2026-363",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:36:27.238785"
     },
     {
       "student_id": "mishra-pari-2028-783",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:37:26.352443"
     },
     {
       "student_id": "gupta-aditya-2029-329",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:38:29.656953"
     },
     {
       "student_id": "banerjee-vihaan-2027-180",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:39:12.803635"
     },
     {
       "student_id": "khan-zara-2029-790",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:40:14.463425"
     },
     {
       "student_id": "lin-xin-2028-241",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:42:05.599257"
     },
     {
       "student_id": "hossain-farhan-2027-161",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:42:26.836859"
     },
     {
       "student_id": "jabari-leila-2028-495",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:43:36.188229"
     },
     {
       "student_id": "mansour-samir-2027-636",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:43:44.941576"
     },
     {
       "student_id": "williams-james-2029-462",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:44:35.952482"
     },
     {
       "student_id": "al_mutairi-lina-2026-117",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:44:40.112868"
     },
     {
       "student_id": "murphy-jack-2029-737",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:48:21.668497"
     },
     {
       "student_id": "bose-arnav-2028-221",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:50:02.209177"
     },
     {
       "student_id": "anderson-mason-2028-608",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:52:11.323953"
     },
     {
       "student_id": "baker-daniel-2027-604",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:52:43.939549"
     },
     {
       "student_id": "st_clare-denise-2027-191",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:53:13.032593"
     },
     {
       "student_id": "kim-min_jun-2029-466",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:53:27.646518"
     },
     {
       "student_id": "sun-lei-2029-787",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:54:15.525937"
     },
     {
       "student_id": "verma-pranav-2029-514",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:56:16.594613"
     },
     {
       "student_id": "nguyen-dao-2026-594",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:58:34.945430"
     },
     {
       "student_id": "suzuki-hana-2028-563",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:58:48.724259"
     },
     {
       "student_id": "yamada-haruki-2028-267",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:59:06.674272"
     },
     {
       "student_id": "barakat-aliyah-2028-637",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:59:14.227410"
     },
     {
       "student_id": "mehta-krishna-2029-672",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:59:24.781096"
     },
     {
       "student_id": "yamamoto-haruto-2029-867",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:59:54.886388"
     },
     {
       "student_id": "kumar-arjun-2029-548",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 17:59:57.789022"
     },
     {
       "student_id": "park-seo_yeon-2029-004",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 18:03:00.212915"
     },
     {
       "student_id": "singh-ananya-2029-225",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 18:07:08.399137"
     },
     {
       "student_id": "davis-isabella-2029-060",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 18:07:35.402043"
     },
     {
       "student_id": "smith-emily-2029-676",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 18:07:52.093568"
     },
     {
       "student_id": "zhou-meilin-2027-200",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 18:08:48.167748"
     },
     {
       "student_id": "das-shreya-2027-285",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 18:11:51.370525"
     },
     {
       "student_id": "young-benjamin-2028-301",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 18:12:31.945113"
     },
     {
       "student_id": "al_farsi-omar-2029-343",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 18:14:53.702352"
     },
     {
       "student_id": "chatterjee-anvi-2027-491",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 18:15:09.092374"
     },
     {
       "student_id": "joshi-neha-2028-211",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 18:17:31.773630"
     },
     {
       "student_id": "reddy-sanvi-2029-139",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 18:19:34.616572"
     },
     {
       "student_id": "oconnor-sean-2028-842",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 18:21:03.017118"
     },
     {
       "student_id": "nguyen-thanh-2029-280",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 18:24:27.658868"
     },
     {
       "student_id": "rizvi-saad-2028-174",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 18:28:26.676263"
     },
     {
       "student_id": "al_hashimi-noor-2027-778",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 18:36:24.269870"
     },
     {
       "student_id": "king-chloe-2028-029",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 18:37:18.506228"
     },
     {
       "student_id": "rana-simran-2027-150",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 18:43:22.800628"
     },
     {
       "student_id": "robinson-grace-2028-298",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 18:44:44.758757"
     },
     {
       "student_id": "chen-li-2029-204",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 18:46:34.877868"
     },
     {
       "student_id": "brown-olivia-2029-956",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-02-23 18:52:17.958467"
     },
     {
@@ -20051,292 +20051,292 @@
     },
     {
       "student_id": "lim-su_bin-2029-223",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:07:15.494604"
     },
     {
       "student_id": "mansour-samir-2027-636",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:08:20.264905"
     },
     {
       "student_id": "park-seo_yeon-2029-004",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:10:29.748606"
     },
     {
       "student_id": "cheng-hui-2028-840",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:12:04.519494"
     },
     {
       "student_id": "kim-min_jun-2029-466",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:12:08.512816"
     },
     {
       "student_id": "kobayashi-shota-2028-005",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:19:19.793487"
     },
     {
       "student_id": "kumar-arjun-2029-548",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:19:57.103794"
     },
     {
       "student_id": "clark-amelia-2029-705",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:20:19.003954"
     },
     {
       "student_id": "salem-amal-2026-624",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:22:09.872230"
     },
     {
       "student_id": "baker-daniel-2027-604",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:22:59.935617"
     },
     {
       "student_id": "hossain-farhan-2027-161",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:23:15.347729"
     },
     {
       "student_id": "sengupta-arjun-2026-794",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:24:47.446758"
     },
     {
       "student_id": "walker-logan-2028-771",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:25:45.542036"
     },
     {
       "student_id": "al_mansour-fatima-2028-744",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:26:20.703580"
     },
     {
       "student_id": "king-chloe-2028-029",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:27:26.653557"
     },
     {
       "student_id": "singh-ananya-2029-225",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:27:53.205766"
     },
     {
       "student_id": "tran-anh-2029-878",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:28:00.017543"
     },
     {
       "student_id": "mishra-pari-2028-783",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:29:51.114342"
     },
     {
       "student_id": "haddad-layla-2029-728",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:29:53.584424"
     },
     {
       "student_id": "wang-wei-2029-685",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:30:55.038383"
     },
     {
       "student_id": "hassan-amira-2029-592",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:32:39.715518"
     },
     {
       "student_id": "hoang-minh-2029-592",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:33:22.163972"
     },
     {
       "student_id": "rizvi-saad-2028-174",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:33:54.611573"
     },
     {
       "student_id": "nguyen-dao-2026-594",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:34:03.513565"
     },
     {
       "student_id": "white-henry-2028-671",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:36:01.303182"
     },
     {
       "student_id": "murphy-jack-2029-737",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:36:07.829041"
     },
     {
       "student_id": "evans-lucas-2029-453",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:37:42.439190"
     },
     {
       "student_id": "ito-sakura-2029-833",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:38:28.059504"
     },
     {
       "student_id": "oconnor-sean-2028-842",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:39:52.911822"
     },
     {
       "student_id": "nasser-maya-2029-732",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:40:51.868569"
     },
     {
       "student_id": "yamamoto-haruto-2029-867",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:44:10.441335"
     },
     {
       "student_id": "hall-david-2027-417",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:47:18.883868"
     },
     {
       "student_id": "yilmaz-deniz-2029-877",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:47:41.456626"
     },
     {
       "student_id": "huynh-trang-2027-384",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:48:01.529312"
     },
     {
       "student_id": "al_sharif-samira-2028-135",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:50:10.258858"
     },
     {
       "student_id": "turner-natalie-2027-825",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:50:54.215761"
     },
     {
       "student_id": "williams-james-2029-462",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:54:09.970946"
     },
     {
       "student_id": "iyer-aria-2027-558",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:54:43.008219"
     },
     {
       "student_id": "mansoor-karim-2028-638",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 17:57:06.386940"
     },
     {
       "student_id": "mehta-krishna-2029-672",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 18:02:27.537916"
     },
     {
       "student_id": "nguyen-phuc-2028-780",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 18:04:45.810984"
     },
     {
       "student_id": "haddad-yousef-2026-200",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 18:06:17.541904"
     },
     {
       "student_id": "zhou-meilin-2027-200",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 18:06:19.493186"
     },
     {
       "student_id": "banerjee-vihaan-2027-180",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 18:07:15.738316"
     },
     {
       "student_id": "young-benjamin-2028-301",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 18:07:20.186359"
     },
     {
       "student_id": "rahim-imran-2028-010",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 18:09:18.332244"
     },
     {
       "student_id": "pham-quang-2028-969",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 18:10:31.742943"
     },
     {
       "student_id": "anderson-mason-2028-608",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 18:13:30.047126"
     },
     {
       "student_id": "pandey-riya-2028-213",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 18:15:39.823605"
     },
     {
       "student_id": "al_hashimi-noor-2027-778",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 18:18:03.517168"
     },
     {
       "student_id": "tanaka-ren-2029-091",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 18:23:37.612223"
     },
     {
       "student_id": "suleiman-yasmin-2029-962",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 18:24:56.272348"
     },
     {
       "student_id": "verma-pranav-2029-514",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 18:25:09.936769"
     },
     {
       "student_id": "rizwan-ayaan-2026-249",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 18:26:49.513183"
     },
     {
       "student_id": "fujita-daiki-2028-499",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 18:37:58.743871"
     },
     {
       "student_id": "st_clare-denise-2027-191",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 18:45:21.611856"
     },
     {
       "student_id": "farooq-samir-2029-619",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 18:49:56.136812"
     },
     {
       "student_id": "choi-ji_ho-2029-324",
-      "event_type": "online",
+      "event_type": "virtual",
       "timestamp": "2026-03-02 18:50:29.370334"
     },
     {
