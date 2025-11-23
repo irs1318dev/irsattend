@@ -96,7 +96,7 @@ class DBase:
             conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA foreign_keys = ON;")
         return conn
-    
+
     def create_tables(self):
         """Creates the database tables if they don't already exist."""
         with self.get_db_connection() as conn:
@@ -482,8 +482,8 @@ class DBase:
         """
         with self.get_db_connection() as conn:
             conn.execute(
-                query,
-                (event_date.strftime("%Y-%m-%d"), event_type.value, description))
+                query, (event_date.strftime("%Y-%m-%d"), event_type.value, description)
+            )
         conn.close()
 
     def get_events_dict(self) -> list[dict[str, Any]]:

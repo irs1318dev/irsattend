@@ -15,11 +15,11 @@ class CheckinEvent(schema.Event):
     """Number of students who checked in at the event."""
 
     def __init__(
-            self,
-            event_date: datetime.date | str,
-            event_type: str | schema.EventType,
-            checkin_count: int,
-            description: Optional[str] = None,
+        self,
+        event_date: datetime.date | str,
+        event_type: str | schema.EventType,
+        checkin_count: int,
+        description: Optional[str] = None,
     ) -> None:
         """Convert event-date and event_type if needed."""
         self.checkin_count = checkin_count
@@ -46,9 +46,7 @@ class CheckinEvent(schema.Event):
               ORDER BY a.event_date DESC;
         """
         conn = dbase.get_db_connection(as_dict=True)
-        events = [
-            CheckinEvent(**event) for event in conn.execute(query)
-        ]
+        events = [CheckinEvent(**event) for event in conn.execute(query)]
         conn.close()
         return events
 
@@ -62,8 +60,7 @@ class EventStudent(schema.Student):
 
     @staticmethod
     def get_students_for_event(
-        dbase: "database.DBase",
-        event_key: str
+        dbase: "database.DBase", event_key: str
     ) -> list["EventStudent"]:
         """Retrieve students who attended the specified event."""
         event_date, event_type = tuple(event_key.split("::"))
@@ -87,4 +84,3 @@ class EventStudent(schema.Student):
         ]
         conn.close()
         return students
-

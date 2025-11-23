@@ -22,7 +22,7 @@ class DateValidator(validation.Validator):
             return self.success()
         except dateutil.parser.ParserError as err:
             return self.failure(str(err))
-        
+
 
 class EventsTable(widgets.DataTable):
     """Table of team events and number of students who attended."""
@@ -34,7 +34,7 @@ class EventsTable(widgets.DataTable):
 
     def __init__(self, dbase: database.DBase, *args, **kwargs) -> None:
         """Set link to database."""
-        super().__init__(*args, **kwargs)
+        super().__init__(zebra_stripes=True, *args, **kwargs)
         self.dbase = dbase
         self.checkin_events = {}
 
@@ -51,10 +51,10 @@ class EventsTable(widgets.DataTable):
             ("Day of Week", "day_of_week"),
             ("Type", "event_type"),
             ("Count", "checkin_count"),
-            ("Description", "description")
+            ("Description", "description"),
         ]:
             self.add_column(col[0], key=col[1])
-    
+
     def update_table(self) -> None:
         """Populate the table with data."""
         self.clear(columns=False)
@@ -69,8 +69,9 @@ class EventsTable(widgets.DataTable):
                 event.event_type,
                 event.checkin_count,
                 event.description,
-                key=key
+                key=key,
             )
+        self.refresh()
 
 
 class StudentsTable(widgets.DataTable):
@@ -85,7 +86,7 @@ class StudentsTable(widgets.DataTable):
 
     def __init__(self, dbase: database.DBase, *args, **kwargs) -> None:
         """Set link to database."""
-        super().__init__(*args, **kwargs)
+        super().__init__(zebra_stripes=True, *args, **kwargs)
         self.dbase = dbase
         self.students = {}
 
@@ -100,10 +101,10 @@ class StudentsTable(widgets.DataTable):
             ("First Name", "first_name"),
             ("Last Name", "last_name"),
             ("Graduation Year", "grad_year"),
-            ("Check-in time", "timestamp")
+            ("Check-in time", "timestamp"),
         ]:
             self.add_column(col[0], key=col[1])
-    
+
     def watch_event_key(self) -> None:
         """Add events to the event table."""
         if not self.event_key:
@@ -112,7 +113,8 @@ class StudentsTable(widgets.DataTable):
         self.students = {
             student.student_id: student
             for student in events.EventStudent.get_students_for_event(
-                self.dbase, self.event_key)
+                self.dbase, self.event_key
+            )
         }
         for key, student in self.students.items():
             self.add_row(
@@ -121,7 +123,7 @@ class StudentsTable(widgets.DataTable):
                 student.last_name,
                 student.grad_year,
                 student.timestamp,
-                key=key
+                key=key,
             )
 
 
@@ -159,15 +161,20 @@ class EventScreen(screen.Screen):
         yield widgets.Footer()
 
     @textual.on(EventsTable.RowHighlighted)
-    def on_events_table_row_highlighted(self, message: widgets.DataTable.RowSelected) -> None:
+    def on_events_table_row_highlighted(
+        self, message: widgets.DataTable.RowSelected
+    ) -> None:
         """Set the new event key, which will trigger a student table update."""
         self.event_key = message.row_key.value
 
     @textual.on(EventsTable.RowSelected)
-    def on_events_table_row_selected(self, message: widgets.DataTable.RowSelected) -> None:
+    def on_events_table_row_selected(
+        self, message: widgets.DataTable.RowSelected
+    ) -> None:
         """Set the new event key, which will trigger a student table update."""
         self.event_key = message.row_key.value
 
+    @textual.work
     @textual.on(widgets.Button.Pressed, "#events-edit")
     async def edit_event(self) -> None:
         """Edit the selected event."""
@@ -175,27 +182,27 @@ class EventScreen(screen.Screen):
         if self.event_key is None:
             return
         edit_dialog = EditEventDialog(
-            events_table.checkin_events[self.event_key],
-            self.dbase
+            dbase=self.dbase, event=events_table.checkin_events[self.event_key]
         )
-        if self.app.push_screen(edit_dialog):
+        if await self.app.push_screen_wait(edit_dialog):
             events_table.update_table()
 
 
-class EditEventDialog(screen.ModalScreen):
+class EditEventDialog(screen.ModalScreen[bool]):
     """Edit or add events."""
 
     CSS_PATH = "../styles/modal.tcss"
 
+    dbase: database.DBase
+    """Database interface."""
     event: events.CheckinEvent
     """The event to be edited."""
-    dbase: database.DBase
 
-    def __init__(self, event: events.CheckinEvent, dbase: database.DBase) -> None:
+    def __init__(self, dbase: database.DBase, event: events.CheckinEvent) -> None:
         """Set the event to be edited."""
         super().__init__()
-        self.event = event
         self.dbase = dbase
+        self.event = event
 
     def compose(self) -> app.ComposeResult:
         """Build the dialog."""
@@ -204,19 +211,26 @@ class EditEventDialog(screen.ModalScreen):
             yield widgets.Label("Selected Event:", classes="bold-label")
             yield widgets.Static(f"\t{event.event_type.value}")
             yield widgets.Static(
-                f"\t{event.weekday_name}, {event.event_date.isoformat()}")
+                f"\t{event.weekday_name}, {event.event_date.isoformat()}"
+            )
+            yield widgets.Label("Event Date:")
+            yield widgets.Input(
+                value=event.iso_date,
+                disabled=(self.event.checkin_count > 0),
+                id="event-date-input",
+            )
             yield widgets.Label("Event Type:")
             yield widgets.Select(
                 [(etype.value.title(), etype.value) for etype in schema.EventType],
                 value=event.event_type,
-                id="event-type-select"
+                id="event-type-select",
             )
             yield widgets.Label("Description:")
             yield widgets.Input(value=event.description, id="event-description-input")
             with containers.Horizontal():
                 yield widgets.Button("Ok", id="events-edit-ok")
                 yield widgets.Button("Cancel", id="events-edit-cancel")
-    
+
     @textual.on(widgets.Button.Pressed, "#events-edit-cancel")
     def cancel_dialog(self) -> None:
         """Close the dialog and take no action."""
@@ -225,29 +239,18 @@ class EditEventDialog(screen.ModalScreen):
     @textual.on(widgets.Button.Pressed, "#events-edit-ok")
     def apply_dialog(self) -> None:
         """Close the dialog and take no action."""
+        new_date = self.query_one("#event-date-input", widgets.Input).value
         new_type = cast(str, self.query_one("#event-type-select", widgets.Select).value)
-        new_description = self.query_one(
-            "#event-description-input", widgets.Input).value
-        self.event.update_event(self.dbase, new_type, new_description)
+        new_description: str | None = self.query_one(
+            "#event-description-input", widgets.Input
+        ).value
+        if not new_description:
+            new_description = None
+        if new_date != self.event.iso_date and self.event.checkin_count == 0:
+            parsed_date = dateutil.parser.parse(new_date, dayfirst=False).date()
+            self.event.update_event_date(self.dbase, parsed_date)
+        if new_type != self.event.event_type.value:
+            self.event.update_event_type(self.dbase, new_type)
+        if new_description != self.event.description:
+            self.event.update_description(self.dbase, new_description)
         self.dismiss(True)
-
-
-
-
-    # def compose(self) -> app.ComposeResult:
-    #     """Add the datatable and other controls to the screen."""
-    #     yield widgets.DataTable(id="events-table", classes="data-table")
-    #     with containers.Vertical(classes="edit-pane"):
-    #         yield widgets.Label("Date:")
-    #         yield widgets.Input(
-    #             placeholder="MM/DD/YYYY",
-    #             validators=[DateValidator()],
-    #             id="event-date-input"
-    #         )
-    #         yield widgets.Label("Event Type:")
-    #         yield widgets.Select(
-    #             [(etype.value.title(), etype.value) for etype in schema.EventType],
-    #             id="event-types-select"
-    #         )
-    #         yield widgets.Label("Description")
-    #         yield widgets.Input(id="event-description-input")

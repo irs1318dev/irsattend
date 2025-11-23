@@ -154,10 +154,7 @@ class EventTypeDialog(screen.ModalScreen[Optional[schema.EventType]]):
         with containers.Vertical(id="event-type-dialog", classes="modal-dialog"):
             yield widgets.Label("Event Type")
             event_options = widgets.OptionList(
-                *[
-                    option_list.Option(t.value.title(), id=t)
-                    for t in schema.EventType
-                ],
+                *[option_list.Option(t.value.title(), id=t) for t in schema.EventType],
                 id="event-type-option",
             )
             yield event_options

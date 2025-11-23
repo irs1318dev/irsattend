@@ -22,7 +22,7 @@ def write(dbase: database.DBase, excel_path: pathlib.Path) -> None:
     _write_sheet(
         workbook,
         "Attendance by Event",
-        [dataclasses.asdict(event) for event in event_totals]
+        [dataclasses.asdict(event) for event in event_totals],
     )
     _write_sheet(workbook, "Check-ins", attendance_data["checkins"])
     workbook.close()

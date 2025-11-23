@@ -122,7 +122,6 @@ def test_from_dict(full_dbase: database.DBase, empty_database2: database.DBase) 
     assert len(attendance) == len(full_dbase.get_all_checkins_records_dict())
 
 
-
 def test_add_event(noevents_dbase: database.DBase) -> None:
     """Add an event to the events table."""
     # Arrange
@@ -172,4 +171,3 @@ def test_add_checkin(
     assert checkins[0]["student_id"] == students[0]["student_id"]
     assert checkins[0]["event_type"] == schema.EventType.COMPETITION.value
     assert checkins[0]["event_date"] == "2025-11-15"
-
