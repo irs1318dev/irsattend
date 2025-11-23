@@ -1,6 +1,6 @@
 """Manage team events."""
 
-from typing import Any
+from typing import cast
 
 import dateutil.parser
 import rich.text
@@ -71,6 +71,7 @@ class EventsTable(widgets.DataTable):
                 event.description,
                 key=key
             )
+
 
 class StudentsTable(widgets.DataTable):
     """Table of students who checked in at the selected event."""
@@ -148,6 +149,7 @@ class EventScreen(screen.Screen):
         yield widgets.Header()
         with containers.Horizontal(classes="menu"):
             yield widgets.Button("Add Event")
+            yield widgets.Button("Edit Event", id="events-edit")
         events_table = EventsTable(dbase=self.dbase, id="events-table")
         yield events_table
         yield widgets.Static("Students at Selected Event", classes="separator")
@@ -156,47 +158,96 @@ class EventScreen(screen.Screen):
         yield students_table
         yield widgets.Footer()
 
-    @textual.on(widgets.DataTable.RowHighlighted)
+    @textual.on(EventsTable.RowHighlighted)
     def on_events_table_row_highlighted(self, message: widgets.DataTable.RowSelected) -> None:
         """Set the new event key, which will trigger a student table update."""
         self.event_key = message.row_key.value
 
-    @textual.on(widgets.DataTable.RowSelected)
+    @textual.on(EventsTable.RowSelected)
     def on_events_table_row_selected(self, message: widgets.DataTable.RowSelected) -> None:
         """Set the new event key, which will trigger a student table update."""
         self.event_key = message.row_key.value
 
+    @textual.on(widgets.Button.Pressed, "#events-edit")
+    async def edit_event(self) -> None:
+        """Edit the selected event."""
+        events_table = self.query_one("#events-table", EventsTable)
+        if self.event_key is None:
+            return
+        edit_dialog = EditEventDialog(
+            events_table.checkin_events[self.event_key],
+            self.dbase
+        )
+        if self.app.push_screen(edit_dialog):
+            events_table.update_table()
 
 
-
-
-class EventDialog(screen.ModalScreen):
+class EditEventDialog(screen.ModalScreen):
     """Edit or add events."""
 
     CSS_PATH = "../styles/modal.tcss"
 
-    def __init__(self, student_data: dict[str, Any] | None = None) -> None:
-        self.student_data = student_data
-        super().__init__()
-        if not student_data:
-            self.add_class("add-mode")
+    event: events.CheckinEvent
+    """The event to be edited."""
+    dbase: database.DBase
 
+    def __init__(self, event: events.CheckinEvent, dbase: database.DBase) -> None:
+        """Set the event to be edited."""
+        super().__init__()
+        self.event = event
+        self.dbase = dbase
 
     def compose(self) -> app.ComposeResult:
-        """Add the datatable and other controls to the screen."""
-        with containers.Horizontal():
-            yield widgets.DataTable(id="events-table", classes="data-table")
-            with containers.Vertical(classes="edit-pane"):
-                yield widgets.Label("Date:")
-                yield widgets.Input(
-                    placeholder="MM/DD/YYYY",
-                    validators=[DateValidator()],
-                    id="event-date-input"
-                )
-                yield widgets.Label("Event Type:")
-                yield widgets.Select(
-                    [(etype.value.title(), etype.value) for etype in schema.EventType],
-                    id="event-types-select"
-                )
-                yield widgets.Label("Description")
-                yield widgets.Input(id="event-description-input")
+        """Build the dialog."""
+        event = self.event
+        with containers.Vertical(id="edit-event-dialog"):
+            yield widgets.Label("Selected Event:", classes="bold-label")
+            yield widgets.Static(f"\t{event.event_type.value}")
+            yield widgets.Static(
+                f"\t{event.weekday_name}, {event.event_date.isoformat()}")
+            yield widgets.Label("Event Type:")
+            yield widgets.Select(
+                [(etype.value.title(), etype.value) for etype in schema.EventType],
+                value=event.event_type,
+                id="event-type-select"
+            )
+            yield widgets.Label("Description:")
+            yield widgets.Input(value=event.description, id="event-description-input")
+            with containers.Horizontal():
+                yield widgets.Button("Ok", id="events-edit-ok")
+                yield widgets.Button("Cancel", id="events-edit-cancel")
+    
+    @textual.on(widgets.Button.Pressed, "#events-edit-cancel")
+    def cancel_dialog(self) -> None:
+        """Close the dialog and take no action."""
+        self.dismiss(False)
+
+    @textual.on(widgets.Button.Pressed, "#events-edit-ok")
+    def apply_dialog(self) -> None:
+        """Close the dialog and take no action."""
+        new_type = cast(str, self.query_one("#event-type-select", widgets.Select).value)
+        new_description = self.query_one(
+            "#event-description-input", widgets.Input).value
+        self.event.update_event(self.dbase, new_type, new_description)
+        self.dismiss(True)
+
+
+
+
+    # def compose(self) -> app.ComposeResult:
+    #     """Add the datatable and other controls to the screen."""
+    #     yield widgets.DataTable(id="events-table", classes="data-table")
+    #     with containers.Vertical(classes="edit-pane"):
+    #         yield widgets.Label("Date:")
+    #         yield widgets.Input(
+    #             placeholder="MM/DD/YYYY",
+    #             validators=[DateValidator()],
+    #             id="event-date-input"
+    #         )
+    #         yield widgets.Label("Event Type:")
+    #         yield widgets.Select(
+    #             [(etype.value.title(), etype.value) for etype in schema.EventType],
+    #             id="event-types-select"
+    #         )
+    #         yield widgets.Label("Description")
+    #         yield widgets.Input(id="event-description-input")

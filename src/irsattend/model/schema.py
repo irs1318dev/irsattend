@@ -153,5 +153,26 @@ class Event:
         ]
         conn.close()
         return events
+    
+    def update_event(
+            self,
+            dbase: "database.DBase",
+            event_type: str,
+            description: str
+    ) -> None:
+        """Update the event in the database."""
+        query = """
+                UPDATE events
+                   SET event_type = :new_type, description = :description
+                 WHERE event_type = :prior_type AND event_date = :event_date;
+        """
+        with dbase.get_db_connection() as conn:
+            conn.execute(query, {
+                "event_date": self.event_date,
+                "prior_type": self.event_type.value,
+                "new_type": event_type,
+                "description": description
+            })
+        conn.close()
 
  
