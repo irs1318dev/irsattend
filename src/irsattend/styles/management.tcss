@@ -92,3 +92,9 @@ Static.separator {
     height: 3;
     background: indigo;
 }
+
+#active-toggle {
+    height: 5;
+    border: round green;
+    background: darkslategray;
+}

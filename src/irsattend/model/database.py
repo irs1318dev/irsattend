@@ -103,6 +103,7 @@ class DBase:
             conn.execute(schema.STUDENT_TABLE_SCHEMA)
             conn.execute(schema.CHECKINS_TABLE_SCHEMA)
             conn.execute(schema.EVENT_TABLE_SCHEMA)
+            conn.execute(schema.ACTIVE_STUDENTS_VIEW_SCHEMA)
         conn.close()
 
     @classmethod
@@ -153,14 +154,17 @@ class DBase:
         last_name: str,
         email: str,
         grad_year: int,
+        deactivated_on: Optional[str],
     ) -> None:
         """Edit student."""
         with self.get_db_connection() as conn:
-            conn.execute(
-                """UPDATE students
-                SET first_name = ?, last_name = ?, email = ?, grad_year = ?
-                WHERE student_id = ?""",
-                (first_name, last_name, email, grad_year, student_id),
+            conn.execute("""
+                UPDATE students
+                   SET first_name = ?, last_name = ?,
+                       email = ?, grad_year = ?,
+                       deactivated_on = ?
+                 WHERE student_id = ?;""",
+                (first_name, last_name, email, grad_year, deactivated_on, student_id),
             )
         conn.close()
 
@@ -170,25 +174,44 @@ class DBase:
             conn.execute("DELETE FROM students WHERE student_id = ?", (student_id,))
         conn.close()
 
-    def get_all_students(self) -> list[sqlite3.Row]:
+    def get_all_students(self, include_inactive: bool = False) -> list[sqlite3.Row]:
         """Retrieve all students from the database."""
-        return cast(list[sqlite3.Row], self._get_all_students())
+        return cast(
+            list[sqlite3.Row],
+            self._get_all_students(include_inactive=include_inactive)
+        )
 
-    def get_all_students_dict(self) -> list[dict[str, Any]]:
+    def get_all_students_dict(self, include_inactive: bool = False) -> list[dict[str, Any]]:
         """Retrieve all students from the database."""
-        return cast(list[dict[str, Any]], self._get_all_students(as_dict=True))
+        return cast(
+            list[dict[str, Any]],
+            self._get_all_students(include_inactive=include_inactive, as_dict=True)
+        )
 
     def _get_all_students(
-        self, as_dict: bool = False
+        self,
+        include_inactive: bool = False,
+        as_dict: bool = False
     ) -> list[sqlite3.Row] | list[dict[str, Any]]:
         """Retrieve all students from the database."""
         conn = self.get_db_connection(as_dict)
-        cursor = conn.execute(
-            """
-                SELECT student_id, last_name, first_name, grad_year, email
-                    FROM students
-                ORDER BY student_id;
+        if include_inactive:
+            cursor = conn.execute(
+                """
+                    SELECT student_id, last_name, first_name, grad_year, email,
+                           deactivated_on
+                      FROM students
+                  ORDER BY student_id;
         """
+            )
+        else:
+            cursor = conn.execute(
+                """
+                    SELECT student_id, last_name, first_name, grad_year, email,
+                           deactivated_on
+                      FROM active_students
+                  ORDER BY student_id;
+            """
         )
         students = cursor.fetchall()
         conn.close()
@@ -197,7 +220,9 @@ class DBase:
     def get_student_ids(self) -> list[str]:
         """Get a list of student IDs."""
         conn = self.get_db_connection()
-        cursor = conn.execute("SELECT student_id FROM students ORDER BY student_id;")
+        cursor = conn.execute(
+            "SELECT student_id FROM active_students ORDER BY student_id;"
+        )
         student_ids = [row[0] for row in cursor]
         conn.close()
         return student_ids
@@ -217,7 +242,8 @@ class DBase:
         # An 'app' is an appearance.
         query = """
                 WITH year_checkins AS (
-                    SELECT student_id, COUNT(student_id) as checkins
+                    SELECT student_id, COUNT(student_id) as checkins,
+                           MAX(event_date) as last_checkin
                       FROM checkins
                      WHERE timestamp >= :year_start
                   GROUP BY student_id
@@ -230,8 +256,9 @@ class DBase:
                 )
                 SELECT s.student_id, s.last_name, s.first_name, s.grad_year,
                        COALESCE(y.checkins, 0) AS year_checkins,
-                       COALESCE(b.checkins, 0) AS build_checkins
-                  FROM students AS s
+                       COALESCE(b.checkins, 0) AS build_checkins,
+                       y.last_checkin
+                  FROM active_students AS s
              LEFT JOIN year_checkins AS y
                     ON y.student_id = s.student_id
             LEFT JOIN build_checkins AS b

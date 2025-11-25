@@ -41,9 +41,10 @@ class AttendanceScreen(screen.Screen):
             ("First Name", "first_name"),
             ("Season Apps", "season_apps"),
             ("Build Apps", "build_apps"),
+            ("Last Check-in", "last_checkin"),
         ]:
             table.add_column(col[0], key=col[1])
         cursor = self.dbase.get_student_attendance_data()
         for row in cursor:
-            table.add_row(row[1], row[2], row[4], row[5], key=row[0])
+            table.add_row(row[1], row[2], row[4], row[5], row[6], key=row[0])
         cursor.connection.close()

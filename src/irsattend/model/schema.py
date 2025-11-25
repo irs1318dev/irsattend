@@ -28,8 +28,16 @@ CREATE TABLE IF NOT EXISTS students (
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
-    grad_year INTEGER NOT NULL
+    grad_year INTEGER NOT NULL,
+    deactivated_on TEXT
 );
+"""
+
+ACTIVE_STUDENTS_VIEW_SCHEMA = """
+    CREATE VIEW IF NOT EXISTS active_students AS
+        SELECT student_id, first_name, last_name, grad_year, email, deactivated_on
+          FROM students
+         WHERE deactivated_on IS NULL;
 """
 
 
@@ -42,15 +50,28 @@ class Student:
     last_name: str
     grad_year: int
     email: str
+    deactivated_on: Optional[datetime.date]
 
     @staticmethod
-    def get_students(dbase: "database.DBase") -> list["Student"]:
+    def get_students(
+        dbase: "database.DBase",
+        include_inactive: bool = False, 
+    ) -> list["Student"]:
         """Retrieve a list of Student objects from the database."""
-        query = """
-            SELECT student_id, last_name, first_name, grad_year, email
-             FROM students
-         ORDER BY student_id;
-        """
+        if include_inactive:
+            query = """
+                SELECT student_id, last_name, first_name, grad_year, email,
+                       deactivated_on
+                  FROM students
+              ORDER BY student_id;
+            """
+        else:
+            query = """
+                SELECT student_id, last_name, first_name, grad_year, email,
+                       deactivated_on
+                  FROM active_students
+              ORDER BY student_id;
+            """
         conn = dbase.get_db_connection(as_dict=True)
         students = [Student(**student) for student in conn.execute(query)]
         conn.close()

@@ -37,10 +37,16 @@ class StudentScreen(screen.Screen):
         with containers.Horizontal():
             with containers.Vertical(id="student-list-container"):
                 yield widgets.Label("Student List")
-                yield widgets.DataTable(id="student-table")
+                yield widgets.DataTable(zebra_stripes=True, id="student-table")
             with containers.Vertical(id="actions-container"):
                 yield widgets.Label("Actions")
                 with containers.ScrollableContainer():
+                    with containers.Horizontal(id="active-toggle"):
+                        yield widgets.Label("Include Inactive Students:")
+                        yield widgets.Switch(
+                            False,
+                            id="students-show-inactive-switch",
+                        )
                     yield widgets.Static(
                         "No student selected",
                         id="selection-indicator",
@@ -52,12 +58,6 @@ class StudentScreen(screen.Screen):
                         variant="success",
                         id="add-student",
                         tooltip="Add a new student to the database.",
-                    )
-                    yield widgets.Button(
-                        "Import from CSV",
-                        variant="success",
-                        id="import-csv",
-                        tooltip="Import students from a CSV file.",
                     )
                     yield widgets.Button(
                         "Edit Selected",
@@ -101,9 +101,9 @@ class StudentScreen(screen.Screen):
         self.table = self.query_one(widgets.DataTable)
         self.table.cursor_type = "row"
         self.table.add_columns(
-            "ID", "Last Name", "First Name", "Email", "Grad Year", "Attendance Count"
+            "ID", "Last Name", "First Name", "Email", "Grad Year", "Deactivated On"
         )
-        self.load_student_data()
+        self.load_student_data(False)
         self._selected_student_id = None
 
     def _add_progress_bar(self, total: int | None, name: str) -> widgets.ProgressBar:
@@ -137,10 +137,11 @@ class StudentScreen(screen.Screen):
             return
         pbar.remove()
 
-    def load_student_data(self) -> None:
+    def load_student_data(self, show_inactive: bool) -> None:
         """Load student data into the datatable widget."""
         self.table.clear()
-        students = self.dbase.get_all_students()
+        textual.log(f"Loading student data, show_inactive={show_inactive}")
+        students = self.dbase.get_all_students(include_inactive=show_inactive)
         for student in students:
             self.table.add_row(
                 student["student_id"],
@@ -148,8 +149,11 @@ class StudentScreen(screen.Screen):
                 student["first_name"],
                 student["email"] or "N/A",
                 str(student["grad_year"]) if student["grad_year"] else "N/A",
+                student["deactivated_on"],
                 key=student["student_id"],
             )
+        status_widget = self.query_one("#status-message", widgets.Static)
+        status_widget.update(f"[green]Loaded {len(students)} students.[/]")
 
     def on_data_table_row_selected(self, event: widgets.DataTable.RowSelected) -> None:
         """Select a row in the datatable."""
@@ -168,13 +172,22 @@ class StudentScreen(screen.Screen):
                 f"[bold]Selected:[/bold]\n{student['first_name']} "
                 f"{student['last_name']}\nID: {student['student_id']}"
             )
+    
+    @textual.on(widgets.Switch.Changed, "#students-show-inactive-switch")
+    def on_active_toggle_changed(self, message: widgets.Switch.Changed) -> None:
+        """Reload student data when the active/inactive toggle is changed."""
+        textual.log(f"Show inactive changed to {message.value}")
+        self.load_student_data(message.value)
+        self._selected_student_id = None
+        self.query_one("#edit-student", widgets.Button).disabled = True
+        self.query_one("#delete-student", widgets.Button).disabled = True
+        self.query_one("#email-qr", widgets.Button).disabled = True
+        self.update_selected("No student selected")
 
     async def on_button_pressed(self, event: widgets.Button.Pressed) -> None:
         """Respond to button presses."""
         if event.button.id == "add-student":
             await self.action_add_student()
-        elif event.button.id == "import-csv":
-            await self.action_import_csv()
         elif event.button.id == "edit-student":
             await self.action_edit_student()
         elif event.button.id == "delete-student":
@@ -203,7 +216,12 @@ class StudentScreen(screen.Screen):
                     f"Error Description:\n{err}"
                 )
             else:
-                self.load_student_data()
+                self.load_student_data(
+                    self.query_one(
+                        "#students-show-inactive-switch",
+                        widgets.Switch
+                    ).value
+                )
                 self.query_one("#status-message", widgets.Static).update(
                     f"[green]Student added successfully. ID: {student_id}[/]"
                 )
@@ -224,30 +242,14 @@ class StudentScreen(screen.Screen):
         def on_dialog_closed(data: dict | None):
             if data is None or self._selected_student_id is None:
                 return
-            # Remove attendance from data before updating student info
-            attendance_count = data.pop("attendance", None)
             self.dbase.update_student(**data)
-            # Might change the way this is done in the future, the current way is a pain
-            if attendance_count is not None:
-                current_attendance = attendance
-                if attendance_count == 0:
-                    self.dbase.remove_all_checkin_records(self._selected_student_id)
-                elif attendance_count > 0:
-                    difference = attendance_count - current_attendance
-                    if difference > 0:
-                        # This means we need to add more records
-                        for _ in range(difference):
-                            self.dbase.add_checkin_record(self._selected_student_id)
-                    elif difference < 0:
-                        # This means we need to remove records
-                        for _ in range(abs(difference)):
-                            self.dbase.remove_last_checkin_record(
-                                self._selected_student_id
-                            )
-                    self.update_status("[green]Student updated successfully.[/]")
-            else:
-                self.update_status("[green]Student updated successfully.[/]")
-            self.load_student_data()
+            self.update_status("[green]Student updated successfully.[/]")
+            self.load_student_data(
+                self.query_one(
+                    "#students-show-inactive-switch",
+                    widgets.Switch
+                ).value
+            )
 
         await self.app.push_screen(
             modals.StudentDialog(student_data=student_dict), callback=on_dialog_closed
@@ -265,7 +267,12 @@ class StudentScreen(screen.Screen):
             if confirmed:
                 if self._selected_student_id is not None:
                     self.dbase.delete_student(self._selected_student_id)
-                self.load_student_data()
+                self.load_student_data(
+                    self.query_one(
+                        "#students-show-inactive-switch",
+                        widgets.Switch
+                    ).value
+                )
                 self.update_status("[green]Student deleted successfully.[/]")
                 self._selected_student_id = None
                 self.query_one("#edit-student", widgets.Button).disabled = True
@@ -364,33 +371,6 @@ class StudentScreen(screen.Screen):
             status_message += "[red]Failed Emails: " + ", ".join(failed_codes) + "[/]"
         self.update_status(status_message)
         self.app.call_from_thread(self._remove_progress_bar)
-
-    async def action_import_csv(self) -> None:
-        def on_import_closed(imported_students: list | None):
-            if imported_students:
-                success_count = 0
-                error_count = 0
-                for student_data in imported_students:
-                    success = self.dbase.add_student(**student_data)
-                    if success:
-                        success_count += 1
-                    else:
-                        error_count += 1
-
-                self.load_student_data()
-
-                if error_count == 0:
-                    self.update_status(
-                        f"[green]Successfully imported {success_count} students.[/]"
-                    )
-                else:
-                    self.update_status(
-                        f"[green]Imported {success_count} students.[/] "
-                        f" [red]Failed to import {error_count} students. "
-                        "(If they are duplicates, you can ignore this message.)[/]"
-                    )
-
-        await self.app.push_screen(modals.CSVImportDialog(), callback=on_import_closed)
 
     def update_status(self, message: str) -> None:
         """Update the text in the status widget."""
