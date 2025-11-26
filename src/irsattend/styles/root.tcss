@@ -1,0 +1,67 @@
+/* Top level styles for irsattend application. Used by all view files. */
+Button {
+    background: purple;
+    color: yellow;
+    border: white;
+    margin: 1;
+    content-align: center middle;
+}
+
+Input {
+    background: darkslategray;
+}
+
+Label {
+    align-vertical: bottom;
+}
+
+ModalScreen {
+    align: center middle;
+}
+
+.cancel {
+    background: gold;
+    color: indigo;
+}
+
+.centered {
+    align: center middle;
+}
+
+.debug {
+    text-align: center;
+    background: indigo;
+    color: thistle;
+    border: thistle;
+}
+
+.emphasis {
+    color: yellow;
+}
+
+.ok {
+    background: indigo;
+}
+
+.pane {
+    border: yellow
+}
+
+#file-widget-controls {
+    width: 30;
+}
+
+.separator {
+    content-align: left middle;
+    background: indigo;
+    height: 2;
+}
+
+.modal-dialog {
+    content-align: center middle;
+    border: thick $primary 80%;
+    background: $surface;
+    padding: 1;
+}
+
+

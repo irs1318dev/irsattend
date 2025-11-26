@@ -7,6 +7,8 @@ from typing import cast, Optional
 import textual
 from textual import app, containers, message, widgets
 
+import irsattend.view
+
 
 class FileSelectorTree(widgets.DirectoryTree):
     """Custom widget for selecting and creating files."""
@@ -98,7 +100,7 @@ class FileSelector(containers.Horizontal):
 
     def compose(self) -> app.ComposeResult:
         """Add widgets to screen."""
-        with containers.VerticalGroup():
+        with containers.VerticalGroup(id="file-widget-controls"):
             yield widgets.Button(
                 "Home", id="to-start-path", tooltip="Go back to the initial folder."
             )
@@ -108,7 +110,7 @@ class FileSelector(containers.Horizontal):
                 tooltip="Navigate up to the parent folder.",
             )
             if self.create:
-                yield widgets.Label("Filename:", classes="field-label")
+                yield widgets.Label("Filename:", classes="emphasis")
                 yield widgets.Input(self.default_filename, id="filename")
                 yield widgets.Button("Create File", id="create-file", classes="ok")
                 yield widgets.Static(

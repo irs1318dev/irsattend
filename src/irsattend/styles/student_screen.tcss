@@ -1,0 +1,30 @@
+/* Styles for view.student_screen.py */
+
+/* Student data table on left side of screen.*/
+#student-list-container {
+    width: 70%;
+}
+
+/* Stack of controls and status messages on right side of screen. */
+#students-actions-container {
+    width:30%;
+    align-horizontal: center;
+}
+#students-actions-container Button {
+    width: 100%;
+}
+
+#students-active-toggle {
+    border: round green;
+    background: darkslategrey;
+    height: 5;
+}
+
+#students-selection-indicator {
+    padding: 1;
+    margin: 1 0 0 0;
+    text-align: center;
+    background: $surface;
+    border: round $primary;
+    min-height: 5;
+}

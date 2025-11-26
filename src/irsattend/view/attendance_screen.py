@@ -10,7 +10,6 @@ class AttendanceScreen(screen.Screen):
 
     dbase: database.DBase
     """Connection to Sqlite Database."""
-    CSS_PATH = "../styles/management.tcss"
     BINDINGS = [
         binding.Binding("escape", "app.pop_screen", "Back to Main Screen", show=True),
     ]
@@ -25,8 +24,7 @@ class AttendanceScreen(screen.Screen):
     def compose(self) -> app.ComposeResult:
         """Add the datatable and other controls to the screen."""
         yield widgets.Header()
-        yield widgets.Button("Do Stuff")
-        yield widgets.DataTable(id="attendance-table")
+        yield widgets.DataTable(id="attendance-table", zebra_stripes=True)
         yield widgets.Footer()
 
     def on_mount(self) -> None:

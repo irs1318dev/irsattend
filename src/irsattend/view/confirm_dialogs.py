@@ -2,11 +2,13 @@
 
 from textual import app, containers, screen, widgets
 
+import irsattend.view
+
 
 class DeleteConfirmDialog(screen.ModalScreen):
     """A confirmation dialog for deleting students."""
 
-    CSS_PATH = "../styles/modal.tcss"
+    CSS_PATH = irsattend.view.CSS_FOLDER / "confirm_dialogs.tcss"
 
     student_name: str
     student_id: str
@@ -15,11 +17,11 @@ class DeleteConfirmDialog(screen.ModalScreen):
         """Include student name and ID in confirmation dialog."""
         self.student_name = student_name
         self.student_id = student_id
-        super().__init__(classes="confirm-dialog")
+        super().__init__()
 
     def compose(self) -> app.ComposeResult:
         """Layout the dialog screen."""
-        with containers.Vertical(id="delete-dialog", classes="confirm-dialog"):
+        with containers.Vertical(id="delete-dialog", classes="modal-dialog"):
             yield widgets.Label("[bold red]Confirm Deletion[/bold red]")
             yield widgets.Static()
             yield widgets.Label("Are you sure you want to delete:")
@@ -42,7 +44,7 @@ class DeleteConfirmDialog(screen.ModalScreen):
 class GeneralConfirmDialog(screen.ModalScreen):
     """General confirmation dialog."""
 
-    CSS_PATH = "../styles/modal.tcss"
+    CSS_PATH = irsattend.view.CSS_FOLDER / "confirm_dialogs.tcss"
 
     message: str
     """Message displayed to user in confirmation dialog."""
@@ -54,7 +56,7 @@ class GeneralConfirmDialog(screen.ModalScreen):
 
     def compose(self) -> app.ComposeResult:
         """Layout the dialog box."""
-        with containers.Vertical(id="confirm-dialog", classes="confirm-dialog"):
+        with containers.Vertical(id="confirm-dialog", classes="modal-dialog"):
             yield widgets.Label("[bold red]Confirm Action[/bold red]")
             yield widgets.Static()
             yield widgets.Label(f"Are you sure you want to {self.message}?")

@@ -639,7 +639,7 @@ wheels = [
 
 [[package]]
 name = "irsattend"
-version = "0.5.0"
+version = "0.7.0"
 source = { editable = "." }
 dependencies = [
     { name = "google-auth" },
@@ -666,6 +666,7 @@ dev = [
     { name = "pytest" },
     { name = "ruff" },
     { name = "textual-dev" },
+    { name = "tinycss" },
 ]
 
 [package.metadata]
@@ -694,6 +695,7 @@ dev = [
     { name = "pytest", specifier = ">=8.4.1" },
     { name = "ruff", specifier = ">=0.12.8" },
     { name = "textual-dev", specifier = ">=1.7.0" },
+    { name = "tinycss", specifier = ">=0.4" },
 ]
 
 [[package]]
@@ -2146,6 +2148,12 @@ sdist = { url = "https://files.pythonhosted.org/packages/27/41/09d5695b050d592ff
 wheels = [
     { url = "https://files.pythonhosted.org/packages/7c/fb/0006f86960ab8a2f69c9f496db657992000547f94f53a2f483fd611b4bd2/textual_serve-1.1.2-py3-none-any.whl", hash = "sha256:147d56b165dccf2f387203fe58d43ce98ccad34003fe3d38e6d2bc8903861865", size = 447326, upload-time = "2025-04-16T12:11:43.176Z" },
 ]
+
+[[package]]
+name = "tinycss"
+version = "0.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/05/59/af583fff6236c7d2f94f8175c40ce501dcefb8d1b42e4bb7a2622dff689e/tinycss-0.4.tar.gz", hash = "sha256:12306fb50e5e9e7eaeef84b802ed877488ba80e35c672867f548c0924a76716e", size = 87759, upload-time = "2016-09-23T16:30:14.894Z" }
 
 [[package]]
 name = "tinycss2"

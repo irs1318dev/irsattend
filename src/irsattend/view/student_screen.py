@@ -3,12 +3,24 @@
 import sqlite3
 from typing import Optional
 
+import rich.text
 import textual
 import textual.css.query
 from textual import app, binding, containers, screen, widgets
 
 from irsattend.model import config, database, emailer, qr_code_generator
+import irsattend.view
 from irsattend.view import modals, confirm_dialogs
+
+
+def success(message: str) -> str:
+    """Format a success message for display in the status widget."""
+    return f"[ansi_bright_green]{message}[/]"
+
+
+def error(message: str) -> str:
+    """Format an error message for display in the status widget."""
+    return f"[ansi_bright_red]{message}[/]"
 
 
 class StudentScreen(screen.Screen):
@@ -19,7 +31,7 @@ class StudentScreen(screen.Screen):
     _selected_student_id: Optional[str]
     """Currently selected student."""
 
-    CSS_PATH = "../styles/management.tcss"
+    CSS_PATH = irsattend.view.CSS_FOLDER / "student_screen.tcss"
     BINDINGS = [
         binding.Binding("escape", "app.pop_screen", "Back to Main Screen", show=True),
     ]
@@ -38,10 +50,10 @@ class StudentScreen(screen.Screen):
             with containers.Vertical(id="student-list-container"):
                 yield widgets.Label("Student List")
                 yield widgets.DataTable(zebra_stripes=True, id="student-table")
-            with containers.Vertical(id="actions-container"):
-                yield widgets.Label("Actions")
+            with containers.Vertical(id="students-actions-container"):
+                yield widgets.Label("Actions", classes="emphasis")
                 with containers.ScrollableContainer():
-                    with containers.Horizontal(id="active-toggle"):
+                    with containers.Horizontal(id="students-active-toggle"):
                         yield widgets.Label("Include Inactive Students:")
                         yield widgets.Switch(
                             False,
@@ -49,7 +61,7 @@ class StudentScreen(screen.Screen):
                         )
                     yield widgets.Static(
                         "No student selected",
-                        id="selection-indicator",
+                        id="students-selection-indicator",
                         classes="selection-info",
                     )
                     yield widgets.Static()
@@ -73,7 +85,7 @@ class StudentScreen(screen.Screen):
                         tooltip="Deleted a student.",
                     )
                     yield widgets.Static()
-                    yield widgets.Label("Communication")
+                    yield widgets.Label("Communication", classes="emphasis")
                     yield widgets.Button(
                         "Generate QR Codes",
                         id="generate-qr-codes",
@@ -109,7 +121,7 @@ class StudentScreen(screen.Screen):
     def _add_progress_bar(self, total: int | None, name: str) -> widgets.ProgressBar:
         """Add a progress bar for sending emails or generating QR Codes."""
         pbar = widgets.ProgressBar(total, name=name, id="qr-progress-bar")
-        container = self.query_one("#actions-container", containers.Vertical)
+        container = self.query_one("#students-actions-container", containers.Vertical)
         container.mount(pbar)
         return pbar
 
@@ -153,7 +165,8 @@ class StudentScreen(screen.Screen):
                 key=student["student_id"],
             )
         status_widget = self.query_one("#status-message", widgets.Static)
-        status_widget.update(f"[green]Loaded {len(students)} students.[/]")
+        status_widget.update(
+            success(f"Loaded {len(students)} students."))
 
     def on_data_table_row_selected(self, event: widgets.DataTable.RowSelected) -> None:
         """Select a row in the datatable."""
@@ -223,7 +236,7 @@ class StudentScreen(screen.Screen):
                     ).value
                 )
                 self.query_one("#status-message", widgets.Static).update(
-                    f"[green]Student added successfully. ID: {student_id}[/]"
+                    success(f"Student added successfully. ID: {student_id}")
                 )
 
         await self.app.push_screen(modals.StudentDialog(), callback=on_dialog_closed)
@@ -243,7 +256,7 @@ class StudentScreen(screen.Screen):
             if data is None or self._selected_student_id is None:
                 return
             self.dbase.update_student(**data)
-            self.update_status("[green]Student updated successfully.[/]")
+            self.update_status(success("Student updated successfully."))
             self.load_student_data(
                 self.query_one(
                     "#students-show-inactive-switch",
@@ -273,7 +286,7 @@ class StudentScreen(screen.Screen):
                         widgets.Switch
                     ).value
                 )
-                self.update_status("[green]Student deleted successfully.[/]")
+                self.update_status(success("Student deleted successfully."))
                 self._selected_student_id = None
                 self.query_one("#edit-student", widgets.Button).disabled = True
                 self.query_one("#delete-student", widgets.Button).disabled = True
@@ -305,12 +318,12 @@ class StudentScreen(screen.Screen):
             if not status:
                 failed_codes.append(student_id)
             self.app.call_from_thread(self._advance_progress_bar)
-        status_message = (
-            f"[green]Created {total_students - len(failed_codes)} QR Codes in folder "
+        status_message = success(
+            f"Created {total_students - len(failed_codes)} QR Codes in folder "
             f"{config.settings.qr_code_dir}\n"
         )
         if failed_codes:
-            status_message += "[red]Failed Codes: " + ", ".join(failed_codes) + "[/]"
+            status_message += error("Failed Codes: " + ", ".join(failed_codes))
         self.update_status(status_message)
         self.app.call_from_thread(self._remove_progress_bar)
 
@@ -321,7 +334,7 @@ class StudentScreen(screen.Screen):
             if confirmed:
                 self.send_emails_worker(students_to_email)
                 self.update_status(
-                    f"[green]Emailed QR codes to {len(students_to_email)}[/]"
+                    success(f"Emailed QR codes to {len(students_to_email)}")
                 )
 
         if all_students:
@@ -331,13 +344,13 @@ class StudentScreen(screen.Screen):
             student = self.dbase.get_student_by_id(self._selected_student_id)
             if student is None:
                 self.update_status(
-                    f"[red]Unable to locate student {self._selected_student_id}[/]"
+                    error(f"Unable to locate student {self._selected_student_id}")
                 )
                 return
             else:
                 students_to_email = [student]
         else:
-            self.update_status("[red]No student selected.[/]")
+            self.update_status(error("No student selected."))
             return
 
         if all_students:
@@ -352,10 +365,10 @@ class StudentScreen(screen.Screen):
     async def send_emails_worker(self, students: list[sqlite3.Row]) -> None:
         """Send QR emails to students."""
         if config.settings.qr_code_dir is None:
-            self.update_status(
-                "[red] Cannot send emails with QR codes because "
-                "no QR code path is defined in config file.[/]"
-            )
+            self.update_status(success(
+                "Cannot send emails with QR codes because "
+                "no QR code path is defined in config file."
+            ))
             return
         email_sender = emailer.send_all_emails(config.settings.qr_code_dir, students)
         failed_codes = []
@@ -364,11 +377,13 @@ class StudentScreen(screen.Screen):
                 failed_codes.append(student_id)
             self.app.call_from_thread(self._advance_progress_bar)
         status_message = (
-            f"[green]Sent {len(students) - len(failed_codes)} email messages with "
-            f"QR codes in folder {config.settings.qr_code_dir}\n"
+            f"[birght_green]Sent {len(students) - len(failed_codes)} email messages "
+            f"with QR codes in folder {config.settings.qr_code_dir}\n"
         )
         if failed_codes:
-            status_message += "[red]Failed Emails: " + ", ".join(failed_codes) + "[/]"
+            status_message += error(
+                "Failed Emails: " + ", ".join(failed_codes)
+            )
         self.update_status(status_message)
         self.app.call_from_thread(self._remove_progress_bar)
 
@@ -377,4 +392,5 @@ class StudentScreen(screen.Screen):
         self.query_one("#status-message", widgets.Static).update(message)
 
     def update_selected(self, message: str) -> None:
-        self.query_one("#selection-indicator", widgets.Static).update(message)
+        self.query_one(
+            "#students-selection-indicator", widgets.Static).update(message)

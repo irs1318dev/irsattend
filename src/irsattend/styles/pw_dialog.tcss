@@ -1,0 +1,22 @@
+/* Styles for view/pw_dialog.py. */
+
+
+#password-dialog {
+    grid-size: 2;
+    grid-gutter: 1 2;
+    grid-rows: 1fr 1fr 1fr;
+    padding: 0 1;
+    width: 60;
+    height: 11;
+}
+
+#password-dialog Label {
+    column-span: 2;
+    width: 100%;
+    content-align: center middle;
+}
+
+#password-error {
+    column-span: 2;
+    content-align: center middle;
+}

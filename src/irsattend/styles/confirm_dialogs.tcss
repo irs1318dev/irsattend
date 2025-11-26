@@ -1,0 +1,11 @@
+/* Styles for view.confirm_dialogs.tcss. */
+
+#delete-dialog {
+    width: 50;
+    height: 18;
+}
+
+#confirm-dialog {
+    width: 50;
+    height: 18;
+}

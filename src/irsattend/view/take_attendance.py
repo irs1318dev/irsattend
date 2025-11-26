@@ -10,6 +10,7 @@ from textual import app, containers, message, screen, widgets
 from textual.widgets import option_list
 
 from irsattend.model import config, database, schema
+import irsattend.view
 from irsattend.view import pw_dialog
 
 
@@ -24,7 +25,6 @@ class ScanScreen(screen.Screen):
     event_type: schema.EventType
     """Type of event at which we're taking attendance."""
 
-    CSS_PATH = "../styles/main.tcss"
     BINDINGS = [
         (
             "q",

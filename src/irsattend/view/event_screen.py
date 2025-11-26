@@ -8,6 +8,7 @@ import rich.text
 import textual
 from textual import app, binding, containers, reactive, screen, validation, widgets
 
+import irsattend.view
 from irsattend.binders import events
 from irsattend.model import config, database, schema
 
@@ -84,6 +85,8 @@ class StudentsTable(widgets.DataTable):
     event_key = reactive.reactive("")
     """Contains the currently selected event."""
 
+    CSS_PATH = irsattend.view.CSS_FOLDER / "event_screen.tcss"
+
     def __init__(self, dbase: database.DBase, *args, **kwargs) -> None:
         """Set link to database."""
         super().__init__(zebra_stripes=True, *args, **kwargs)
@@ -152,9 +155,16 @@ class EventScreen(screen.Screen):
         with containers.Horizontal(classes="menu"):
             yield widgets.Button("Add Event")
             yield widgets.Button("Edit Event", id="events-edit")
+        yield widgets.Static(
+            "Events",
+            classes="separator emphasis",
+        )
         events_table = EventsTable(dbase=self.dbase, id="events-table")
         yield events_table
-        yield widgets.Static("Students at Selected Event", classes="separator")
+        yield widgets.Static(
+            "Students at Selected Event",
+            classes="separator emphasis",
+        )
         students_table = StudentsTable(dbase=self.dbase, id="events-students-table")
         students_table.data_bind(EventScreen.event_key)
         yield students_table

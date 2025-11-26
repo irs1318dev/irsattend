@@ -95,6 +95,7 @@ class StudentDialog(screen.ModalScreen):
     def on_mount(self) -> None:
         self.query_one("#s-fname", widgets.Input).focus()
 
+    # Not used?
     def on_button_pressed(self, event: widgets.Button.Pressed) -> None:
         if event.button.id == "add-attendance":
             self.count += 1

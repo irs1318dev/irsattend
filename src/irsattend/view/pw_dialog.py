@@ -4,13 +4,14 @@ import hashlib
 
 from textual import app, containers, screen, widgets
 
+import irsattend.view
 from irsattend.model import config
 
 
 class PasswordPrompt(screen.ModalScreen[bool]):
     """A modal screen to ask for the management password."""
 
-    CSS_PATH = "../styles/modal.tcss"
+    CSS_PATH = irsattend.view.CSS_FOLDER / "pw_dialog.tcss"
 
     exit_on_cancel: bool
     """Exit from application when dialog canceled if true."""
@@ -22,11 +23,11 @@ class PasswordPrompt(screen.ModalScreen[bool]):
 
     def compose(self) -> app.ComposeResult:
         """Build the password dialog box."""
-        with containers.Vertical(id="password-dialog"):
-            yield widgets.Label("Enter Management Password")
+        with containers.Vertical(id="password-dialog", classes="modal-dialog"):
+            yield widgets.Label("Enter Management Password", classes="emphasis")
             yield widgets.Input(password=True, id="password-input")
             yield widgets.Static("", id="password-error")
-            with containers.Horizontal(id="password-actions", classes="dialog-row"):
+            with containers.Horizontal(classes="centered"):
                 yield widgets.Button("Submit", variant="primary", id="submit-password")
                 yield widgets.Button("Cancel", id="cancel-password")
 

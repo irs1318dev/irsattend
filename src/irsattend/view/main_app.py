@@ -7,20 +7,24 @@ import textual
 from textual import app, containers, reactive, widgets
 
 from irsattend.model import config, database, excel
+import irsattend.view
 from irsattend.view import (
     attendance_screen,
     event_screen,
     file_widgets,
     pw_dialog,
-    scan_screen,
     student_screen,
+    take_attendance,
 )
 
 
 class IRSAttend(app.App):
-    """Main applicaiton and introduction screen."""
+    """Main application and introduction screen."""
 
-    CSS_PATH = "../styles/main.tcss"
+    CSS_PATH = [
+        irsattend.view.CSS_FOLDER / tcss_file
+        for tcss_file in ["root.tcss", "main2.tcss"]
+    ]
     TITLE = "IRS 1318 Attendance System"
     BINDINGS = [
         ("a", "take_attendance", "Take Attendance"),
@@ -39,7 +43,7 @@ class IRSAttend(app.App):
         yield widgets.Header()
 
         # Main menu bar
-        with containers.HorizontalGroup(classes="outer"):
+        with containers.HorizontalGroup(classes="pane"):
             with containers.HorizontalGroup(id="main-top-menu"):
                 yield widgets.Button(
                     "Take Attendance",
@@ -62,9 +66,9 @@ class IRSAttend(app.App):
                 )
 
         # Database Controls
-        with containers.VerticalGroup(classes="outer"):
+        with containers.VerticalGroup(classes="pane"):
             with containers.HorizontalGroup():
-                yield widgets.Label("Current Database: ", classes="config-row")
+                yield widgets.Label("Current Database: ", classes="emphasis")
                 yield widgets.Label(
                     str(config.settings.db_path), id="main-config-db-path"
                 )
@@ -87,9 +91,9 @@ class IRSAttend(app.App):
                 )
 
         # Configuration Controls
-        with containers.VerticalGroup(classes="outer"):
+        with containers.VerticalGroup(classes="pane"):
             with containers.HorizontalGroup():
-                yield widgets.Label("Configuration File: ", classes="config-row")
+                yield widgets.Label("Configuration File: ", classes="emphasis")
                 yield widgets.Label(
                     str(config.settings.config_path), id="main-settings-path"
                 )
@@ -105,7 +109,7 @@ class IRSAttend(app.App):
                     id="main-select-settings",
                 )
         yield widgets.Label(
-            "Nothing to see here!", id="main-status-message", classes="app-alert"
+            "Nothing to see here!", id="main-status-message", classes="debug"
         )
         yield widgets.Footer()
 
@@ -125,7 +129,7 @@ class IRSAttend(app.App):
     @textual.on(widgets.Button.Pressed, "#main-take-attendance")
     def action_take_attendance(self) -> None:
         """Put application in attenance mode, so students can scan QR codes."""
-        self.app.push_screen(scan_screen.ScanScreen())
+        self.app.push_screen(take_attendance.ScanScreen())
 
     @textual.on(widgets.Button.Pressed, "#main-manage-students")
     def action_manage_students(self) -> None:
@@ -319,7 +323,7 @@ class IRSAttend(app.App):
         """Disable navigation actions when other screens are active."""
         if len(self.screen_stack) == 1:
             return True
-        if isinstance(self.screen_stack[-1], scan_screen.ScanScreen):
+        if isinstance(self.screen_stack[-1], take_attendance.ScanScreen):
             return False
         match action:
             case "manage_students":

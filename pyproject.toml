@@ -36,6 +36,7 @@ dev = [
     "pytest>=8.4.1",
     "ruff>=0.12.8",
     "textual-dev>=1.7.0",
+    "tinycss>=0.4",
 ]
 
 [project.scripts]
