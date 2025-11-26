@@ -10,7 +10,6 @@ from textual import app, containers, message, screen, widgets
 from textual.widgets import option_list
 
 from irsattend.model import config, database, schema
-import irsattend.view
 from irsattend.view import pw_dialog
 
 

@@ -7,7 +7,6 @@ from typing import cast, Optional
 import textual
 from textual import app, containers, message, widgets
 
-import irsattend.view
 
 
 class FileSelectorTree(widgets.DirectoryTree):
