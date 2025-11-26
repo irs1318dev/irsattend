@@ -21,10 +21,8 @@ from irsattend.view import (
 class IRSAttend(app.App):
     """Main application and introduction screen."""
 
-    CSS_PATH = [
-        irsattend.view.CSS_FOLDER / tcss_file
-        for tcss_file in ["root.tcss", "main2.tcss"]
-    ]
+    CSS_PATH = irsattend.view.CSS_FOLDER / "root.tcss"
+
     TITLE = "IRS 1318 Attendance System"
     BINDINGS = [
         ("a", "take_attendance", "Take Attendance"),

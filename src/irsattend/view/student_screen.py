@@ -3,14 +3,13 @@
 import sqlite3
 from typing import Optional
 
-import rich.text
 import textual
 import textual.css.query
 from textual import app, binding, containers, screen, widgets
 
 from irsattend.model import config, database, emailer, qr_code_generator
 import irsattend.view
-from irsattend.view import modals, confirm_dialogs
+from irsattend.view import confirm_dialogs, student_dialog
 
 
 def success(message: str) -> str:
@@ -239,7 +238,7 @@ class StudentScreen(screen.Screen):
                     success(f"Student added successfully. ID: {student_id}")
                 )
 
-        await self.app.push_screen(modals.StudentDialog(), callback=on_dialog_closed)
+        await self.app.push_screen(student_dialog.StudentDialog(), callback=on_dialog_closed)
 
     async def action_edit_student(self) -> None:
         if self._selected_student_id is None:
@@ -265,7 +264,7 @@ class StudentScreen(screen.Screen):
             )
 
         await self.app.push_screen(
-            modals.StudentDialog(student_data=student_dict), callback=on_dialog_closed
+            student_dialog.StudentDialog(student_data=student_dict), callback=on_dialog_closed
         )
 
     async def action_delete_student(self) -> None:
@@ -290,7 +289,7 @@ class StudentScreen(screen.Screen):
                 self._selected_student_id = None
                 self.query_one("#edit-student", widgets.Button).disabled = True
                 self.query_one("#delete-student", widgets.Button).disabled = True
-                self.query_one("#selection-indicator", widgets.Static).update(
+                self.query_one("#students-selection-indicator", widgets.Static).update(
                     "No student selected"
                 )
 

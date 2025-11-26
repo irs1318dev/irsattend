@@ -43,6 +43,10 @@ ModalScreen {
     background: indigo;
 }
 
+.menu {
+    height: 5;
+}
+
 .pane {
     border: yellow
 }

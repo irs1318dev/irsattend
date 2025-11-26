@@ -3,6 +3,8 @@
 
 from textual import app, containers, screen, validation, widgets
 
+import irsattend.view
+
 
 class NotEmpty(validation.Validator):
     def validate(self, value: str) -> validation.ValidationResult:
@@ -21,13 +23,13 @@ class IsInteger(validation.Validator):
 class StudentDialog(screen.ModalScreen):
     """A dialog for adding or editing student details."""
 
-    CSS_PATH = "../styles/modal.tcss"
+    CSS_PATH = irsattend.view.CSS_FOLDER / "student_dialog.tcss"
 
     def __init__(self, student_data: dict | None = None) -> None:
         self.student_data = student_data
         super().__init__()
-        if not student_data:
-            self.add_class("add-mode")
+        # if not student_data:
+        #     self.add_class("add-mode")
 
     def compose(self) -> app.ComposeResult:
         title = "Edit Student" if self.student_data else "Add New Student"
@@ -36,8 +38,8 @@ class StudentDialog(screen.ModalScreen):
             if self.student_data and "attendance" in self.student_data
             else 0
         )
-        with containers.Vertical(id="student-dialog"):
-            yield widgets.Label(title)
+        with containers.Vertical(id="student-dialog", classes="modal-dialog"):
+            yield widgets.Label(title, classes="emphasis")
             # Display read-only ID for existing students, but don't show input for new students
             if self.student_data:
                 yield widgets.Label(f"Student ID: {self.student_data['student_id']}")
@@ -69,7 +71,7 @@ class StudentDialog(screen.ModalScreen):
                 id="s-gyear",
                 validators=[NotEmpty(), IsInteger()],
             )
-            yield widgets.Label("Deactivated on:")
+            yield widgets.Label("Deactivated on:", classes="emphasis")
             yield widgets.Input(
                 value=(
                     self.student_data["deactivated_on"]

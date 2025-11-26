@@ -133,7 +133,7 @@ class StudentsTable(widgets.DataTable):
 class EventScreen(screen.Screen):
     """Add, delete, and edit students."""
 
-    CSS_PATH = "../styles/management.tcss"
+    CSS_PATH = irsattend.view.CSS_FOLDER / "event_screen.tcss"
     BINDINGS = [
         binding.Binding("escape", "app.pop_screen", "Back to Main Screen", show=True),
     ]
@@ -201,12 +201,12 @@ class EventScreen(screen.Screen):
 class EditEventDialog(screen.ModalScreen[bool]):
     """Edit or add events."""
 
-    CSS_PATH = "../styles/modal.tcss"
-
     dbase: database.DBase
     """Database interface."""
     event: events.CheckinEvent
     """The event to be edited."""
+
+    CSS_PATH = irsattend.view.CSS_FOLDER / "event_screen.tcss"
 
     def __init__(self, dbase: database.DBase, event: events.CheckinEvent) -> None:
         """Set the event to be edited."""
@@ -217,7 +217,7 @@ class EditEventDialog(screen.ModalScreen[bool]):
     def compose(self) -> app.ComposeResult:
         """Build the dialog."""
         event = self.event
-        with containers.Vertical(id="edit-event-dialog"):
+        with containers.Vertical(id="edit-event-dialog", classes="modal-dialog"):
             yield widgets.Label("Selected Event:", classes="bold-label")
             yield widgets.Static(f"\t{event.event_type.value}")
             yield widgets.Static(

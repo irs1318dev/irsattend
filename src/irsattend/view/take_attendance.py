@@ -143,8 +143,6 @@ class ScanScreen(screen.Screen):
 class EventTypeDialog(screen.ModalScreen[Optional[schema.EventType]]):
     """Select the event type when opening scan attendance screen."""
 
-    CSS_PATH = "../styles/modal.tcss"
-
     def __init__(self) -> None:
         super().__init__()
         self.title = "Select Event Type"

@@ -1,0 +1,17 @@
+/* Styles for the edit student dialog in view/student_dialog.py. */
+
+
+#student-dialog {
+    width: 80;
+    height: 35;
+    overflow-y: auto;
+}
+
+#student-dialog Input {
+    margin-bottom: 0;
+}
+
+#student-dialog Horizontal {
+    margin-top: 1;
+    align: center middle;
+}

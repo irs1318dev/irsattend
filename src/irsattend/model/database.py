@@ -125,7 +125,12 @@ class DBase:
         )
 
     def add_student(
-        self, first_name: str, last_name: str, email: str, grad_year: int
+        self,
+        first_name: str,
+        last_name: str,
+        email: str,
+        grad_year: int,
+        deactivated_on: str | None
     ) -> str:
         """Add a new student to the database.
 
@@ -140,9 +145,10 @@ class DBase:
             conn.execute(
                 """
                 INSERT INTO students
-                            (student_id, first_name, last_name, email, grad_year)
-                        VALUES (?, ?, ?, ?, ?);""",
-                (student_id, first_name, last_name, email, grad_year),
+                            (student_id, first_name, last_name, email, grad_year,
+                            deactivated_on)
+                     VALUES (?, ?, ?, ?, ?, ?);""",
+                (student_id, first_name, last_name, email, grad_year, deactivated_on),
             )
         conn.close()
         return student_id
