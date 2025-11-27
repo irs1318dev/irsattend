@@ -4,12 +4,11 @@ from collections.abc import Iterator
 from email import encoders
 from email.mime import base, image, multipart, text
 import pathlib
-import sqlite3
 import smtplib
 import time
-from typing import cast
+from typing import cast, Optional
 
-from irsattend.model import config, qr_code_generator
+from irsattend.model import config, qr_code_generator, schema
 
 
 class EmailError(Exception):
@@ -17,17 +16,20 @@ class EmailError(Exception):
 
 
 def send_all_emails(
-    qr_folder: pathlib.Path, students: list[sqlite3.Row]
-) -> Iterator[tuple[str, int]]:
-    """Send an email with a QR code to all students."""
+    qr_folder: pathlib.Path, students: list[schema.Student], email: Optional[str] = None
+) -> Iterator[tuple[str, bool]]:
+    """Send an email with a QR code to all students.
+    
+    Yields a tuple of student ID and a boolean indicating success.
+    """
     for student in students:
-        qr_path = qr_folder / f"{student["student_id"]}.png"
+        qr_path = qr_folder / f"{student.student_id}.png"
         if not qr_path.exists():
-            qr_code_generator.generate_qr_code_image(student["student_id"], qr_path)
+            qr_code_generator.generate_qr_code_image(student.student_id, qr_path)
         try:
             send_email(
-                student["email"],
-                f"{student['first_name']} {student['last_name']}",
+                student.email if email is None else email,
+                f"{student.first_name} {student.last_name}",
                 qr_path,
             )
         except (
@@ -35,9 +37,9 @@ def send_all_emails(
             smtplib.SMTPAuthenticationError,
             smtplib.SMTPException,
         ):
-            yield student["student_id"], 1
+            yield student.student_id, False
         else:
-            yield student["student_id"], 1
+            yield student.student_id, True
         time.sleep(0.5)  # Experimental
         # Several emails were not sent when emails sent to entire team on 3 Sep 2025.
         #   Of 105 students, only 94 emails were actually sent, but there were no
@@ -52,7 +54,6 @@ def send_email(
     """
     Sends an email with a QR Code to a student.
     """
-
     if any(
         [
             config.settings.smtp_server is None,

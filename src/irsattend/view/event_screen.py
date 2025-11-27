@@ -9,20 +9,8 @@ import textual
 from textual import app, binding, containers, reactive, screen, validation, widgets
 
 import irsattend.view
-from irsattend.binders import events
+from irsattend.features import events, validators
 from irsattend.model import config, database, schema
-
-
-class DateValidator(validation.Validator):
-    """Validate user input."""
-
-    def validate(self, value: str) -> validation.ValidationResult:
-        """Verify input is a valid date."""
-        try:
-            dateutil.parser.parse(value, dayfirst=False).date()
-            return self.success()
-        except dateutil.parser.ParserError as err:
-            return self.failure(str(err))
 
 
 class EventsTable(widgets.DataTable):
@@ -228,6 +216,7 @@ class EditEventDialog(screen.ModalScreen[bool]):
                 value=event.iso_date,
                 disabled=(self.event.checkin_count > 0),
                 id="event-date-input",
+                validators=[validators.DateValidator()],
             )
             yield widgets.Label("Event Type:")
             yield widgets.Select(

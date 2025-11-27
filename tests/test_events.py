@@ -6,7 +6,7 @@ import datetime
 import rich  # noqa: F401
 
 from irsattend.model import database, schema
-from irsattend.binders import events
+from irsattend.features import events
 
 
 DATA_FOLDER = pathlib.Path(__file__).parent / "data"

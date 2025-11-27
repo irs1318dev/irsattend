@@ -7,7 +7,7 @@ from typing import Any
 import xlsxwriter
 
 from irsattend.model import database
-from irsattend.binders import events
+from irsattend.features import events
 
 
 def write(dbase: database.DBase, excel_path: pathlib.Path) -> None:

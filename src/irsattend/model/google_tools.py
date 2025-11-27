@@ -11,7 +11,7 @@ from google.oauth2 import service_account
 import gspread
 import gspread.utils
 
-from irsattend.model import database
+from irsattend.model import database, schema
 
 
 # TODO: Check attendance name from roster.
@@ -139,10 +139,8 @@ class SheetUpdater:
         Dictionary values are student IDs.
         """
         student_ids: dict[tuple[str, str, int], str] = {}
-        for row in self.dbase.get_all_students():
-            student_ids[(row["last_name"], row["first_name"], row["grad_year"])] = row[
-                "student_id"
-            ]
+        for s in schema.Student.get_all(self.dbase, include_inactive=True):
+            student_ids[(s.last_name, s.first_name, s.grad_year)] = s.student_id
         return student_ids
 
     def insert_student_ids(self) -> None:

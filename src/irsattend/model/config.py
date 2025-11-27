@@ -52,6 +52,7 @@ class Settings:
     smtp_username: Optional[str] = None
     smtp_password: Optional[str] = None
     email_sender_name: Optional[str] = None
+    sender_email: Optional[str] = None
 
     @functools.cached_property
     def schoolyear_start_date(self) -> datetime.date:
@@ -85,7 +86,6 @@ class Settings:
         self.db_path = self._get_full_path(args.db_path, DB_FILE_NAME)
         self.config_path = self._get_full_path(args.config_path, CONFIG_FILE_NAME)
         if self.config_path is not None:
-            print(self.config_path)
             self._read_config_file()
 
     @staticmethod

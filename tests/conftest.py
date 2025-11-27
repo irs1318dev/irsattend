@@ -1,17 +1,20 @@
 """Pytest fixtures."""
 
+import argparse
 import json
 import pathlib
 import shutil
 
 import pytest
 
-from irsattend.model import database
+from irsattend.model import config, database
 
 
 TEST_FOLDER = pathlib.Path(__file__).parent
 DATA_FOLDER = TEST_FOLDER / "data"
+PRIVATE_FOLDER = DATA_FOLDER / "private"
 OUTPUT_FOLDER = TEST_FOLDER / "output"
+CONFIG_PATH = PRIVATE_FOLDER / "test-config.toml"
 
 
 @pytest.fixture()
@@ -26,6 +29,17 @@ def empty_output_folder() -> pathlib.Path:
     else:
         OUTPUT_FOLDER.mkdir(parents=True)
     return OUTPUT_FOLDER
+
+
+@pytest.fixture()
+def settings(full_dbase: database.DBase) -> config.Settings:
+    """Get default settings for tests."""
+    args = argparse.Namespace(
+        db_path=full_dbase.db_path,
+        config_path=CONFIG_PATH,
+    )
+    config.settings.update_from_args(args)
+    return config.settings
 
 
 @pytest.fixture

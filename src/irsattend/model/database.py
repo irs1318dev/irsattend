@@ -1,6 +1,7 @@
 """Connect to the Sqlite database and run queries."""
 
 from collections.abc import Sequence
+import dataclasses
 import datetime
 import pathlib
 import random
@@ -68,10 +69,6 @@ class DBase:
 
     db_path: pathlib.Path
     """Path to Sqlite database."""
-    underscore_pattern: re.Pattern = re.compile(r"[\s\-]+")
-    """Replace whitespace and dashes with an underscore."""
-    remove_pattern: re.Pattern = re.compile(r"[.!?;,:']+")
-    """Remove punctuation."""
 
     def __init__(self, db_path: pathlib.Path, create_new: bool = False) -> None:
         """Set database path."""
@@ -105,133 +102,6 @@ class DBase:
             conn.execute(schema.EVENT_TABLE_SCHEMA)
             conn.execute(schema.ACTIVE_STUDENTS_VIEW_SCHEMA)
         conn.close()
-
-    @classmethod
-    def _clean_name(cls, name: str) -> str:
-        """Replace dashes and spaces with an underscore and remove punctuation."""
-        name = cls.remove_pattern.sub("", name)
-        return cls.underscore_pattern.sub("_", name)
-
-    @classmethod
-    def generate_unique_student_id(
-        cls, first_name: str, last_name: str, grad_year: int
-    ) -> str:
-        """Generate a unique 8-digit student ID."""
-        first_name = cls._clean_name(first_name)
-        last_name = cls._clean_name(last_name)
-        return (
-            f"{last_name.strip().lower()}-{first_name.strip().lower()}"
-            f"-{grad_year}-{random.randint(1, 999):03}"
-        )
-
-    def add_student(
-        self,
-        first_name: str,
-        last_name: str,
-        email: str,
-        grad_year: int,
-        deactivated_on: str | None
-    ) -> str:
-        """Add a new student to the database.
-
-        Returns:
-            student_id
-
-        Raises:
-            sqlite3.IntegrityError if insert query is not successful.
-        """
-        student_id = self.generate_unique_student_id(first_name, last_name, grad_year)
-        with self.get_db_connection() as conn:
-            conn.execute(
-                """
-                INSERT INTO students
-                            (student_id, first_name, last_name, email, grad_year,
-                            deactivated_on)
-                     VALUES (?, ?, ?, ?, ?, ?);""",
-                (student_id, first_name, last_name, email, grad_year, deactivated_on),
-            )
-        conn.close()
-        return student_id
-
-    def update_student(
-        self,
-        student_id: str,
-        first_name: str,
-        last_name: str,
-        email: str,
-        grad_year: int,
-        deactivated_on: Optional[str],
-    ) -> None:
-        """Edit student."""
-        with self.get_db_connection() as conn:
-            conn.execute("""
-                UPDATE students
-                   SET first_name = ?, last_name = ?,
-                       email = ?, grad_year = ?,
-                       deactivated_on = ?
-                 WHERE student_id = ?;""",
-                (first_name, last_name, email, grad_year, deactivated_on, student_id),
-            )
-        conn.close()
-
-    def delete_student(self, student_id: str):
-        """Delete a student and their attendance records."""
-        with self.get_db_connection() as conn:
-            conn.execute("DELETE FROM students WHERE student_id = ?", (student_id,))
-        conn.close()
-
-    def get_all_students(self, include_inactive: bool = False) -> list[sqlite3.Row]:
-        """Retrieve all students from the database."""
-        return cast(
-            list[sqlite3.Row],
-            self._get_all_students(include_inactive=include_inactive)
-        )
-
-    def get_all_students_dict(self, include_inactive: bool = False) -> list[dict[str, Any]]:
-        """Retrieve all students from the database."""
-        return cast(
-            list[dict[str, Any]],
-            self._get_all_students(include_inactive=include_inactive, as_dict=True)
-        )
-
-    def _get_all_students(
-        self,
-        include_inactive: bool = False,
-        as_dict: bool = False
-    ) -> list[sqlite3.Row] | list[dict[str, Any]]:
-        """Retrieve all students from the database."""
-        conn = self.get_db_connection(as_dict)
-        if include_inactive:
-            cursor = conn.execute(
-                """
-                    SELECT student_id, last_name, first_name, grad_year, email,
-                           deactivated_on
-                      FROM students
-                  ORDER BY student_id;
-        """
-            )
-        else:
-            cursor = conn.execute(
-                """
-                    SELECT student_id, last_name, first_name, grad_year, email,
-                           deactivated_on
-                      FROM active_students
-                  ORDER BY student_id;
-            """
-        )
-        students = cursor.fetchall()
-        conn.close()
-        return students
-
-    def get_student_ids(self) -> list[str]:
-        """Get a list of student IDs."""
-        conn = self.get_db_connection()
-        cursor = conn.execute(
-            "SELECT student_id FROM active_students ORDER BY student_id;"
-        )
-        student_ids = [row[0] for row in cursor]
-        conn.close()
-        return student_ids
 
     def get_student_by_id(self, student_id: str) -> Optional[sqlite3.Row]:
         """Retrieve a student by their ID."""
@@ -407,45 +277,6 @@ class DBase:
         conn.close()
         return records
 
-    def merge_database(self, incoming: "DBase") -> None:
-        """Insert contents of another database."""
-        current_student_ids = set(self.get_student_ids())
-        incoming_students = incoming.get_all_students()
-        with self.get_db_connection() as main_conn:
-            for student in incoming_students:
-                if student["student_id"] not in current_student_ids:
-                    main_conn.execute(
-                        """
-                    INSERT INTO students
-                                (student_id, first_name, last_name, email, grad_year)
-                        VALUES (:student_id, :first_name, :last_name, :email,
-                               :grad_year)
-                        ON CONFLICT(email) DO NOTHING;
-                    """,
-                        dict(student),
-                    )
-        main_conn.close()
-        incoming_conn = incoming.get_db_connection(as_dict=True)
-        incoming_checkins = incoming_conn.execute("SELECT * FROM checkins;")
-        incoming_conn.close()
-        db_conn: sqlite3.Connection | None = None
-        for appearance in incoming_checkins:
-            try:
-                with self.get_db_connection() as db_conn:
-                    db_conn.execute(
-                        """
-                            INSERT INTO checkins
-                                        (student_id, event_type, timestamp)
-                                VALUES (:student_id, :event_type, :timestamp);
-                    """,
-                        appearance,
-                    )
-            except sqlite3.IntegrityError as err:
-                print(err)
-            finally:
-                if db_conn is not None:
-                    db_conn.close()
-
     def to_dict(self) -> dict[str, list[dict[str, str | int | None]]]:
         """Save database contents to a JSON file.
 
@@ -454,7 +285,10 @@ class DBase:
             {<table_name>: [{<col_name>: <col_value>}]}
         """
         db_data = {}
-        db_data["students"] = self.get_all_students_dict()
+        db_data["students"] = [
+            student.to_dict()
+            for student in schema.Student.get_all(self, include_inactive=True)
+        ]
         events = self.get_events_dict()
         excluded_columns = ["event_id", "day_of_week"]
         db_data["events"] = [

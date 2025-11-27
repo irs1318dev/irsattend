@@ -4,6 +4,8 @@
 from textual import app, containers, screen, validation, widgets
 
 import irsattend.view
+from irsattend.model import schema
+from irsattend.features import validators
 
 
 class NotEmpty(validation.Validator):
@@ -25,46 +27,41 @@ class StudentDialog(screen.ModalScreen):
 
     CSS_PATH = irsattend.view.CSS_FOLDER / "student_dialog.tcss"
 
-    def __init__(self, student_data: dict | None = None) -> None:
-        self.student_data = student_data
+    def __init__(self, student: schema.Student | None = None) -> None:
+        self.student = student
         super().__init__()
         # if not student_data:
         #     self.add_class("add-mode")
 
     def compose(self) -> app.ComposeResult:
-        title = "Edit Student" if self.student_data else "Add New Student"
-        self.count = (
-            self.student_data["attendance"]
-            if self.student_data and "attendance" in self.student_data
-            else 0
-        )
+        title = "Edit Student" if self.student else "Add New Student"
         with containers.Vertical(id="student-dialog", classes="modal-dialog"):
             yield widgets.Label(title, classes="emphasis")
             # Display read-only ID for existing students, but don't show input for new students
-            if self.student_data:
-                yield widgets.Label(f"Student ID: {self.student_data['student_id']}")
+            if self.student:
+                yield widgets.Label(f"Student ID: {self.student.student_id}")
             yield widgets.Input(
-                value=self.student_data["first_name"] if self.student_data else "",
+                value=self.student.first_name if self.student else "",
                 placeholder="First Name",
                 id="s-fname",
                 validators=[NotEmpty()],
             )
             yield widgets.Input(
-                value=self.student_data["last_name"] if self.student_data else "",
+                value=self.student.last_name if self.student else "",
                 placeholder="Last Name",
                 id="s-lname",
                 validators=[NotEmpty()],
             )
             yield widgets.Input(
-                value=self.student_data["email"] if self.student_data else "",
+                value=self.student.email if self.student else "",
                 placeholder="Email",
                 id="s-email",
                 validators=[NotEmpty()],
             )
             yield widgets.Input(
                 value=(
-                    str(self.student_data["grad_year"])
-                    if self.student_data and self.student_data["grad_year"]
+                    str(self.student.grad_year)
+                    if self.student and self.student.grad_year
                     else ""
                 ),
                 placeholder="Graduation Year",
@@ -74,11 +71,12 @@ class StudentDialog(screen.ModalScreen):
             yield widgets.Label("Deactivated on:", classes="emphasis")
             yield widgets.Input(
                 value=(
-                    self.student_data["deactivated_on"]
-                    if self.student_data and self.student_data["deactivated_on"]
+                    self.student.deactivated_iso
+                    if self.student and self.student.deactivated_on
                     else ""
                 ),
                 placeholder="YYYY-MM-DD or leave blank if active",
+                validators=[validators.DateValidator()],
                 id="s-deactivated",
             )
                                 
@@ -128,9 +126,13 @@ class StudentDialog(screen.ModalScreen):
                     else None
                 )
             }
-            if self.student_data:
-                data["student_id"] = self.student_data["student_id"]
-            self.dismiss(data)
+            if self.student is None:
+                data["student_id"] = ""
+            else:
+                data["student_id"] = self.student.student_id
+            student = schema.Student(**data)
+
+            self.dismiss(student)
         elif event.button.id == "cancel-student":
             self.dismiss(None)
 

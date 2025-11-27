@@ -23,6 +23,7 @@ class ScanScreen(screen.Screen):
     """Recently scanned student IDs."""
     event_type: schema.EventType
     """Type of event at which we're taking attendance."""
+    students = dict[str, schema.Student]
 
     BINDINGS = [
         (
@@ -39,6 +40,10 @@ class ScanScreen(screen.Screen):
         if config.settings.db_path is None:
             raise database.DBaseError("No database file selected.")
         self.dbase = database.DBase(config.settings.db_path)
+        self.students = {
+            student.student_id: student
+            for student in schema.Student.get_all(self.dbase)
+        }
 
     class QrCodeFound(message.Message):
         def __init__(self, code: str) -> None:
@@ -104,8 +109,8 @@ class ScanScreen(screen.Screen):
     async def on_scan_screen_qr_code_found(self, message: QrCodeFound) -> None:
         """Add an attendance record to the database."""
         student_id = message.code
-        student = self.dbase.get_student_by_id(student_id)
-        if not student:
+        student = self.students.get(student_id)
+        if student_id not in self.students:
             self.log_widget.write(
                 "[yellow]Unknown ID scanned,\nplease talk to a mentor.[/]"
             )

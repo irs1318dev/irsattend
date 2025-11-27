@@ -1,4 +1,4 @@
-"""Test Sqlite event functionality."""
+"""Test Sqlite student functionality."""
 
 import pathlib
 
@@ -13,7 +13,9 @@ DATA_FOLDER = pathlib.Path(__file__).parent / "data"
 def test_get_students(full_dbase: database.DBase) -> None:
     """Get events as Event objects."""
     # Act
-    students = schema.Student.get_students(full_dbase)
+    students = schema.Student.get_all(full_dbase)
     # Assert
     assert all(isinstance(student, schema.Student) for student in students)
     assert isinstance(students[0].grad_year, int)
+
+
