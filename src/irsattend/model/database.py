@@ -103,16 +103,6 @@ class DBase:
             conn.execute(schema.ACTIVE_STUDENTS_VIEW_SCHEMA)
         conn.close()
 
-    def get_student_by_id(self, student_id: str) -> Optional[sqlite3.Row]:
-        """Retrieve a student by their ID."""
-        conn = self.get_db_connection()
-        cursor = conn.execute(
-            "SELECT * FROM students WHERE student_id = ?", (student_id,)
-        )
-        student = None if cursor is None else cursor.fetchone()
-        conn.close()
-        return student
-
     def get_student_attendance_data(self) -> sqlite3.Cursor:
         """Join students and checkins table and get current season data."""
         # An 'app' is an appearance.
@@ -309,8 +299,10 @@ class DBase:
         """Import data into the Sqlite database."""
         student_query = """
             INSERT INTO students
-                        (student_id, first_name, last_name, email, grad_year)
-                 VALUES (:student_id, :first_name, :last_name, :email, :grad_year);
+                        (student_id, first_name, last_name, email, grad_year,
+                        deactivated_on)
+                 VALUES (:student_id, :first_name, :last_name, :email, :grad_year,
+                        :deactivated_on);
         """
         checkins_query = """
             INSERT INTO checkins

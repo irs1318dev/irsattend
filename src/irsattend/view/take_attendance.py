@@ -18,19 +18,21 @@ class ScanScreen(screen.Screen):
 
     dbase: database.DBase
     """Sqlte database connection object."""
+    students: dict[str, schema.Student]
+    """Mapping of student IDs to student records."""
     log_widget: widgets.RichLog
-    _scanned: set[str]
-    """Recently scanned student IDs."""
+    """Displays checking results."""
     event_type: schema.EventType
     """Type of event at which we're taking attendance."""
-    students = dict[str, schema.Student]
+    _scanned: set[str]
+    """Recently scanned student IDs."""
 
     BINDINGS = [
         (
             "q",
             "exit_scan_mode",
             "Quit QR Code Scan Mode.",
-        ),  # TODO password modal to switch
+        ),
     ]
 
     def __init__(self) -> None:
@@ -110,12 +112,12 @@ class ScanScreen(screen.Screen):
         """Add an attendance record to the database."""
         student_id = message.code
         student = self.students.get(student_id)
-        if student_id not in self.students:
+        if student is None:
             self.log_widget.write(
                 "[yellow]Unknown ID scanned,\nplease talk to a mentor.[/]"
             )
             return
-        student_name = f"{student['first_name']} {student['last_name']}"
+        student_name = f"{student.first_name} {student.last_name}"
         if self.dbase.has_attended_today(student_id):
             self.log_widget.write(f"[orange3]Already attended: {student_name}[/]")
         else:
