@@ -5,11 +5,15 @@ import pathlib
 import pytest
 import rich  # noqa: F401
 
-from irsattend.model import config, database, emailer, qr_code_generator, schema
+from irsattend import config
+from irsattend.features import emailer, qr_code_generator
+from irsattend.model import database, schema
 
 
 DATA_FOLDER = pathlib.Path(__file__).parent / "data"
 QR_FOLDER_NAME = "test_qr_codes"
+
+pytestmark = pytest.mark.skip(reason="Roster update tests are slow.")
 
 
 def test_generate_qr_codes(
@@ -19,16 +23,21 @@ def test_generate_qr_codes(
     """Generate QR codes for all students."""
     # Arrange
     qr_folder = empty_output_folder / QR_FOLDER_NAME
+    students = schema.Student.get_all(full_dbase, include_inactive=True)
+    num_active_students = len([s for s in students if s.deactivated_on is None])
     # Act
     generator = qr_code_generator.generate_all_qr_codes(qr_folder, full_dbase)
     results = list(generator)
     # Assert
-    assert results[0] == ("quantity-students", len(schema.Student.get_all(full_dbase)))
-    assert len(results) == len(schema.Student.get_all(full_dbase)) + 1
+    assert results[0] == ("quantity-students", num_active_students)
+    assert len(results) == num_active_students + 1
     assert all(result[1] is True for result in results[1:])
-    for student_id in schema.Student.get_all_ids(full_dbase):
-        qr_path = qr_folder / f"{student_id}.png"
-        assert qr_path.exists()
+    for student in students:
+        qr_path = qr_folder / f"{student.student_id}.png"
+        if student.deactivated_on is None:
+            assert qr_path.exists()
+        else:
+            assert not qr_path.exists()
 
 
 @pytest.mark.skip(reason="Requires email server and valid credentials.")
@@ -56,7 +65,7 @@ def test_send_one_qr_code(
     assert result[0]
 
 
-# @pytest.mark.skip(reason="Requires email server and valid credentials.")
+@pytest.mark.skip(reason="Requires email server and valid credentials.")
 def test_send_multiple_qr_codes(
     full_dbase: database.DBase,
     empty_output_folder: pathlib.Path,

@@ -1,10 +1,9 @@
 """Modal dialog definitions."""
 
-
 from textual import app, containers, screen, validation, widgets
 
 import irsattend.view
-from irsattend.model import schema
+from irsattend.model import students
 from irsattend.features import validators
 
 
@@ -27,7 +26,7 @@ class StudentDialog(screen.ModalScreen):
 
     CSS_PATH = irsattend.view.CSS_FOLDER / "student_dialog.tcss"
 
-    def __init__(self, student: schema.Student | None = None) -> None:
+    def __init__(self, student: students.Student | None = None) -> None:
         self.student = student
         super().__init__()
         # if not student_data:
@@ -79,7 +78,7 @@ class StudentDialog(screen.ModalScreen):
                 validators=[validators.DateValidator()],
                 id="s-deactivated",
             )
-                                
+
             yield widgets.Static()
             # if self.student_data:
             #     with Horizontal():
@@ -124,15 +123,14 @@ class StudentDialog(screen.ModalScreen):
                     self.query_one("#s-deactivated", widgets.Input).value
                     if self.query_one("#s-deactivated", widgets.Input).value
                     else None
-                )
+                ),
             }
             if self.student is None:
                 data["student_id"] = ""
             else:
                 data["student_id"] = self.student.student_id
-            student = schema.Student(**data)
+            student = students.Student(**data)
 
             self.dismiss(student)
         elif event.button.id == "cancel-student":
             self.dismiss(None)
-

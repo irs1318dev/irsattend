@@ -1,17 +1,15 @@
 """Connect to the Sqlite database and run queries."""
 
 from collections.abc import Sequence
-import dataclasses
 import datetime
 import pathlib
-import random
-import re
 import sqlite3
-from typing import Any, cast, Optional
+from typing import Any, Optional
 
 import polars as pl
 
-from irsattend.model import config, schema
+from irsattend import config
+from irsattend.model import schema, students
 
 
 class DBaseError(Exception):
@@ -97,10 +95,10 @@ class DBase:
     def create_tables(self):
         """Creates the database tables if they don't already exist."""
         with self.get_db_connection() as conn:
-            conn.execute(schema.STUDENT_TABLE_SCHEMA)
+            conn.execute(students.STUDENT_TABLE_SCHEMA)
             conn.execute(schema.CHECKINS_TABLE_SCHEMA)
             conn.execute(schema.EVENT_TABLE_SCHEMA)
-            conn.execute(schema.ACTIVE_STUDENTS_VIEW_SCHEMA)
+            conn.execute(students.ACTIVE_STUDENTS_VIEW_SCHEMA)
         conn.close()
 
     def get_student_attendance_data(self) -> sqlite3.Cursor:
@@ -277,7 +275,7 @@ class DBase:
         db_data = {}
         db_data["students"] = [
             student.to_dict()
-            for student in schema.Student.get_all(self, include_inactive=True)
+            for student in students.Student.get_all(self, include_inactive=True)
         ]
         events = self.get_events_dict()
         excluded_columns = ["event_id", "day_of_week"]

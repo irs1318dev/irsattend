@@ -6,7 +6,9 @@ import pathlib
 import textual
 from textual import app, containers, reactive, widgets
 
-from irsattend.model import config, database, excel
+from irsattend import config
+from irsattend.features import excel
+from irsattend.model import database
 import irsattend.view
 from irsattend.view import (
     attendance_screen,

@@ -22,3 +22,16 @@ def test_get_checkin_count(full_dbase: database.DBase) -> None:
     assert isinstance(count, int)
     assert count >= 0
     rich.print(f"\nCheckin count for event on {event.event_date}: {count}")
+
+
+def test_checkedin_student_ids(full_dbase: database.DBase) -> None:
+    """Get list of student IDs who have checked in for an event."""
+    # Arrange
+    event = schema.Event.get_all(full_dbase)[0]
+    # Act
+    student_ids = schema.Checkin.get_checkedin_students(
+        full_dbase, event.event_date, event.event_type.value
+    )
+    # Assert
+    assert all(isinstance(sid, str) for sid in student_ids)
+    assert len(student_ids) >= 0

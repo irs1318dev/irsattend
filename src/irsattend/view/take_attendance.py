@@ -1,6 +1,8 @@
 """Turn on camera and scan QR Codes."""
 
 import asyncio
+import datetime
+import time
 from typing import cast, Optional
 
 import cv2
@@ -9,7 +11,8 @@ import textual
 from textual import app, containers, message, screen, widgets
 from textual.widgets import option_list
 
-from irsattend.model import config, database, schema
+from irsattend import config
+from irsattend.model import database, schema, students
 from irsattend.view import pw_dialog
 
 
@@ -18,14 +21,16 @@ class ScanScreen(screen.Screen):
 
     dbase: database.DBase
     """Sqlte database connection object."""
-    students: dict[str, schema.Student]
+    _students: dict[str, students.Student]
     """Mapping of student IDs to student records."""
     log_widget: widgets.RichLog
     """Displays checking results."""
     event_type: schema.EventType
     """Type of event at which we're taking attendance."""
-    _scanned: set[str]
+    _checkedin_students: set[str]
     """Recently scanned student IDs."""
+    _scanned_students: set[str]
+    """Students who have scanned their QR code within the last few seconds."""
 
     BINDINGS = [
         (
@@ -42,9 +47,9 @@ class ScanScreen(screen.Screen):
         if config.settings.db_path is None:
             raise database.DBaseError("No database file selected.")
         self.dbase = database.DBase(config.settings.db_path)
-        self.students = {
+        self._students = {
             student.student_id: student
-            for student in schema.Student.get_all(self.dbase)
+            for student in students.Student.get_all(self.dbase)
         }
 
     class QrCodeFound(message.Message):
@@ -61,7 +66,6 @@ class ScanScreen(screen.Screen):
 
     def on_mount(self) -> None:
         """Request type of event then start the scanner."""
-        self._scanned = set()  # Prevent code from being scanned more than once.
         self.log_widget = self.query_one("#attendance-log", widgets.RichLog)
         self.app.push_screen(
             EventTypeDialog(), callback=self.set_event_type_and_start_scanning
@@ -76,6 +80,11 @@ class ScanScreen(screen.Screen):
             return
         self.event_type = event_type
         self.dbase.add_event(event_type)
+        # Prevent codes from being scanned more than once for same event.
+        self._checkedin_students = set(schema.Checkin.get_checkedin_students(
+            self.dbase, datetime.date.today(),
+            event_type.value
+        ))
         self.scan_qr_codes()
 
     @textual.work(exclusive=False)
@@ -83,7 +92,8 @@ class ScanScreen(screen.Screen):
         """Open video window and capture QR codes."""
         vcap = cv2.VideoCapture(config.settings.camera_number)
         detector = cv2.QRCodeDetector()
-        qr_data = None
+        qr_data: str | None = None
+        self._scanned_students = set()
         while True:
             try:
                 _, img = vcap.read()
@@ -92,13 +102,12 @@ class ScanScreen(screen.Screen):
                 disp_img = cv2.flip(img, 1)
                 cv2.imshow(window_title, disp_img)
 
-                data, bbox, straight_code = detector.detectAndDecode(img)
+                qr_data, bbox, straight_code = detector.detectAndDecode(img)
             except cv2.error:
                 continue
-            if data:
-                qr_data = data
-                if qr_data not in self._scanned:
-                    self._scanned.add(qr_data)
+            if qr_data:
+                if qr_data not in self._scanned_students:
+                    self._scanned_students.add(qr_data)
                     self.post_message(self.QrCodeFound(qr_data))
                     await asyncio.sleep(0.1)  # Allow log to update.
             wait_key = cv2.waitKey(50)  # Wait 50 miliseconds for key press.
@@ -111,16 +120,17 @@ class ScanScreen(screen.Screen):
     async def on_scan_screen_qr_code_found(self, message: QrCodeFound) -> None:
         """Add an attendance record to the database."""
         student_id = message.code
-        student = self.students.get(student_id)
+        student = self._students.get(student_id)
         if student is None:
             self.log_widget.write(
                 "[yellow]Unknown ID scanned,\nplease talk to a mentor.[/]"
             )
             return
         student_name = f"{student.first_name} {student.last_name}"
-        if self.dbase.has_attended_today(student_id):
+        if student_id in self._checkedin_students:
             self.log_widget.write(f"[orange3]Already attended: {student_name}[/]")
         else:
+            self._checkedin_students.add(student_id)
             timestamp = self.dbase.add_checkin_record(
                 student_id, event_type=self.event_type
             )
@@ -129,8 +139,15 @@ class ScanScreen(screen.Screen):
                     f"[green]Success: {student_name} "
                     f"checked in at {timestamp.strftime('%H:%M:%S')}[/]"
                 )
-        # Allow student to scan again after 15 seconds.
-        self.set_timer(2, lambda: self._scanned.discard(student_id))
+        self.discard_scanned_code(student_id)
+
+    @textual.work(exclusive=False, thread=True)
+    def discard_scanned_code(self, student_id: str) -> None:
+        """Allow a QR code to be scanned again."""
+        textual.log(f"Waiting to discard {student_id} from scanned list.")
+        time.sleep(5)
+        textual.log(f"Discarding {student_id} from scanned list.")
+        self._scanned_students.discard(student_id)
 
     def action_exit_scan_mode(self) -> None:
         """Require a password to exit QR code scan mode."""

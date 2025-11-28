@@ -2,7 +2,8 @@
 
 import pathlib
 
-from irsattend.model import database, excel
+from irsattend.features import excel
+from irsattend.model import database
 
 
 OUTPUT_PATH = pathlib.Path(__file__).parent / "output"

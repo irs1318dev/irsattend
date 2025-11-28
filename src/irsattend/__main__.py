@@ -5,7 +5,8 @@ import pathlib
 
 import rich
 
-from irsattend.model import config, database, google_tools
+from irsattend import config
+from irsattend.model import database, roster
 import irsattend.view.main_app
 
 
@@ -70,7 +71,7 @@ def sync_data(args: argparse.Namespace) -> None:
     config_path = to_absolute_path(args.config_path)
     db_path = to_absolute_path(args.db_path)
     dbase = database.DBase(db_path)
-    updater = google_tools.SheetUpdater(config_path, dbase)
+    updater = roster.SheetUpdater(config_path, dbase)
     rich.print(args)
     if args.student_ids:
         print("updating Student IDs")

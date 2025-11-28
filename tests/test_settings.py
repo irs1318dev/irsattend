@@ -4,7 +4,7 @@ import argparse
 import pathlib
 
 
-from irsattend.model import config
+from irsattend import config
 
 
 DATA_PATH = pathlib.Path(__file__).parent / "data"

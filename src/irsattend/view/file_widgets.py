@@ -8,7 +8,6 @@ import textual
 from textual import app, containers, message, widgets
 
 
-
 class FileSelectorTree(widgets.DirectoryTree):
     """Custom widget for selecting and creating files."""
 

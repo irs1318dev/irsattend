@@ -7,7 +7,8 @@ import shutil
 
 import pytest
 
-from irsattend.model import config, database
+from irsattend import config
+from irsattend.model import database
 
 
 TEST_FOLDER = pathlib.Path(__file__).parent

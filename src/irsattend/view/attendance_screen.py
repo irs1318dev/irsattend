@@ -2,7 +2,8 @@
 
 from textual import app, binding, screen, widgets
 
-from irsattend.model import config, database
+from irsattend import config
+from irsattend.model import database
 
 
 class AttendanceScreen(screen.Screen):

@@ -7,7 +7,9 @@ import textual
 import textual.css.query
 from textual import app, binding, containers, screen, widgets
 
-from irsattend.model import config, database, emailer, qr_code_generator, schema
+from irsattend import config
+from irsattend.features import emailer, qr_code_generator
+from irsattend.model import database, students
 import irsattend.view
 from irsattend.view import confirm_dialogs, student_dialog
 
@@ -29,7 +31,7 @@ class StudentScreen(screen.Screen):
     """Connection to Sqlite Database."""
     _selected_student_id: Optional[str]
     """Currently selected student."""
-    students: dict[str, schema.Student]
+    _students: dict[str, students.Student]
     """List of students currently loaded in the datatable."""
 
     CSS_PATH = irsattend.view.CSS_FOLDER / "student_screen.tcss"
@@ -43,7 +45,7 @@ class StudentScreen(screen.Screen):
         if config.settings.db_path is None:
             raise database.DBaseError("No database file selected.")
         self.dbase = database.DBase(config.settings.db_path)
-        self.students = {}
+        self._students = {}
 
     def compose(self) -> app.ComposeResult:
         """Build the management screen's user interface."""
@@ -148,12 +150,13 @@ class StudentScreen(screen.Screen):
         """Load student data into the datatable widget."""
         self.table.clear()
         textual.log(f"Loading student data, show_inactive={show_inactive}")
-        self.students = {
+        self._students = {
             student.student_id: student
-            for student in schema.Student.get_all(
-                self.dbase, include_inactive=show_inactive)
+            for student in students.Student.get_all(
+                self.dbase, include_inactive=show_inactive
+            )
         }
-        for student in self.students.values():
+        for student in self._students.values():
             self.table.add_row(
                 student.student_id,
                 student.last_name,
@@ -164,8 +167,7 @@ class StudentScreen(screen.Screen):
                 key=student.student_id,
             )
         status_widget = self.query_one("#status-message", widgets.Static)
-        status_widget.update(
-            success(f"Loaded {len(self.students)} students."))
+        status_widget.update(success(f"Loaded {len(self._students)} students."))
 
     def on_data_table_row_selected(self, event: widgets.DataTable.RowSelected) -> None:
         """Select a row in the datatable."""
@@ -173,7 +175,7 @@ class StudentScreen(screen.Screen):
         if self._selected_student_id is None:
             return
         self.query_one("#edit-student", widgets.Button).disabled = False
-        student = self.students[self._selected_student_id]
+        student = self._students[self._selected_student_id]
         self.query_one("#email-qr", widgets.Button).disabled = not (
             student and student.email
         )
@@ -181,7 +183,7 @@ class StudentScreen(screen.Screen):
             f"[bold]Selected:[/bold]\n{student.first_name} "
             f"{student.last_name}\nID: {student.student_id}"
         )
-    
+
     @textual.on(widgets.Switch.Changed, "#students-show-inactive-switch")
     def on_active_toggle_changed(self, message: widgets.Switch.Changed) -> None:
         """Reload student data when the active/inactive toggle is changed."""
@@ -209,7 +211,7 @@ class StudentScreen(screen.Screen):
     async def action_add_student(self) -> None:
         """Show the student dialog and add a new student."""
 
-        def on_dialog_closed(student: schema.Student | None):
+        def on_dialog_closed(student: students.Student | None):
             if student is None:
                 return
             try:
@@ -223,31 +225,29 @@ class StudentScreen(screen.Screen):
             else:
                 self.load_student_data(
                     self.query_one(
-                        "#students-show-inactive-switch",
-                        widgets.Switch
+                        "#students-show-inactive-switch", widgets.Switch
                     ).value
                 )
                 self.query_one("#status-message", widgets.Static).update(
                     success(f"Student added successfully. ID: {student.student_id}")
                 )
 
-        await self.app.push_screen(student_dialog.StudentDialog(), callback=on_dialog_closed)
+        await self.app.push_screen(
+            student_dialog.StudentDialog(), callback=on_dialog_closed
+        )
 
     async def action_edit_student(self) -> None:
         if self._selected_student_id is None:
             return
-        student = self.students[self._selected_student_id]
+        student = self._students[self._selected_student_id]
 
-        def on_dialog_closed(student: schema.Student | None):
+        def on_dialog_closed(student: students.Student | None):
             if student is None or self._selected_student_id is None:
                 return
             student.update(self.dbase)
             self.update_status(success("Student updated successfully."))
             self.load_student_data(
-                self.query_one(
-                    "#students-show-inactive-switch",
-                    widgets.Switch
-                ).value
+                self.query_one("#students-show-inactive-switch", widgets.Switch).value
             )
 
         await self.app.push_screen(
@@ -285,10 +285,10 @@ class StudentScreen(screen.Screen):
     async def action_email_qr(self, all_students: bool) -> None:
         """Email QR codes to students."""
         if all_students:
-            students_to_email = schema.Student.get_all(self.dbase)
+            students_to_email = students.Student.get_all(self.dbase)
             self._add_progress_bar(len(students_to_email), "Send Emails")
         elif self._selected_student_id:
-            student = schema.Student.get_by_id(self.dbase, self._selected_student_id)
+            student = students.Student.get_by_id(self.dbase, self._selected_student_id)
             if student is None:
                 self.update_status(
                     error(f"Unable to locate student {self._selected_student_id}")
@@ -299,7 +299,7 @@ class StudentScreen(screen.Screen):
         else:
             self.update_status(error("No student selected."))
             return
-        
+
         def _email_all_students(confirmed: bool | None) -> None:
             if confirmed:
                 self.send_emails_worker(students_to_email)
@@ -316,13 +316,15 @@ class StudentScreen(screen.Screen):
             self.send_emails_worker(students_to_email)
 
     @textual.work(thread=True)
-    async def send_emails_worker(self, students: list[schema.Student]) -> None:
+    async def send_emails_worker(self, students: list[students.Student]) -> None:
         """Send QR emails to students."""
         if config.settings.qr_code_dir is None:
-            self.update_status(success(
-                "Cannot send emails with QR codes because "
-                "no QR code path is defined in config file."
-            ))
+            self.update_status(
+                success(
+                    "Cannot send emails with QR codes because "
+                    "no QR code path is defined in config file."
+                )
+            )
             return
         email_sender = emailer.send_all_emails(config.settings.qr_code_dir, students)
         failed_codes = []
@@ -335,9 +337,7 @@ class StudentScreen(screen.Screen):
             f"with QR codes in folder {config.settings.qr_code_dir}\n"
         )
         if failed_codes:
-            status_message += error(
-                "Failed Emails: " + ", ".join(failed_codes)
-            )
+            status_message += error("Failed Emails: " + ", ".join(failed_codes))
         self.update_status(status_message)
         self.app.call_from_thread(self._remove_progress_bar)
 
@@ -346,5 +346,4 @@ class StudentScreen(screen.Screen):
         self.query_one("#status-message", widgets.Static).update(message)
 
     def update_selected(self, message: str) -> None:
-        self.query_one(
-            "#students-selection-indicator", widgets.Static).update(message)
+        self.query_one("#students-selection-indicator", widgets.Static).update(message)

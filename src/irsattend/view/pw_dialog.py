@@ -5,7 +5,7 @@ import hashlib
 from textual import app, containers, screen, widgets
 
 import irsattend.view
-from irsattend.model import config
+from irsattend import config
 
 
 class PasswordPrompt(screen.ModalScreen[bool]):

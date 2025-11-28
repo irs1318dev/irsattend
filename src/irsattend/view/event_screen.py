@@ -6,11 +6,12 @@ import dateutil.parser
 import rich.text
 
 import textual
-from textual import app, binding, containers, reactive, screen, validation, widgets
+from textual import app, binding, containers, reactive, screen, widgets
 
+from irsattend import config
 import irsattend.view
 from irsattend.features import events, validators
-from irsattend.model import config, database, schema
+from irsattend.model import database, schema
 
 
 class EventsTable(widgets.DataTable):
