@@ -4,7 +4,7 @@ import pathlib
 
 import rich  # noqa: F401
 
-from irsattend.model import database, schema
+from irsattend.model import database, events_mod
 
 
 DATA_FOLDER = pathlib.Path(__file__).parent / "data"
@@ -13,11 +13,9 @@ DATA_FOLDER = pathlib.Path(__file__).parent / "data"
 def test_get_checkin_count(full_dbase: database.DBase) -> None:
     """Get number of checkins for an event."""
     # Arrange
-    event = schema.Event.get_all(full_dbase)[0]
+    event = events_mod.Event.get_all(full_dbase)[0]
     # Act
-    count = schema.Checkin.get_count(
-        full_dbase, event.event_date, event.event_type
-    )
+    count = events_mod.Checkin.get_count(full_dbase, event.event_date, event.event_type)
     # Assert
     assert isinstance(count, int)
     assert count >= 0
@@ -27,9 +25,9 @@ def test_get_checkin_count(full_dbase: database.DBase) -> None:
 def test_checkedin_student_ids(full_dbase: database.DBase) -> None:
     """Get list of student IDs who have checked in for an event."""
     # Arrange
-    event = schema.Event.get_all(full_dbase)[0]
+    event = events_mod.Event.get_all(full_dbase)[0]
     # Act
-    student_ids = schema.Checkin.get_checkedin_students(
+    student_ids = events_mod.Checkin.get_checkedin_students(
         full_dbase, event.event_date, event.event_type
     )
     # Assert

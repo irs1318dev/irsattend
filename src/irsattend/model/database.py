@@ -8,7 +8,7 @@ from typing import Any, Optional
 
 
 from irsattend import config
-from irsattend.model import schema, students_mod
+from irsattend.model import events_mod, students_mod
 
 
 class DBaseError(Exception):
@@ -81,8 +81,8 @@ class DBase:
         """Creates the database tables if they don't already exist."""
         with self.get_db_connection() as conn:
             conn.execute(students_mod.STUDENT_TABLE_SCHEMA)
-            conn.execute(schema.CHECKINS_TABLE_SCHEMA)
-            conn.execute(schema.EVENT_TABLE_SCHEMA)
+            conn.execute(events_mod.CHECKINS_TABLE_SCHEMA)
+            conn.execute(events_mod.EVENT_TABLE_SCHEMA)
             conn.execute(students_mod.ACTIVE_STUDENTS_VIEW_SCHEMA)
         conn.close()
 
@@ -142,7 +142,7 @@ class DBase:
             {col: val for col, val in row.items() if col not in excluded_columns}
             for row in events
         ]
-        checkins = [c.to_dict() for c in schema.Checkin.get_all(self)]
+        checkins = [c.to_dict() for c in events_mod.Checkin.get_all(self)]
         excluded_columns = ["checkin_id"]
         db_data["checkins"] = [
             {col: val for col, val in row.items() if col not in excluded_columns}
@@ -180,7 +180,7 @@ class DBase:
 
     def add_event(
         self,
-        event_type: schema.EventType,
+        event_type: events_mod.EventType,
         event_date: Optional[datetime.date] = None,
         description: Optional[str] = None,
     ) -> None:

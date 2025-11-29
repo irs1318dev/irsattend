@@ -4,11 +4,11 @@ import dataclasses
 import datetime
 from typing import Optional
 
-from irsattend.model import database, schema, students_mod
+from irsattend.model import database, events_mod, students_mod
 
 
 @dataclasses.dataclass
-class CheckinEvent(schema.Event):
+class CheckinEvent(events_mod.Event):
     """Event with total number of students who checkedin."""
 
     checkin_count: int
@@ -17,7 +17,7 @@ class CheckinEvent(schema.Event):
     def __init__(
         self,
         event_date: datetime.date | str,
-        event_type: str | schema.EventType,
+        event_type: str | events_mod.EventType,
         checkin_count: int,
         description: Optional[str] = None,
     ) -> None:

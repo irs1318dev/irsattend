@@ -10,7 +10,7 @@ from textual import app, binding, containers, reactive, screen, widgets
 from irsattend import config
 import irsattend.view
 from irsattend.features import events, validators
-from irsattend.model import database, schema
+from irsattend.model import database, events_mod
 
 
 class EventsTable(widgets.DataTable):
@@ -220,7 +220,7 @@ class EditEventDialog(screen.ModalScreen[bool]):
             )
             yield widgets.Label("Event Type:")
             yield widgets.Select(
-                [(etype.value.title(), etype.value) for etype in schema.EventType],
+                [(etype.value.title(), etype.value) for etype in events_mod.EventType],
                 value=event.event_type,
                 id="event-type-select",
             )
@@ -237,21 +237,23 @@ class EditEventDialog(screen.ModalScreen[bool]):
 
     @textual.on(widgets.Button.Pressed, "#events-edit-ok")
     def apply_dialog(self) -> None:
-        """Close the dialog and take no action."""
-        new_date = self.query_one("#event-date-input", widgets.Input).value
-        new_type = schema.EventType(
+        """Close the dialog and update the event."""
+        new_date = dateutil.parser.parse(
+            self.query_one("#event-date-input", widgets.Input).value,
+            dayfirst=False
+        ).date()
+        new_type = events_mod.EventType(
             self.query_one("#event-type-select", widgets.Select).value
         )
         new_description: str | None = self.query_one(
             "#event-description-input", widgets.Input
         ).value
-        if not new_description:
-            new_description = None
-        if new_date != self.event.iso_date and self.event.checkin_count == 0:
-            parsed_date = dateutil.parser.parse(new_date, dayfirst=False).date()
-            self.event.update_event_date(self.dbase, parsed_date)
-        if new_type != self.event.event_type:
-            self.event.update_event_type(self.dbase, new_type)
-        if new_description != self.event.description:
-            self.event.update_description(self.dbase, new_description)
+        # Update method calls do nothing if value hasn't changed.
+        self.event.update_description(self.dbase, new_description)
+        self.event.update_event_date(self.dbase, new_date)
+        # update_event_type adds a new event and deletes the old one, then
+        #   updates the linked checkin data. This avoids referential integrity
+        #   issues. 
+        self.event.update_event_type(self.dbase, new_type)
         self.dismiss(True)
+

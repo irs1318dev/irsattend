@@ -7,7 +7,7 @@ import pathlib
 import pytest
 import rich  # noqa: F401
 
-from irsattend.model import database, schema, students_mod
+from irsattend.model import database, events_mod, students_mod
 
 
 DATA_FOLDER = pathlib.Path(__file__).parent / "data"
@@ -44,19 +44,19 @@ def test_existing_database_raises_error_on_create_new(empty_database) -> None:
 def test_attendance_table(full_dbase: database.DBase) -> None:
     """Attendance table has many rows and 5 columns of data."""
     # Act
-    checkins = schema.Checkin.get_all(full_dbase)
+    checkins = events_mod.Checkin.get_all(full_dbase)
     # Assert
     assert len(checkins) > 4000
-    assert isinstance(checkins[0], schema.Checkin)
+    assert isinstance(checkins[0], events_mod.Checkin)
 
 
 def test_attendance_counts(full_dbase: database.DBase) -> None:
     """Get count of student appearances."""
     # Act
-    season_counts = schema.Checkin.get_counts_by_student(
+    season_counts = events_mod.Checkin.get_counts_by_student(
         full_dbase, datetime.date(2025, 9, 1)
     )
-    build_counts = schema.Checkin.get_counts_by_student(
+    build_counts = events_mod.Checkin.get_counts_by_student(
         full_dbase, datetime.date(2026, 1, 1)
     )
     # Assert
@@ -105,8 +105,8 @@ def test_from_dict(full_dbase: database.DBase, empty_database2: database.DBase) 
     students1 = students_mod.Student.get_all(full_dbase, include_inactive=True)
     students2 = students_mod.Student.get_all(empty_database2, include_inactive=True)
     assert len(students1) == len(students2)
-    checkins1 = schema.Checkin.get_all(full_dbase)
-    checkins2 = schema.Checkin.get_all(empty_database2)
+    checkins1 = events_mod.Checkin.get_all(full_dbase)
+    checkins2 = events_mod.Checkin.get_all(empty_database2)
     assert len(checkins1) == len(checkins2)
 
 
@@ -116,11 +116,11 @@ def test_add_event(noevents_dbase: database.DBase) -> None:
     edate = datetime.date(2026, 1, 10)
     desc = "Multiteam kickoff event at Auburn H.S."
     # Act
-    noevents_dbase.add_event(schema.EventType.KICKOFF, edate, desc)
+    noevents_dbase.add_event(events_mod.EventType.KICKOFF, edate, desc)
     # Assert
     events = noevents_dbase.get_events_dict()
     assert len(events) == 1
-    assert events[0]["event_type"] == schema.EventType.KICKOFF
+    assert events[0]["event_type"] == events_mod.EventType.KICKOFF
     assert events[0]["event_date"] == edate.isoformat()
     assert events[0]["description"] == desc
 
@@ -130,9 +130,9 @@ def test_add_duplicate_event_does_nothing(noevents_dbase: database.DBase) -> Non
     # Arrange
     edate = datetime.date(2026, 1, 10)
     desc = "Multiteam kickoff event at Auburn H.S."
-    noevents_dbase.add_event(schema.EventType.KICKOFF, edate, desc)
+    noevents_dbase.add_event(events_mod.EventType.KICKOFF, edate, desc)
     # Act
-    noevents_dbase.add_event(schema.EventType.KICKOFF, edate, "duplicate")
+    noevents_dbase.add_event(events_mod.EventType.KICKOFF, edate, "duplicate")
     # Assert
     events = noevents_dbase.get_events_dict()
     assert len(events) == 1
@@ -146,18 +146,18 @@ def test_add_checkin(
     # Arrange
     students = attendance_test_data["students"]
     event_date = datetime.datetime(2025, 11, 15)
-    noevents_dbase.add_event(schema.EventType.COMPETITION, event_date, "test")
-    checkin = schema.Checkin(
+    noevents_dbase.add_event(events_mod.EventType.COMPETITION, event_date, "test")
+    checkin = events_mod.Checkin(
         checkin_id=-1,
         student_id=students[0]["student_id"],
-        event_type=schema.EventType.COMPETITION,
+        event_type=events_mod.EventType.COMPETITION,
         timestamp=event_date,
     )
     # Act
     checkin.add(noevents_dbase)
     # Assert
-    checkins = schema.Checkin.get_all(noevents_dbase)
+    checkins = events_mod.Checkin.get_all(noevents_dbase)
     assert len(checkins) == 1
     assert checkins[0].student_id == students[0]["student_id"]
-    assert checkins[0].event_type == schema.EventType.COMPETITION
+    assert checkins[0].event_type == events_mod.EventType.COMPETITION
     assert checkins[0].iso_date == "2025-11-15"

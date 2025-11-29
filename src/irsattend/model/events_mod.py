@@ -65,6 +65,248 @@ sqlite3.register_converter("event_date", convert_event_date)
 sqlite3.register_converter("timestamp", convert_timestamp)
 
 
+EVENT_TABLE_SCHEMA = """
+CREATE TABLE IF NOT EXISTS events (
+     event_date TEXT NOT NULL,
+    day_of_week INT GENERATED ALWAYS AS (strftime('%u', event_date)) VIRTUAL,
+     event_type TEXT NOT NULL,
+    description TEXT,
+    PRIMARY KEY (event_date, event_type) ON CONFLICT IGNORE
+);
+"""
+
+
+class EventUpateError(Exception):
+    """Raised when an event update fails."""
+    pass
+
+
+@dataclasses.dataclass
+class Event:
+    """An event at which we record attendance."""
+
+    event_date: datetime.date
+    event_type: EventType
+    description: Optional[str]
+
+    def __init__(
+        self,
+        event_date: datetime.date | str,
+        event_type: str | EventType,
+        description: Optional[str] = None,
+    ) -> None:
+        """Ensure event_date is converted to datetime.date."""
+        if isinstance(event_date, str):
+            event_date = datetime.date.fromisoformat(event_date)
+        if isinstance(event_type, str):
+            event_type = EventType(event_type)
+        self.event_date = event_date
+        self.event_type = event_type
+        self.description = description
+
+    @property
+    def iso_date(self) -> str:
+        """Event date as an iso-formatted string."""
+        return self.event_date.strftime("%Y-%m-%d")
+
+    @property
+    def day_of_week(self) -> int:
+        """Day of week as an integer with Monday = 1."""
+        return self.event_date.weekday() + 1
+
+    @property
+    def weekday_name(self) -> str:
+        """Day of week as a string: 'Monday', 'Tuesday', etc."""
+        return self.event_date.strftime("%A")
+
+    @property
+    def key(self) -> str:
+        """String that uniquely identifies the event."""
+        return f"{self.iso_date}::{self.event_type.value}"
+
+    def exists(self, dbase: "database.DBase") -> bool:
+        """Check if the event exists in the database."""
+        query = """
+                SELECT 1
+                  FROM events
+                 WHERE event_date = ?
+                   AND event_type = ?;
+        """
+        conn = dbase.get_db_connection()
+        query_result = conn.execute(
+            query, (self.event_date, self.event_type)
+        ).fetchone()
+        conn.close()
+        return query_result is not None
+
+    def add(self, dbase: "database.DBase") -> bool:
+        """Add the event to the database.
+
+        Return True if the event was added, False if it already existed.
+        """
+        query = """
+                INSERT INTO events
+                            (event_date, event_type, description)
+                     VALUES (:event_date, :event_type, :description);
+        """
+        with dbase.get_db_connection() as conn:
+            cursor = conn.execute(
+                query,
+                {
+                    "event_date": self.event_date,
+                    "event_type": self.event_type,
+                    "description": self.description,
+                },
+            )
+        row_count = cursor.rowcount
+        conn.close()
+        return row_count == 1
+
+    def delete(self, dbase: "database.DBase") -> bool:
+        """Delete the event from the database.
+
+        Return True if the event was deleted, False if it did not exist.
+        """
+        query = """
+                DELETE FROM events
+                      WHERE event_date = :event_date
+                        AND event_type = :event_type;
+        """
+        with dbase.get_db_connection() as conn:
+            cursor = conn.execute(
+                query,
+                {"event_date": self.event_date, "event_type": self.event_type},
+            )
+        row_count = cursor.rowcount
+        conn.close()
+        return row_count == 1
+
+    @staticmethod
+    def select(
+        dbase: "database.DBase", event_date: datetime.date, event_type: EventType
+    ) -> "Event | None":
+        """Retrieve a single event."""
+        query = """
+                SELECT event_date, event_type, description
+                  FROM events
+                 WHERE event_date = ?
+                   AND event_type = ?;
+        """
+        conn = dbase.get_db_connection(as_dict=True)
+        query_result = conn.execute(
+            query, (event_date.strftime("%Y-%m-%d"), event_type)
+        ).fetchone()
+        event = None if query_result is None else Event(**query_result)
+        conn.close()
+        return event
+
+    @staticmethod
+    def get_all(dbase: "database.DBase") -> list["Event"]:
+        """Retrieve a list of Student objects from the database."""
+        query = """
+                SELECT event_date, event_type, description
+                  FROM events
+              ORDER BY event_date, event_type;
+        """
+        conn = dbase.get_db_connection(as_dict=True)
+        events = [Event(**event) for event in conn.execute(query)]
+        conn.close()
+        return events
+    
+    def update_description(
+        self, dbase: "database.DBase", description: str | None
+    ) -> None:
+        """Update the event in the database."""
+        if self.description == description:
+            return
+        else:
+            self.description = description
+        query = """
+                UPDATE events
+                   SET description = :description
+                 WHERE event_type = :event_type AND event_date = :event_date;
+        """
+        with dbase.get_db_connection() as conn:
+            conn.execute(
+                query,
+                {
+                    "event_date": self.event_date,
+                    "event_type": self.event_type,
+                    "description": description,
+                },
+            )
+        conn.close()
+
+    def update_event_type(self, dbase: "database.DBase", new_type: EventType) -> int:
+        """Update the event type in the database.
+
+        Returns:
+          Number of checkins updated.
+
+        Raises:
+          EventUpdateError: If the update could not be performed.
+        """
+        if self.event_type == new_type:
+            # Do nothing if the event_type hasn't changed.
+            return 0
+        if not self.exists(dbase):
+            raise EventUpateError("Original event does not exist.")
+        event_query = """
+                UPDATE events
+                   SET event_type = :new_type
+                 WHERE event_type = :event_type AND event_date = :event_date;
+        """
+        checkins_query = """
+                UPDATE checkins
+                   SET event_type = :new_type
+                 WHERE event_date = :event_date
+                   AND event_type = :event_type;
+        """
+        params = {
+                    "new_type": new_type,
+                    "event_type": self.event_type,
+                    "event_date": self.event_date
+        }
+        with dbase.get_db_connection() as conn:
+            conn.execute(event_query, params)
+            cursor = conn.execute(checkins_query, params)
+            checkins_updated = cursor.rowcount
+        conn.close()
+        self.event_type = new_type
+        return checkins_updated
+
+    def update_event_date(
+        self, dbase: "database.DBase", new_date: datetime.date
+    ) -> None:
+        """Update the event date in the database.
+
+        Raises:
+          EventUpdateError: If the update could not be performed.
+        """
+        if self.event_date == new_date:
+            # Do nothing if the date hasn't changed.
+            return
+        if not self.exists(dbase):
+            raise EventUpateError("Original event does not exist.")
+        checkin_counts = Checkin.get_count(dbase, self.event_date, self.event_type)
+        if checkin_counts > 0:
+            raise EventUpateError("Cannot change date; checkins exist for this event.")
+        event_query = """
+                UPDATE events
+                   SET event_date = :new_date
+                 WHERE event_type = :event_type AND event_date = :event_date;
+        """
+        params = {
+            "new_date": new_date,
+            "event_date": self.event_date,
+            "event_type": self.event_type,
+        }
+        with dbase.get_db_connection() as conn:
+            conn.execute(event_query, params)
+        conn.close()
+        self.event_date = new_date
+
+
 CHECKINS_TABLE_SCHEMA = """
 CREATE TABLE IF NOT EXISTS checkins (
        checkin_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -74,10 +316,14 @@ CREATE TABLE IF NOT EXISTS checkins (
        event_type TEXT,
         timestamp TEXT NOT NULL,
       FOREIGN KEY (student_id) REFERENCES students (student_id),
-      FOREIGN KEY (event_date, event_type) REFERENCES events (event_date, event_type),
+      FOREIGN KEY (event_date, event_type) REFERENCES events (event_date, event_type)
+                  DEFERRABLE INITIALLY DEFERRED,
        CONSTRAINT single_event_constraint UNIQUE(student_id, event_date, event_type)
 );
 """
+# DEFERRABLE INITIALLY DEFERRED allows queries to create foreign key violations within
+# a transaction, as long as the violations are fixed before the end of the transaction.
+# See section 4.2 of https://sqlite.org/foreignkeys.html
 
 
 @dataclasses.dataclass
@@ -229,227 +475,3 @@ class Checkin:
             "event_type": self.event_type,
             "timestamp": self.timestamp.isoformat(),
         }
-
-
-EVENT_TABLE_SCHEMA = """
-CREATE TABLE IF NOT EXISTS events (
-     event_date TEXT NOT NULL,
-    day_of_week INT GENERATED ALWAYS AS (strftime('%u', event_date)) VIRTUAL,
-     event_type TEXT NOT NULL,
-    description TEXT,
-    PRIMARY KEY (event_date, event_type) ON CONFLICT IGNORE
-);
-"""
-
-
-class EventUpateError(Exception):
-    """Raised when an event update fails."""
-
-    pass
-
-
-@dataclasses.dataclass
-class Event:
-    """An event at which we record attendance."""
-
-    event_date: datetime.date
-    event_type: EventType
-    description: Optional[str]
-
-    def __init__(
-        self,
-        event_date: datetime.date | str,
-        event_type: str | EventType,
-        description: Optional[str] = None,
-    ) -> None:
-        """Ensure event_date is converted to datetime.date."""
-        if isinstance(event_date, str):
-            event_date = datetime.date.fromisoformat(event_date)
-        if isinstance(event_type, str):
-            event_type = EventType(event_type)
-        self.event_date = event_date
-        self.event_type = event_type
-        self.description = description
-
-    @property
-    def iso_date(self) -> str:
-        """Event date as an iso-formatted string."""
-        return self.event_date.strftime("%Y-%m-%d")
-
-    @property
-    def day_of_week(self) -> int:
-        """Day of week as an integer with Monday = 1."""
-        return self.event_date.weekday() + 1
-
-    @property
-    def weekday_name(self) -> str:
-        """Day of week as a string: 'Monday', 'Tuesday', etc."""
-        return self.event_date.strftime("%A")
-
-    @property
-    def key(self) -> str:
-        """String that uniquely identifies the event."""
-        return f"{self.iso_date}::{self.event_type.value}"
-
-    def exists(self, dbase: "database.DBase") -> bool:
-        """Check if the event exists in the database."""
-        query = """
-                SELECT 1
-                  FROM events
-                 WHERE event_date = ?
-                   AND event_type = ?;
-        """
-        conn = dbase.get_db_connection()
-        query_result = conn.execute(
-            query, (self.event_date, self.event_type)
-        ).fetchone()
-        conn.close()
-        return query_result is not None
-
-    def add(self, dbase: "database.DBase") -> bool:
-        """Add the event to the database.
-
-        Return True if the event was added, False if it already existed.
-        """
-        query = """
-                INSERT INTO events
-                            (event_date, event_type, description)
-                     VALUES (:event_date, :event_type, :description);
-        """
-        with dbase.get_db_connection() as conn:
-            cursor = conn.execute(
-                query,
-                {
-                    "event_date": self.event_date,
-                    "event_type": self.event_type,
-                    "description": self.description,
-                },
-            )
-        row_count = cursor.rowcount
-        conn.close()
-        return row_count == 1
-
-    def delete(self, dbase: "database.DBase") -> bool:
-        """Delete the event from the database.
-
-        Return True if the event was deleted, False if it did not exist.
-        """
-        query = """
-                DELETE FROM events
-                      WHERE event_date = :event_date
-                        AND event_type = :event_type;
-        """
-        with dbase.get_db_connection() as conn:
-            cursor = conn.execute(
-                query,
-                {"event_date": self.event_date, "event_type": self.event_type},
-            )
-        row_count = cursor.rowcount
-        conn.close()
-        return row_count == 1
-
-    @staticmethod
-    def select(
-        dbase: "database.DBase", event_date: datetime.date, event_type: EventType
-    ) -> "Event | None":
-        """Retrieve a single event."""
-        query = """
-                SELECT event_date, event_type, description
-                  FROM events
-                 WHERE event_date = ?
-                   AND event_type = ?;
-        """
-        conn = dbase.get_db_connection(as_dict=True)
-        query_result = conn.execute(
-            query, (event_date.strftime("%Y-%m-%d"), event_type)
-        ).fetchone()
-        event = None if query_result is None else Event(**query_result)
-        conn.close()
-        return event
-
-    @staticmethod
-    def get_all(dbase: "database.DBase") -> list["Event"]:
-        """Retrieve a list of Student objects from the database."""
-        query = """
-                SELECT event_date, event_type, description
-                  FROM events
-              ORDER BY event_date, event_type;
-        """
-        conn = dbase.get_db_connection(as_dict=True)
-        events = [Event(**event) for event in conn.execute(query)]
-        conn.close()
-        return events
-
-    def update_description(
-        self, dbase: "database.DBase", description: str | None
-    ) -> None:
-        """Update the event in the database."""
-        query = """
-                UPDATE events
-                   SET description = :description
-                 WHERE event_type = :event_type AND event_date = :event_date;
-        """
-        with dbase.get_db_connection() as conn:
-            conn.execute(
-                query,
-                {
-                    "event_date": self.event_date,
-                    "event_type": self.event_type,
-                    "description": description,
-                },
-            )
-        conn.close()
-
-    def update_event_type(self, dbase: "database.DBase", new_type: EventType) -> int:
-        """Update the event type in the database.
-
-        Returns:
-          Number of checkins updated.
-
-        Raises:
-          EventUpdateError: If the update could not be performed.
-        """
-        if not self.exists(dbase):
-            raise EventUpateError("Original event does not exist.")
-        updated_event = Event(self.event_date, new_type, self.description)
-        if not updated_event.add(dbase):
-            raise EventUpateError("Cannot update event; target event already exists.")
-        # Update checkins to reference the new event date and type.
-        checkins_query = """
-                UPDATE checkins
-                   SET event_type = :new_type
-                 WHERE event_date = :event_date
-                   AND event_type = :event_type;
-        """
-        with dbase.get_db_connection() as conn:
-            cursor = conn.execute(
-                checkins_query,
-                {
-                    "event_date": self.event_date,
-                    "event_type": self.event_type,
-                    "old_date": self.event_date.isoformat(),
-                    "new_type": new_type,
-                },
-            )
-            checkins_updated = cursor.rowcount
-        conn.close()
-        self.delete(dbase)
-        return checkins_updated
-
-    def update_event_date(
-        self, dbase: "database.DBase", new_date: datetime.date
-    ) -> None:
-        """Update the event date in the database.
-
-        Raises:
-          EventUpdateError: If the update could not be performed.
-        """
-        if not self.exists(dbase):
-            raise EventUpateError("Original event does not exist.")
-        checkin_counts = Checkin.get_count(dbase, self.event_date, self.event_type)
-        if checkin_counts > 0:
-            raise EventUpateError("Cannot change date; checkins exist for this event.")
-        updated_event = Event(new_date, self.event_type.value, self.description)
-        if not updated_event.add(dbase):
-            raise EventUpateError("Cannot update event; target event already exists.")
-        self.delete(dbase)

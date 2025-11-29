@@ -13,7 +13,8 @@ from irsattend.model import database, students_mod
 DATA_FOLDER = pathlib.Path(__file__).parent / "data"
 QR_FOLDER_NAME = "test_qr_codes"
 
-pytestmark = pytest.mark.skip(reason="Roster update tests are slow.")
+# Comment next line to run tests.
+pytestmark = pytest.mark.skip(reason="Tests require email credentials.")
 
 
 def test_generate_qr_codes(
@@ -40,7 +41,6 @@ def test_generate_qr_codes(
             assert not qr_path.exists()
 
 
-@pytest.mark.skip(reason="Requires email server and valid credentials.")
 def test_send_one_qr_code(
     full_dbase: database.DBase,
     empty_output_folder: pathlib.Path,
@@ -65,7 +65,6 @@ def test_send_one_qr_code(
     assert result[0]
 
 
-@pytest.mark.skip(reason="Requires email server and valid credentials.")
 def test_send_multiple_qr_codes(
     full_dbase: database.DBase,
     empty_output_folder: pathlib.Path,
