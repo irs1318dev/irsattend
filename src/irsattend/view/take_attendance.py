@@ -12,12 +12,17 @@ from textual import app, containers, message, screen, widgets
 from textual.widgets import option_list
 
 from irsattend import config
+import irsattend.view
 from irsattend.model import database, schema, students
 from irsattend.view import pw_dialog
 
 
 class ScanScreen(screen.Screen):
     """UI for scanning QR codes while taking attendance."""
+
+    CSS_PATH = [
+        irsattend.view.CSS_FOLDER / "take_attendance.tcss"
+    ]
 
     dbase: database.DBase
     """Sqlte database connection object."""
@@ -141,12 +146,13 @@ class ScanScreen(screen.Screen):
                 )
         self.discard_scanned_code(student_id)
 
+    # Tried using Textual's set_timer method, but that didn't work.
+    #   Non-threaded async workers didn't work either. Might be due to
+    #   OpenCV and while loop blocking calls?
     @textual.work(exclusive=False, thread=True)
     def discard_scanned_code(self, student_id: str) -> None:
-        """Allow a QR code to be scanned again."""
-        textual.log(f"Waiting to discard {student_id} from scanned list.")
+        """Allow a QR code to be scanned after five seconds have elapsed.."""
         time.sleep(5)
-        textual.log(f"Discarding {student_id} from scanned list.")
         self._scanned_students.discard(student_id)
 
     def action_exit_scan_mode(self) -> None:

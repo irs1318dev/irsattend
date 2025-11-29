@@ -35,6 +35,10 @@ ModalScreen {
     border: thistle;
 }
 
+.dialog-row {
+    align-horizontal: center;
+}
+
 .emphasis {
     color: yellow;
 }
