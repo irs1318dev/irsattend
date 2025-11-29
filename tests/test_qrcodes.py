@@ -47,7 +47,7 @@ def test_send_one_qr_code(
     settings: config.Settings,
 ) -> None:
     """Generate and send one QR code email.
-    
+
     Sends email to the sender email address specified in test config. Check
     sender inbox to verify email was received.
     """
@@ -72,7 +72,7 @@ def test_send_multiple_qr_codes(
     settings: config.Settings,
 ) -> None:
     """Generate and send multiple QR code emails.
-    
+
     Sends emails to the sender email address specified in test config. Check
     sender inbox to verify emails were received.
     """
@@ -85,9 +85,8 @@ def test_send_multiple_qr_codes(
     assert settings.sender_email is not None
     results = list(
         emailer.send_all_emails(
-            qr_folder,
-            students[:num_codes],
-            email=settings.sender_email)
+            qr_folder, students[:num_codes], email=settings.sender_email
+        )
     )
     # Assert
     assert len(results) == num_codes

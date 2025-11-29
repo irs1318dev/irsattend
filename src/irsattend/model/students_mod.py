@@ -29,6 +29,7 @@ ACTIVE_STUDENTS_VIEW_SCHEMA = """
          WHERE deactivated_on IS NULL;
 """
 
+
 @dataclasses.dataclass
 class Student:
     """An FRC student."""

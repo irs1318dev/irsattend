@@ -63,7 +63,15 @@ model. During my earlier efforts to implement an MVVM architecture, I often foun
 that the model could provide the information needed by the view, and that sending
 the information through the middle view-model layer just added complexity and
 extra work.
-2. There are no strict rules for where user-triggered events are handled. If a
+2. Application state can be maintained within a view. For example, for a Textual
+screen with a datatable, we might want to have a list of objects that corresponds
+to the rows in the databable. MVVM or MVP architectures would require that the
+object list be maintained in the view-model or presentation layer. MVF allows us
+to maintain the object list within the view instead of creating a separate class.
+I still recommend that complex data structures that contain business logic be
+maintained in the features layer, to avoid mixing business logic into the view
+and cluttering the view code.
+3. There are no strict rules for where user-triggered events are handled. If a
 user-triggered event can be handled in the view-layer with a couple lines of
 code, that's probably fine. User-triggered events are not required to be sent to
 the features layer. That said, the view layer should stay focused on defining the
@@ -71,10 +79,10 @@ user interface and responding to user-triggered events. Non-trival data processi
 and logic should happen in the features or model layers. 
 
 #### Final Thoughts
-Perhaps you are thinking that I'm just ignorant, and don't really understand how
-MVVM or MVP architectures are supposed to work. I concur. I've read up on both
-architectures and I think I don't have the software development experience that's
-needed for a deep understanding.
+Perhaps you are thinking that I'm just ignorant, and that I don't really
+understand how MVVM or MVP architectures are supposed to work. I concur. I've
+read up on both architectures and I realized I don't have the software development
+experience that's needed for a deep understanding.
 
 I have two points to make in defense of MVF.
 1. I don't develop large or highly complex applications, so I think both

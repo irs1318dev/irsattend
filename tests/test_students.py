@@ -16,5 +16,3 @@ def test_get_students(full_dbase: database.DBase) -> None:
     # Assert
     assert all(isinstance(student, students_mod.Student) for student in students)
     assert isinstance(students[0].grad_year, int)
-
-

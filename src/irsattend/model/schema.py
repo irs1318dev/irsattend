@@ -113,27 +113,31 @@ class Checkin:
     def day_of_week(self) -> int:
         """Day of week as an integer with Monday = 1."""
         return self.event_date.weekday() + 1
-    
+
     @staticmethod
     def to_iso_date(date: datetime.date) -> str:
         """Convert a datetime.date to an iso-formatted string."""
         return date.strftime("%Y-%m-%d")
-    
+
     @property
     def iso_date(self) -> str:
         """Event date as an iso-formatted string."""
         return self.to_iso_date(self.event_date)
-    
 
-    def add(self, dbase: "database.DBase") -> None:
-        """Add the checkin record to the database."""
+    def add(self, dbase: "database.DBase") -> int | None:
+        """Add the checkin record to the database.
+
+        Returns:
+            The checkin ID of the newly added record, or None if the insert
+            failed.
+        """
         query = """
                 INSERT INTO checkins
                             (student_id, event_type, timestamp)
                      VALUES (:student_id, :event_type, :timestamp);
         """
         with dbase.get_db_connection() as conn:
-            conn.execute(
+            cursor = conn.execute(
                 query,
                 {
                     "student_id": self.student_id,
@@ -141,7 +145,22 @@ class Checkin:
                     "timestamp": self.timestamp,
                 },
             )
+            checkin_id = cursor.lastrowid
         conn.close()
+        return checkin_id
+
+    @staticmethod
+    def get_all(dbase: "database.DBase") -> list["Checkin"]:
+        """Retrieve a list of Checkin objects from the database."""
+        query = """
+                SELECT checkin_id, student_id, event_type, timestamp
+                  FROM checkins
+              ORDER BY timestamp;
+        """
+        conn = dbase.get_db_connection(as_dict=True)
+        checkins = [Checkin(**checkin) for checkin in conn.execute(query)]
+        conn.close()
+        return checkins
 
     @classmethod
     def get_checkedin_students(
@@ -159,18 +178,14 @@ class Checkin:
         """
         conn = dbase.get_db_connection()
         student_ids = [
-            row["student_id"]
-            for row in conn.execute(
-                query, (event_date, event_type)
-            )
+            row["student_id"] for row in conn.execute(query, (event_date, event_type))
         ]
         conn.close()
         return student_ids
-    
+
     @staticmethod
     def get_counts_by_student(
-        dbase: "database.DBase",
-        since: datetime.date
+        dbase: "database.DBase", since: datetime.date
     ) -> dict[str, int]:
         """Get a dictionary of student IDs and their checkin counts."""
         conn = dbase.get_db_connection()
@@ -206,6 +221,15 @@ class Checkin:
         conn.close()
         return query_result["checkin_count"]
 
+    def to_dict(self) -> dict:
+        """Convert the Checkin dataclass to a JSON-serializable dictionary."""
+        return {
+            "checkin_id": self.checkin_id,
+            "student_id": self.student_id,
+            "event_type": self.event_type,
+            "timestamp": self.timestamp.isoformat(),
+        }
+
 
 EVENT_TABLE_SCHEMA = """
 CREATE TABLE IF NOT EXISTS events (
@@ -220,6 +244,7 @@ CREATE TABLE IF NOT EXISTS events (
 
 class EventUpateError(Exception):
     """Raised when an event update fails."""
+
     pass
 
 
@@ -421,9 +446,7 @@ class Event:
         """
         if not self.exists(dbase):
             raise EventUpateError("Original event does not exist.")
-        checkin_counts = Checkin.get_count(
-            dbase, self.event_date, self.event_type
-        )
+        checkin_counts = Checkin.get_count(dbase, self.event_date, self.event_type)
         if checkin_counts > 0:
             raise EventUpateError("Cannot change date; checkins exist for this event.")
         updated_event = Event(new_date, self.event_type.value, self.description)

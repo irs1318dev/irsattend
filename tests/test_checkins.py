@@ -16,7 +16,7 @@ def test_get_checkin_count(full_dbase: database.DBase) -> None:
     event = schema.Event.get_all(full_dbase)[0]
     # Act
     count = schema.Checkin.get_count(
-        full_dbase, event.event_date, event.event_type.value
+        full_dbase, event.event_date, event.event_type
     )
     # Assert
     assert isinstance(count, int)

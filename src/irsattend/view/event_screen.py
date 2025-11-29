@@ -1,6 +1,5 @@
 """Manage team events."""
 
-from typing import cast
 
 import dateutil.parser
 import rich.text
@@ -241,7 +240,8 @@ class EditEventDialog(screen.ModalScreen[bool]):
         """Close the dialog and take no action."""
         new_date = self.query_one("#event-date-input", widgets.Input).value
         new_type = schema.EventType(
-            self.query_one("#event-type-select", widgets.Select).value)
+            self.query_one("#event-type-select", widgets.Select).value
+        )
         new_description: str | None = self.query_one(
             "#event-description-input", widgets.Input
         ).value

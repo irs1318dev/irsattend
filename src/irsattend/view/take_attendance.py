@@ -20,9 +20,7 @@ from irsattend.view import pw_dialog
 class ScanScreen(screen.Screen):
     """UI for scanning QR codes while taking attendance."""
 
-    CSS_PATH = [
-        irsattend.view.CSS_FOLDER / "take_attendance.tcss"
-    ]
+    CSS_PATH = [irsattend.view.CSS_FOLDER / "take_attendance.tcss"]
 
     dbase: database.DBase
     """Sqlte database connection object."""
@@ -86,10 +84,11 @@ class ScanScreen(screen.Screen):
         self.event_type = event_type
         self.dbase.add_event(event_type)
         # Prevent codes from being scanned more than once for same event.
-        self._checkedin_students = set(schema.Checkin.get_checkedin_students(
-            self.dbase, datetime.date.today(),
-            event_type
-        ))
+        self._checkedin_students = set(
+            schema.Checkin.get_checkedin_students(
+                self.dbase, datetime.date.today(), event_type
+            )
+        )
         self.scan_qr_codes()
 
     @textual.work(exclusive=False)
@@ -136,10 +135,20 @@ class ScanScreen(screen.Screen):
             self.log_widget.write(f"[orange3]Already attended: {student_name}[/]")
         else:
             self._checkedin_students.add(student_id)
-            timestamp = self.dbase.add_checkin_record(
-                student_id, event_type=self.event_type
+            timestamp = datetime.datetime.now()
+            checkin = schema.Checkin(
+                checkin_id=-1,
+                student_id=student_id,
+                event_type=self.event_type,
+                timestamp=timestamp,
             )
-            if timestamp is not None:
+            checkin_id = checkin.add(self.dbase)
+            if checkin_id is None:
+                self.log_widget.write(
+                    "[ansi_bright_red]Valid QR code, but error recording checkin.\n"
+                    "Please speak to a mentor.[/]"
+                )
+            else:
                 self.log_widget.write(
                     f"[green]Success: {student_name} "
                     f"checked in at {timestamp.strftime('%H:%M:%S')}[/]"

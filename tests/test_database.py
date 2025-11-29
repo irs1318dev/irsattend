@@ -44,19 +44,21 @@ def test_existing_database_raises_error_on_create_new(empty_database) -> None:
 def test_attendance_table(full_dbase: database.DBase) -> None:
     """Attendance table has many rows and 5 columns of data."""
     # Act
-    rapdf = full_dbase.get_checkins_dataframe()
+    checkins = schema.Checkin.get_all(full_dbase)
     # Assert
-    assert rapdf.shape[0] > 4000
-    assert rapdf.shape[1] == 6
+    assert len(checkins) > 4000
+    assert isinstance(checkins[0], schema.Checkin)
 
 
 def test_attendance_counts(full_dbase: database.DBase) -> None:
     """Get count of student appearances."""
     # Act
     season_counts = schema.Checkin.get_counts_by_student(
-        full_dbase, datetime.date(2025, 9, 1))
+        full_dbase, datetime.date(2025, 9, 1)
+    )
     build_counts = schema.Checkin.get_counts_by_student(
-        full_dbase, datetime.date(2026, 1, 1))
+        full_dbase, datetime.date(2026, 1, 1)
+    )
     # Assert
     assert len(season_counts) >= len(build_counts)
     for student_id in build_counts:
@@ -103,8 +105,9 @@ def test_from_dict(full_dbase: database.DBase, empty_database2: database.DBase) 
     students1 = students_mod.Student.get_all(full_dbase, include_inactive=True)
     students2 = students_mod.Student.get_all(empty_database2, include_inactive=True)
     assert len(students1) == len(students2)
-    attendance = empty_database2.get_all_checkins_records_dict()
-    assert len(attendance) == len(full_dbase.get_all_checkins_records_dict())
+    checkins1 = schema.Checkin.get_all(full_dbase)
+    checkins2 = schema.Checkin.get_all(empty_database2)
+    assert len(checkins1) == len(checkins2)
 
 
 def test_add_event(noevents_dbase: database.DBase) -> None:
@@ -144,15 +147,17 @@ def test_add_checkin(
     students = attendance_test_data["students"]
     event_date = datetime.datetime(2025, 11, 15)
     noevents_dbase.add_event(schema.EventType.COMPETITION, event_date, "test")
-    # Act
-    noevents_dbase.add_checkin_record(
-        students[0]["student_id"],
-        event_date,
+    checkin = schema.Checkin(
+        checkin_id=-1,
+        student_id=students[0]["student_id"],
         event_type=schema.EventType.COMPETITION,
+        timestamp=event_date,
     )
+    # Act
+    checkin.add(noevents_dbase)
     # Assert
-    checkins = noevents_dbase.get_all_checkins_records_dict()
+    checkins = schema.Checkin.get_all(noevents_dbase)
     assert len(checkins) == 1
-    assert checkins[0]["student_id"] == students[0]["student_id"]
-    assert checkins[0]["event_type"] == schema.EventType.COMPETITION.value
-    assert checkins[0]["event_date"] == "2025-11-15"
+    assert checkins[0].student_id == students[0]["student_id"]
+    assert checkins[0].event_type == schema.EventType.COMPETITION
+    assert checkins[0].iso_date == "2025-11-15"

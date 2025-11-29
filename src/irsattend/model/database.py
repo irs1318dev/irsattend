@@ -6,7 +6,6 @@ import pathlib
 import sqlite3
 from typing import Any, Optional
 
-import polars as pl
 
 from irsattend import config
 from irsattend.model import schema, students_mod
@@ -125,116 +124,6 @@ class DBase:
         )
         return cursor
 
-
-    def get_checkin_count_by_id(self, student_id: str) -> int:
-        """Retrieve a student's checkin count by their ID."""
-        conn = self.get_db_connection()
-        cursor = conn.execute(
-            """SELECT COUNT(student_id) as count
-            FROM checkins WHERE student_id = ?""",
-            (student_id,),
-        )
-        checkin_count = cursor.fetchone()
-        conn.close()
-        return checkin_count["count"] if checkin_count else 0
-
-    def remove_last_checkin_record(
-        self, student_id: str
-    ) -> Optional[datetime.datetime]:
-        """Remove the most recent checkin record for a student.
-        Returns the timestamp of the removed record if successful."""
-        with self.get_db_connection() as conn:
-            cursor = conn.execute(
-                """SELECT student_id, timestamp FROM checkins
-                WHERE student_id = ? 
-                ORDER BY timestamp DESC 
-                LIMIT 1""",
-                (student_id,),
-            )
-            record = cursor.fetchone()
-
-            if record:
-                conn.execute(
-                    "DELETE FROM checkins WHERE student_id = ?",
-                    (record["student_id"],),
-                )
-                conn.commit()
-                return record["timestamp"]
-        conn.close()
-        return None
-
-    def remove_all_checkin_records(self, student_id: str) -> int:
-        """Remove all checkin records for a student.
-        Returns the number of records removed."""
-        with self.get_db_connection() as conn:
-            cursor = conn.execute(
-                "DELETE FROM checkins WHERE student_id = ?", (student_id,)
-            )
-            rowcount = cursor.rowcount
-        conn.close()
-        return rowcount
-
-    def add_checkin_record(
-        self,
-        student_id: str,
-        timestamp: Optional[datetime.datetime] = None,
-        event_type: schema.EventType = schema.EventType.MEETING,
-    ) -> Optional[datetime.datetime]:
-        """Add an checkin record for a student.
-
-        Returns:
-            Date and time when checkin was recorded.
-        """
-        if timestamp is None:
-            timestamp = datetime.datetime.now()
-        with self.get_db_connection() as conn:
-            conn.execute(
-                """
-                        INSERT INTO checkins
-                                    (student_id, timestamp, event_type)
-                             VALUES (?, ?, ?);
-                """,
-                (student_id, timestamp, str(event_type)),
-            )
-        conn.close()
-        return timestamp
-
-    def has_attended_today(self, student_id: str) -> bool:
-        """Check if a student has already been marked present today.
-        Must be used before add_checkin_record."""
-
-        # Get the start of today (for v2, we can add other ways to calculate meetings)
-        today_start = datetime.datetime.now().replace(
-            hour=0, minute=0, second=0, microsecond=0
-        )
-        conn = self.get_db_connection()
-        cursor = conn.execute(
-            "SELECT 1 FROM checkins WHERE student_id = ? AND timestamp >= ?",
-            (student_id, today_start),
-        )
-        has_attended = cursor.fetchone() is not None
-        conn.close()
-        return has_attended
-
-    def get_checkins_dataframe(self) -> pl.DataFrame:
-        """Get a Polars dataframe with checkin data."""
-        conn = self.get_db_connection()
-        dframe = pl.read_database("SELECT * FROM checkins ORDER BY timestamp;", conn)
-        conn.close()
-        return dframe
-
-    def get_all_checkins_records_dict(self) -> list[dict[str, Any]]:
-        """Get all data from the checkin table."""
-        query = """
-                SELECT checkin_id, student_id, event_date, event_type, timestamp
-                  FROM checkins
-              ORDER BY timestamp;
-        """
-        conn = self.get_db_connection(as_dict=True)
-        records = conn.execute(query).fetchall()
-        conn.close()
-        return records
-
     def to_dict(self) -> dict[str, list[dict[str, str | int | None]]]:
         """Save database contents to a JSON file.
 
@@ -253,11 +142,11 @@ class DBase:
             {col: val for col, val in row.items() if col not in excluded_columns}
             for row in events
         ]
-        attends = self.get_all_checkins_records_dict()
-        excluded_columns = ["checkin_id", "event_date", "day_of_week"]
+        checkins = [c.to_dict() for c in schema.Checkin.get_all(self)]
+        excluded_columns = ["checkin_id"]
         db_data["checkins"] = [
             {col: val for col, val in row.items() if col not in excluded_columns}
-            for row in attends
+            for row in checkins
         ]
         return db_data
 
