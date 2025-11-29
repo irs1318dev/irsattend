@@ -9,7 +9,7 @@ from typing import Any, Optional
 import polars as pl
 
 from irsattend import config
-from irsattend.model import schema, students
+from irsattend.model import schema, students_mod
 
 
 class DBaseError(Exception):
@@ -22,9 +22,11 @@ def dict_factory(cursor: sqlite3.Cursor, row: Sequence) -> dict[str, Any]:
     return {key: value for key, value in zip(fields, row)}
 
 
-def adapt_date_iso(val: datetime.date) -> str:
+def adapt_date_iso(val: datetime.date | str) -> str:
     """Adapt datetime.date to ISO 8601 date."""
-    return val.isoformat()
+    if isinstance(val, datetime.date):
+        return val.isoformat()
+    return val
 
 
 def convert_event_date(val: bytes) -> datetime.date:
@@ -32,14 +34,18 @@ def convert_event_date(val: bytes) -> datetime.date:
     return datetime.date.fromisoformat(str(val))
 
 
-def adapt_datetime_iso(val: datetime.datetime) -> str:
+def adapt_datetime_iso(val: datetime.datetime | str) -> str:
     """Adapt datetime.datetime to timezone-naive ISO 8601 date."""
-    return val.replace(tzinfo=None).isoformat()
+    if isinstance(val, datetime.datetime):
+        return val.replace(tzinfo=None).isoformat()
+    return val
 
 
-def adapt_event_type(val: schema.EventType) -> str:
+def adapt_event_type(val: schema.EventType | str) -> str:
     """Adapt schema.Eventtype objects to strings."""
-    return val.value
+    if isinstance(val, schema.EventType):
+        return val.value
+    return val
 
 
 def convert_event_type(val: bytes) -> schema.EventType:
@@ -57,8 +63,8 @@ def convert_event_type(val: bytes) -> schema.EventType:
 #   application or tests.
 sqlite3.register_adapter(datetime.date, adapt_date_iso)
 sqlite3.register_adapter(datetime.datetime, adapt_datetime_iso)
-# sqlite3.register_adapter(schema.EventType, adapt_event_type)
-# sqlite3.register_converter("event_date", convert_event_date)
+sqlite3.register_adapter(schema.EventType, adapt_event_type)
+sqlite3.register_converter("event_date", convert_event_date)
 # sqlite3.register_converter("event_type", convert_event_type)
 
 
@@ -95,10 +101,10 @@ class DBase:
     def create_tables(self):
         """Creates the database tables if they don't already exist."""
         with self.get_db_connection() as conn:
-            conn.execute(students.STUDENT_TABLE_SCHEMA)
+            conn.execute(students_mod.STUDENT_TABLE_SCHEMA)
             conn.execute(schema.CHECKINS_TABLE_SCHEMA)
             conn.execute(schema.EVENT_TABLE_SCHEMA)
-            conn.execute(students.ACTIVE_STUDENTS_VIEW_SCHEMA)
+            conn.execute(students_mod.ACTIVE_STUDENTS_VIEW_SCHEMA)
         conn.close()
 
     def get_student_attendance_data(self) -> sqlite3.Cursor:
@@ -275,7 +281,7 @@ class DBase:
         db_data = {}
         db_data["students"] = [
             student.to_dict()
-            for student in students.Student.get_all(self, include_inactive=True)
+            for student in students_mod.Student.get_all(self, include_inactive=True)
         ]
         events = self.get_events_dict()
         excluded_columns = ["event_id", "day_of_week"]

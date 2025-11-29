@@ -3,7 +3,7 @@
 from textual import app, containers, screen, validation, widgets
 
 import irsattend.view
-from irsattend.model import students
+from irsattend.model import students_mod
 from irsattend.features import validators
 
 
@@ -26,7 +26,7 @@ class StudentDialog(screen.ModalScreen):
 
     CSS_PATH = irsattend.view.CSS_FOLDER / "student_dialog.tcss"
 
-    def __init__(self, student: students.Student | None = None) -> None:
+    def __init__(self, student: students_mod.Student | None = None) -> None:
         self.student = student
         super().__init__()
         # if not student_data:
@@ -129,7 +129,7 @@ class StudentDialog(screen.ModalScreen):
                 data["student_id"] = ""
             else:
                 data["student_id"] = self.student.student_id
-            student = students.Student(**data)
+            student = students_mod.Student(**data)
 
             self.dismiss(student)
         elif event.button.id == "cancel-student":

@@ -6,7 +6,7 @@ import shutil
 
 import segno
 
-from irsattend.model import database, students
+from irsattend.model import database, students_mod
 
 
 class QrError(Exception):
@@ -36,7 +36,7 @@ def generate_all_qr_codes(
         qr_folder.mkdir(parents=True)
     else:
         _clear_folder_contents(qr_folder)
-    _students = students.Student.get_all(dbase)
+    _students = students_mod.Student.get_all(dbase)
     yield ("quantity-students", len(_students))
     for student in _students:
         try:

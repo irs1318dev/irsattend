@@ -4,7 +4,7 @@ import dataclasses
 import datetime
 from typing import Optional
 
-from irsattend.model import database, schema, students
+from irsattend.model import database, schema, students_mod
 
 
 @dataclasses.dataclass
@@ -52,7 +52,7 @@ class CheckinEvent(schema.Event):
 
 
 @dataclasses.dataclass
-class EventStudent(students.Student):
+class EventStudent(students_mod.Student):
     """Students who have checked in at a specific event."""
 
     event_key: str

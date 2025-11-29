@@ -7,7 +7,7 @@ import pathlib
 import pytest
 import rich  # noqa: F401
 
-from irsattend.model import database, schema
+from irsattend.model import database, schema, students_mod
 
 
 DATA_FOLDER = pathlib.Path(__file__).parent / "data"
@@ -98,8 +98,8 @@ def test_from_dict(full_dbase: database.DBase, empty_database2: database.DBase) 
     # Act
     empty_database2.load_from_dict(exported_data)
     # Assert
-    students1 = schema.Student.get_all(full_dbase, include_inactive=True)
-    students2 = schema.Student.get_all(empty_database2, include_inactive=True)
+    students1 = students_mod.Student.get_all(full_dbase, include_inactive=True)
+    students2 = students_mod.Student.get_all(empty_database2, include_inactive=True)
     assert len(students1) == len(students2)
     attendance = empty_database2.get_all_checkins_records_dict()
     assert len(attendance) == len(full_dbase.get_all_checkins_records_dict())

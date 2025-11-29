@@ -13,7 +13,7 @@ from textual.widgets import option_list
 
 from irsattend import config
 import irsattend.view
-from irsattend.model import database, schema, students
+from irsattend.model import database, schema, students_mod
 from irsattend.view import pw_dialog
 
 
@@ -26,7 +26,7 @@ class ScanScreen(screen.Screen):
 
     dbase: database.DBase
     """Sqlte database connection object."""
-    _students: dict[str, students.Student]
+    _students: dict[str, students_mod.Student]
     """Mapping of student IDs to student records."""
     log_widget: widgets.RichLog
     """Displays checking results."""
@@ -54,7 +54,7 @@ class ScanScreen(screen.Screen):
         self.dbase = database.DBase(config.settings.db_path)
         self._students = {
             student.student_id: student
-            for student in students.Student.get_all(self.dbase)
+            for student in students_mod.Student.get_all(self.dbase)
         }
 
     class QrCodeFound(message.Message):

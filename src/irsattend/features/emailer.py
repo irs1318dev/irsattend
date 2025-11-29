@@ -10,7 +10,7 @@ from typing import cast, Optional
 
 from irsattend import config
 from irsattend.features import qr_code_generator
-from irsattend.model import students
+from irsattend.model import students_mod
 
 
 class EmailError(Exception):
@@ -18,7 +18,7 @@ class EmailError(Exception):
 
 
 def send_all_emails(
-    qr_folder: pathlib.Path, students: list[students.Student], email: Optional[str] = None
+    qr_folder: pathlib.Path, students: list[students_mod.Student], email: Optional[str] = None
 ) -> Iterator[tuple[str, bool]]:
     """Send an email with a QR code to all students.
 

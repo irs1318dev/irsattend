@@ -9,7 +9,7 @@ from textual import app, binding, containers, screen, widgets
 
 from irsattend import config
 from irsattend.features import emailer, qr_code_generator
-from irsattend.model import database, students
+from irsattend.model import database, students_mod
 import irsattend.view
 from irsattend.view import confirm_dialogs, student_dialog
 
@@ -31,7 +31,7 @@ class StudentScreen(screen.Screen):
     """Connection to Sqlite Database."""
     _selected_student_id: Optional[str]
     """Currently selected student."""
-    _students: dict[str, students.Student]
+    _students: dict[str, students_mod.Student]
     """List of students currently loaded in the datatable."""
 
     CSS_PATH = irsattend.view.CSS_FOLDER / "student_screen.tcss"
@@ -152,7 +152,7 @@ class StudentScreen(screen.Screen):
         textual.log(f"Loading student data, show_inactive={show_inactive}")
         self._students = {
             student.student_id: student
-            for student in students.Student.get_all(
+            for student in students_mod.Student.get_all(
                 self.dbase, include_inactive=show_inactive
             )
         }
@@ -211,7 +211,7 @@ class StudentScreen(screen.Screen):
     async def action_add_student(self) -> None:
         """Show the student dialog and add a new student."""
 
-        def on_dialog_closed(student: students.Student | None):
+        def on_dialog_closed(student: students_mod.Student | None):
             if student is None:
                 return
             try:
@@ -241,7 +241,7 @@ class StudentScreen(screen.Screen):
             return
         student = self._students[self._selected_student_id]
 
-        def on_dialog_closed(student: students.Student | None):
+        def on_dialog_closed(student: students_mod.Student | None):
             if student is None or self._selected_student_id is None:
                 return
             student.update(self.dbase)
@@ -285,10 +285,10 @@ class StudentScreen(screen.Screen):
     async def action_email_qr(self, all_students: bool) -> None:
         """Email QR codes to students."""
         if all_students:
-            students_to_email = students.Student.get_all(self.dbase)
+            students_to_email = students_mod.Student.get_all(self.dbase)
             self._add_progress_bar(len(students_to_email), "Send Emails")
         elif self._selected_student_id:
-            student = students.Student.get_by_id(self.dbase, self._selected_student_id)
+            student = students_mod.Student.get_by_id(self.dbase, self._selected_student_id)
             if student is None:
                 self.update_status(
                     error(f"Unable to locate student {self._selected_student_id}")
@@ -316,7 +316,7 @@ class StudentScreen(screen.Screen):
             self.send_emails_worker(students_to_email)
 
     @textual.work(thread=True)
-    async def send_emails_worker(self, students: list[students.Student]) -> None:
+    async def send_emails_worker(self, students: list[students_mod.Student]) -> None:
         """Send QR emails to students."""
         if config.settings.qr_code_dir is None:
             self.update_status(
