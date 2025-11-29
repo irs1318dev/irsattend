@@ -240,7 +240,8 @@ class EditEventDialog(screen.ModalScreen[bool]):
     def apply_dialog(self) -> None:
         """Close the dialog and take no action."""
         new_date = self.query_one("#event-date-input", widgets.Input).value
-        new_type = cast(str, self.query_one("#event-type-select", widgets.Select).value)
+        new_type = schema.EventType(
+            self.query_one("#event-type-select", widgets.Select).value)
         new_description: str | None = self.query_one(
             "#event-description-input", widgets.Input
         ).value
@@ -249,7 +250,7 @@ class EditEventDialog(screen.ModalScreen[bool]):
         if new_date != self.event.iso_date and self.event.checkin_count == 0:
             parsed_date = dateutil.parser.parse(new_date, dayfirst=False).date()
             self.event.update_event_date(self.dbase, parsed_date)
-        if new_type != self.event.event_type.value:
+        if new_type != self.event.event_type:
             self.event.update_event_type(self.dbase, new_type)
         if new_description != self.event.description:
             self.event.update_description(self.dbase, new_description)

@@ -29,28 +29,11 @@ def adapt_date_iso(val: datetime.date | str) -> str:
     return val
 
 
-def convert_event_date(val: bytes) -> datetime.date:
-    """Convert Sqlite event_date values to Date objects."""
-    return datetime.date.fromisoformat(str(val))
-
-
 def adapt_datetime_iso(val: datetime.datetime | str) -> str:
     """Adapt datetime.datetime to timezone-naive ISO 8601 date."""
     if isinstance(val, datetime.datetime):
         return val.replace(tzinfo=None).isoformat()
     return val
-
-
-def adapt_event_type(val: schema.EventType | str) -> str:
-    """Adapt schema.Eventtype objects to strings."""
-    if isinstance(val, schema.EventType):
-        return val.value
-    return val
-
-
-def convert_event_type(val: bytes) -> schema.EventType:
-    """Convert values from event_type columns to an EventType enum object."""
-    return schema.EventType(str(val))
 
 
 # Sqlite converts Python datetime.date and datetime.datetime objects to
@@ -63,9 +46,6 @@ def convert_event_type(val: bytes) -> schema.EventType:
 #   application or tests.
 sqlite3.register_adapter(datetime.date, adapt_date_iso)
 sqlite3.register_adapter(datetime.datetime, adapt_datetime_iso)
-sqlite3.register_adapter(schema.EventType, adapt_event_type)
-sqlite3.register_converter("event_date", convert_event_date)
-# sqlite3.register_converter("event_type", convert_event_type)
 
 
 class DBase:
@@ -145,22 +125,6 @@ class DBase:
         )
         return cursor
 
-    def get_checkin_counts(self, since: datetime.date) -> dict[str, int]:
-        """Get a dictionary of student IDs and their checkin counts."""
-        conn = self.get_db_connection()
-        cursor = conn.execute(
-            """
-                SELECT student_id, COUNT(student_id) as checkins
-                    FROM checkins
-                    WHERE timestamp >= ?
-                GROUP BY student_id
-                ORDER BY student_id;
-        """,
-            (since,),
-        )
-        counts = {row["student_id"]: row["checkins"] for row in cursor.fetchall()}
-        conn.close()
-        return counts
 
     def get_checkin_count_by_id(self, student_id: str) -> int:
         """Retrieve a student's checkin count by their ID."""

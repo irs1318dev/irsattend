@@ -15,6 +15,7 @@ The day_of_week field is an integer ranging from 1 (Monday) to 7 (Sunday).
 import dataclasses
 import datetime
 import enum
+import sqlite3
 
 from typing import Optional, TYPE_CHECKING
 
@@ -34,6 +35,34 @@ class EventType(enum.StrEnum):
     OUTREACH = "outreach"
     VIRTUAL = "virtual"
     VOLUNTEERING = "volunteering"
+
+
+def adapt_event_type(val: EventType | str) -> str:
+    """Adapt schema.EventType objects to Sqlite TEXT values."""
+    if isinstance(val, EventType):
+        return val.value
+    return val
+
+
+def convert_event_type(val: bytes) -> EventType:
+    """Convert values from event_type columns to an EventType enum object."""
+    return EventType(str(val))
+
+
+def convert_event_date(val: bytes) -> datetime.date:
+    """Convert Sqlite event_date strings to EventType objects."""
+    return datetime.date.fromisoformat(str(val))
+
+
+def convert_timestamp(val: bytes) -> datetime.datetime:
+    """Convert Sqlite timestamp strings to datetime.datetime objects."""
+    return datetime.datetime.fromisoformat(str(val))
+
+
+sqlite3.register_adapter(EventType, adapt_event_type)
+sqlite3.register_converter("event_type", convert_event_type)
+sqlite3.register_converter("event_date", convert_event_date)
+sqlite3.register_converter("timestamp", convert_timestamp)
 
 
 CHECKINS_TABLE_SCHEMA = """
@@ -109,7 +138,7 @@ class Checkin:
                 {
                     "student_id": self.student_id,
                     "event_type": self.event_type.value,
-                    "timestamp": self.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+                    "timestamp": self.timestamp,
                 },
             )
         conn.close()
@@ -119,7 +148,7 @@ class Checkin:
         cls,
         dbase: "database.DBase",
         event_date: datetime.date,
-        event_type: str,
+        event_type: EventType,
     ) -> list[str]:
         """Get a list of student IDs who checked in for a given event."""
         query = """
@@ -132,15 +161,36 @@ class Checkin:
         student_ids = [
             row["student_id"]
             for row in conn.execute(
-                query, (cls.to_iso_date(event_date), event_type)
+                query, (event_date, event_type)
             )
         ]
         conn.close()
         return student_ids
+    
+    @staticmethod
+    def get_counts_by_student(
+        dbase: "database.DBase",
+        since: datetime.date
+    ) -> dict[str, int]:
+        """Get a dictionary of student IDs and their checkin counts."""
+        conn = dbase.get_db_connection()
+        cursor = conn.execute(
+            """
+                SELECT student_id, COUNT(student_id) as checkins
+                  FROM checkins
+                 WHERE timestamp >= ?
+              GROUP BY student_id
+              ORDER BY student_id;
+        """,
+            (since,),
+        )
+        counts = {row["student_id"]: row["checkins"] for row in cursor.fetchall()}
+        conn.close()
+        return counts
 
     @staticmethod
     def get_count(
-        dbase: "database.DBase", event_date: datetime.date, event_type: str
+        dbase: "database.DBase", event_date: datetime.date, event_type: EventType
     ) -> int:
         """Count the number of checkins for a given event."""
         query = """
@@ -170,7 +220,6 @@ CREATE TABLE IF NOT EXISTS events (
 
 class EventUpateError(Exception):
     """Raised when an event update fails."""
-
     pass
 
 
@@ -227,7 +276,7 @@ class Event:
         """
         conn = dbase.get_db_connection()
         query_result = conn.execute(
-            query, (self.event_date.strftime("%Y-%m-%d"), self.event_type.value)
+            query, (self.event_date, self.event_type)
         ).fetchone()
         conn.close()
         return query_result is not None
@@ -247,7 +296,7 @@ class Event:
                 query,
                 {
                     "event_date": self.event_date,
-                    "event_type": self.event_type.value,
+                    "event_type": self.event_type,
                     "description": self.description,
                 },
             )
@@ -268,7 +317,7 @@ class Event:
         with dbase.get_db_connection() as conn:
             cursor = conn.execute(
                 query,
-                {"event_date": self.event_date, "event_type": self.event_type.value},
+                {"event_date": self.event_date, "event_type": self.event_type},
             )
         row_count = cursor.rowcount
         conn.close()
@@ -276,7 +325,7 @@ class Event:
 
     @staticmethod
     def select(
-        dbase: "database.DBase", event_date: datetime.date, event_type: str
+        dbase: "database.DBase", event_date: datetime.date, event_type: EventType
     ) -> "Event | None":
         """Retrieve a single event."""
         query = """
@@ -320,13 +369,13 @@ class Event:
                 query,
                 {
                     "event_date": self.event_date,
-                    "event_type": self.event_type.value,
+                    "event_type": self.event_type,
                     "description": description,
                 },
             )
         conn.close()
 
-    def update_event_type(self, dbase: "database.DBase", new_type: str) -> int:
+    def update_event_type(self, dbase: "database.DBase", new_type: EventType) -> int:
         """Update the event type in the database.
 
         Returns:
@@ -352,7 +401,7 @@ class Event:
                 checkins_query,
                 {
                     "event_date": self.event_date,
-                    "event_type": self.event_type.value,
+                    "event_type": self.event_type,
                     "old_date": self.event_date.isoformat(),
                     "new_type": new_type,
                 },
@@ -373,7 +422,7 @@ class Event:
         if not self.exists(dbase):
             raise EventUpateError("Original event does not exist.")
         checkin_counts = Checkin.get_count(
-            dbase, self.event_date, self.event_type.value
+            dbase, self.event_date, self.event_type
         )
         if checkin_counts > 0:
             raise EventUpateError("Cannot change date; checkins exist for this event.")

@@ -30,7 +30,7 @@ def test_checkedin_student_ids(full_dbase: database.DBase) -> None:
     event = schema.Event.get_all(full_dbase)[0]
     # Act
     student_ids = schema.Checkin.get_checkedin_students(
-        full_dbase, event.event_date, event.event_type.value
+        full_dbase, event.event_date, event.event_type
     )
     # Assert
     assert all(isinstance(sid, str) for sid in student_ids)

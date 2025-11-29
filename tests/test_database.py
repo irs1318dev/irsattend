@@ -53,8 +53,10 @@ def test_attendance_table(full_dbase: database.DBase) -> None:
 def test_attendance_counts(full_dbase: database.DBase) -> None:
     """Get count of student appearances."""
     # Act
-    season_counts = full_dbase.get_checkin_counts(datetime.date(2025, 9, 1))
-    build_counts = full_dbase.get_checkin_counts(datetime.date(2026, 1, 1))
+    season_counts = schema.Checkin.get_counts_by_student(
+        full_dbase, datetime.date(2025, 9, 1))
+    build_counts = schema.Checkin.get_counts_by_student(
+        full_dbase, datetime.date(2026, 1, 1))
     # Assert
     assert len(season_counts) >= len(build_counts)
     for student_id in build_counts:

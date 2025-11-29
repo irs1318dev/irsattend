@@ -88,7 +88,7 @@ class ScanScreen(screen.Screen):
         # Prevent codes from being scanned more than once for same event.
         self._checkedin_students = set(schema.Checkin.get_checkedin_students(
             self.dbase, datetime.date.today(),
-            event_type.value
+            event_type
         ))
         self.scan_qr_codes()
 

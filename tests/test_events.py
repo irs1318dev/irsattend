@@ -28,7 +28,7 @@ def test_select_event(full_dbase: database.DBase) -> None:
     expected_event = schema.Event.get_all(full_dbase)[-1]
     # Act
     event = schema.Event.select(
-        full_dbase, expected_event.event_date, expected_event.event_type.value
+        full_dbase, expected_event.event_date, expected_event.event_type
     )
     # Assert
     assert isinstance(event, schema.Event)
@@ -40,7 +40,7 @@ def test_select_missing_event(full_dbase: database.DBase) -> None:
     """Select a non-existent event."""
     # Act
     event = schema.Event.select(
-        full_dbase, datetime.date(2019, 12, 31), schema.EventType.OUTREACH.value
+        full_dbase, datetime.date(2019, 12, 31), schema.EventType.OUTREACH
     )
     # Assert
     assert event is None
@@ -51,7 +51,7 @@ def test_update_event_description(full_dbase: database.DBase) -> None:
     # Arrange
     event_to_update = schema.Event.get_all(full_dbase)[0]
     key_date = event_to_update.event_date
-    key_type = event_to_update.event_type.value
+    key_type = event_to_update.event_type
     assert event_to_update.event_type == schema.EventType.MEETING
     assert event_to_update.description is None
     # Act
@@ -91,7 +91,7 @@ def test_add_new_event(full_dbase: database.DBase) -> None:
     assert new_event.add(full_dbase)  # Returns True if event was added.
     assert (
         schema.Event.select(
-            full_dbase, datetime.date(2024, 12, 25), schema.EventType.OUTREACH.value
+            full_dbase, datetime.date(2024, 12, 25), schema.EventType.OUTREACH
         )
         is not None
     )
@@ -125,7 +125,7 @@ def test_update_event_date(full_dbase: database.DBase) -> None:
     # Act
     event_to_update.update_event_date(full_dbase, new_date)
     updated_event = schema.Event.select(
-        full_dbase, new_date, event_to_update.event_type.value
+        full_dbase, new_date, event_to_update.event_type
     )
     # Assert
     assert updated_event is not None
@@ -138,7 +138,7 @@ def test_update_event_type(full_dbase: database.DBase) -> None:
     # Arrange
     event_to_update = schema.Event.get_all(full_dbase)[0]
     event_to_update.add(full_dbase)
-    new_type = schema.EventType.COMPETITION.value
+    new_type = schema.EventType.COMPETITION
     assert (
         schema.Checkin.get_count(full_dbase, event_to_update.event_date, new_type) == 0
     )
